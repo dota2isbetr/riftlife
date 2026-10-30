@@ -272,6 +272,29 @@ h1{margin:2px 0 0;font-size:clamp(22px,4vw,30px);font-weight:700;letter-spacing:
 .fan .c:nth-child(3){left:144px;transform:rotate(11deg);transform-origin:bottom center;z-index:2}
 @media (prefers-reduced-motion:no-preference){.fan .c{transition:transform .3s ease}.hcard:hover .fan .c:nth-child(1){transform:rotate(-16deg) translateX(-8px)}.hcard:hover .fan .c:nth-child(3){transform:rotate(16deg) translateX(8px)}}
 .hcard.dark .go{color:#7FD0D8}
+/* home meta card: crossed overnumber legends; medals and a trophy pop out on hover (about .8s in all) */
+.mp{position:absolute;left:50%;bottom:-48px;width:310px;height:300px;transform:translateX(-50%);pointer-events:none}
+.mp-card{position:absolute;bottom:0;left:72px;width:164px;aspect-ratio:420/588;border-radius:10px;overflow:hidden;background:#15203A;box-shadow:0 18px 40px rgb(0 0 0 / .45);transform-origin:50% 100%;z-index:2}
+.mp-card .ti,.mp-card img{display:block;width:100%;height:100%;object-fit:contain;background-repeat:no-repeat}
+.mp-card:nth-of-type(4){transform:translateX(-22px) rotate(-9deg)}
+.mp-card:nth-of-type(5){transform:translate(22px,-6px) rotate(8deg);z-index:3}
+.mp-pop{position:absolute;left:50%;bottom:120px;width:54px;margin-left:-27px;z-index:1;opacity:0;transform:translateY(40px) scale(.4)}
+.mp-pop svg{display:block;width:100%;height:auto;filter:drop-shadow(0 8px 14px rgb(0 0 0 / .45))}
+.mp-trophy{width:72px;margin-left:-36px}
+.hcard:is(:hover,:focus-visible) .mp-card:nth-of-type(4){transform:translateX(-58px) rotate(-17deg)}
+.hcard:is(:hover,:focus-visible) .mp-card:nth-of-type(5){transform:translate(58px,-10px) rotate(16deg)}
+.hcard:is(:hover,:focus-visible) .mp-pop{opacity:1;z-index:4}
+.hcard:is(:hover,:focus-visible) .mp-trophy{transform:translateY(-126px) scale(1)}
+.hcard:is(:hover,:focus-visible) .mp-gold{transform:translate(-86px,-98px) rotate(-14deg) scale(1)}
+.hcard:is(:hover,:focus-visible) .mp-silver{transform:translate(86px,-94px) rotate(13deg) scale(1)}
+@media (prefers-reduced-motion:no-preference){
+  .mp-card{transition:transform .38s cubic-bezier(.3,1.2,.4,1)}
+  .mp-pop{transition:transform .2s ease-in,opacity .12s ease}
+  .hcard:is(:hover,:focus-visible) .mp-pop{transition:transform .45s cubic-bezier(.22,1.55,.45,1) .3s,opacity .1s linear .3s,z-index 0s linear .5s}
+  .hcard:is(:hover,:focus-visible) .mp-gold{transition-delay:.22s}
+  .hcard:is(:hover,:focus-visible) .mp-silver{transition-delay:.26s}
+}
+
 /* home collection card: crossed foil overnumbers */
 .foilx{position:absolute;left:50%;bottom:-46px;width:300px;height:290px;transform:translateX(-50%);pointer-events:none}
 .fx{position:absolute;bottom:0;left:70px;width:160px;aspect-ratio:420/588;border-radius:10px;overflow:hidden;background:var(--sunk);box-shadow:0 18px 40px rgb(0 0 0 / .32);transform-origin:50% 100%}
@@ -2169,29 +2192,30 @@ function previewHTML(c) {
       ${isBanned(c) ? '<span><span class="pill bad">현재 금지 카드</span></span>' : ''}</div>`;
 }
 function showPreview(art) {
-  const tile = art.closest('[data-id]'), c = tile && BYID.get(tile.dataset.id); if (!c) return;
+  const id = art.dataset.cid || (art.closest('[data-id]') || {}).dataset?.id, c = id && BYID.get(id); if (!c) return;
   const h = $('hover-card');
   h.innerHTML = previewHTML(c);
   h.querySelectorAll('[data-bg]').forEach(el => { el.style.backgroundImage = `url('${el.dataset.bg}')`; BG_SEEN.add(el.dataset.bg); });
   h.hidden = false;
   // beside the thumbnail: left of it when there is room (over the card pool), otherwise right; kept inside the viewport
   const r = art.getBoundingClientRect(), w = h.offsetWidth, hh = h.offsetHeight, gap = 14, pad = 8;
-  const side = art.closest('#sheet') ? $('sheet').getBoundingClientRect() : r;   // side-sheet rows open the preview beside the sheet itself
-  let left = side.left - w - gap;
-  if (left < pad) left = side.right + gap;
+  let left = r.left - w - gap;
+  if (left < pad) left = r.right + gap;
   left = Math.max(pad, Math.min(left, innerWidth - w - pad));
   const top = Math.max(pad + 48, Math.min(r.top - 40, innerHeight - hh - pad));
   h.style.left = left + 'px'; h.style.top = top + 'px';
 }
 function onHoverPreview(ev) {
   if (!canHover.matches || (DRAG.st && DRAG.st.active)) return;
-  const art = ev.target.closest('#ws-body .dt-art');
+  const art = ev.target.closest('#ws-body .dt-art, .bd-card[data-cid]');
   if (!art) { if (hpFor) hidePreview(); return; }
   if (hpFor === art) return;
   hidePreview(); hpFor = art;
   hpTimer = setTimeout(() => { if (hpFor === art && document.contains(art)) showPreview(art); }, 140);
 }
 addEventListener('scroll', () => { if (hpFor) hidePreview(); }, { passive: true, capture: true });
+$('sheet').addEventListener('mouseover', onHoverPreview);   // deck boards in the deck sheet
+$('sheet').addEventListener('mouseleave', hidePreview);
 
 /* ---------- meta decks ---------- */
 const KR_META = 'OGN';   // the Korean release is still in the Origins environment
@@ -2692,9 +2716,6 @@ function renderHome() {
   $('home-sets').innerHTML = `<button class="cat" type="button" data-set="">${catArt([CARDS.find(c => has(c, 'legend') && c.set === 'SFD'), CARDS.find(c => has(c, 'legend') && c.set === 'UNL'), CARDS.find(c => has(c, 'legend') && c.set === 'VEN')].filter(Boolean))}<span>전체 카드<small>${base.toLocaleString()}종</small></span></button>` +
     SETS.map(s => `<button class="cat" type="button" data-set="${s.id}">${catArt(SET_REP.get(s.id))}<span>${esc(s.ko)}<small>${per[s.id].own}/${per[s.id].n}</small></span></button>`).join('');
   // feature shelf: one large card per part of the site, each with a fan of relevant card art
-  const legCount = new Map();
-  for (const o of MD.decks) if (MD.events[o.e].meta === m.id && o.r != null && o.r <= 8) legCount.set(o.L, (legCount.get(o.L) || 0) + 1);
-  const metaLegends = [...legCount].sort((a, b) => b[1] - a[1]).map(([ix]) => CARDS[ix]);
   const fill = (cs, extra) => [...new Set([...cs, ...extra])].slice(0, 3);
   const nDecks = Object.keys(decks.data).length, metaN = MD.decks.filter(o => MD.events[o.e].meta === m.id).length;
   $('home-feat').innerHTML = `
@@ -2724,7 +2745,7 @@ function renderHome() {
       <h3>메타 덱</h3>
       <p class="sub">공식 지역 예선 상위 덱을 메타별로 모았습니다. 내 보유율이 높은 덱부터 볼 수 있습니다.</p>
       <span class="go">메타 덱 보기 ›</span>
-      ${fanArt(fill(metaLegends, []))}
+      ${medalPair(['sfd-242-221', 'sfd-246-221'])}
     </button>`;
   // collection shelf
   const setBars = SETS.map(s => `<div><span>${esc(s.ko)}</span><span class="hint">${per[s.id].own}/${per[s.id].n}</span><span class="ownbar"><i style="width:${(per[s.id].own / per[s.id].n * 100).toFixed(1)}%"></i></span></div>`).join('');
@@ -2780,6 +2801,16 @@ function deckBox(cls, cards = [], theme = 'navy') {
 const boxTheme = (id, lg) => { const d = (lg && lg.d || []).filter(x => DBX_THEMES[x]); if (!d.length) return 'navy'; let h = 0; for (const ch of id) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return d[h % d.length]; };
 function deckBoxArt() {
   return `<span class="dbx-scene" aria-hidden="true">${deckBox('dbx-a')}${deckBox('dbx-b', DBX_CARDS.map(id => BYID.get(id)).filter(Boolean))}</span>`;
+}
+// Home "meta decks" card: two Spiritforged overnumber legends crossed; on hover they spread and a trophy and medals pop up.
+const MEDAL = (fill, ring, label) => `<svg viewBox="0 0 48 64" aria-hidden="true"><path d="M14 0h8l6 20h-8zM34 0h-8l-6 20h8z" fill="#C83C3C"/><path d="M18 0h4l6 20h-4zM30 0h-4l-6 20h4z" fill="#2C4E9A"/>
+  <circle cx="24" cy="42" r="19" fill="${ring}"/><circle cx="24" cy="42" r="14.5" fill="${fill}"/><text x="24" y="48" text-anchor="middle" font-size="16" font-weight="800" fill="${ring}" font-family="system-ui,sans-serif">${label}</text></svg>`;
+const TROPHY = `<svg viewBox="0 0 64 72" aria-hidden="true"><path d="M14 6h36v14c0 13-8 22-18 22S14 33 14 20z" fill="#F2C14E"/><path d="M14 10H5v5c0 9 6 14 12 15M50 10h9v5c0 9-6 14-12 15" fill="none" stroke="#D69E2E" stroke-width="4"/>
+  <path d="M28 41h8v10h-8z" fill="#D69E2E"/><rect x="18" y="51" width="28" height="8" rx="2" fill="#B7791F"/><rect x="13" y="59" width="38" height="9" rx="2" fill="#7B4F12"/><path d="M22 10h6v18c-4-3-6-10-6-18z" fill="#FFF3C4" opacity=".7"/>
+  <path d="M32 16l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.6-4.8 2.6.9-5.4-3.9-3.8 5.4-.8z" fill="#FFF8DC"/></svg>`;
+function medalPair(ids) {
+  const cards = ids.map(id => BYID.get(id)).filter(Boolean).map(c => `<span class="mp-card">${tileArt(c)}</span>`).join('');
+  return `<span class="mp" aria-hidden="true"><span class="mp-pop mp-trophy">${TROPHY}</span><span class="mp-pop mp-gold">${MEDAL('#F6CF57', '#B8860B', '1')}</span><span class="mp-pop mp-silver">${MEDAL('#E3E8EE', '#8A96A3', '2')}</span>${cards}</span>`;
 }
 // Home "collection" card: two Nine-Tailed Fox overnumbers crossed; on hover they spread and a foil sheen sweeps across.
 function foilPair(ids) { return `<span class="foilx" aria-hidden="true">${ids.map(id => BYID.get(id)).filter(Boolean).map(c => `<span class="fx">${tileArt(c)}<i class="foil"></i></span>`).join('')}</span>`; }
