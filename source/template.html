@@ -2393,7 +2393,8 @@ $('kr-list').onclick = ev => {
 
 function fillSelects() {
   const opt = (v, t, sel) => `<option value="${v}"${sel === v ? ' selected' : ''}>${esc(t)}</option>`;
-  $('f-set').innerHTML = opt('', '세트: 전체', ui.set) + SETS.map(s => opt(s.id, `${setName(s.id)} (${s.id})`, ui.set)).join('');
+  const picked = selSets();
+  $('f-set').innerHTML = opt('', '세트: 전체', ui.set) + (picked.length > 1 ? opt(ui.set, `세트: ${picked.length}개 선택 (${picked.join('·')})`, ui.set) : '') + SETS.map(s => opt(s.id, `${setName(s.id)} (${s.id})`, ui.set)).join('');
   // Native <option>s can't hold drawn shapes, so each domain carries a color circle glyph.
   const DOT = { fury: '🔴', calm: '🟢', mind: '🔵', body: '🟠', chaos: '🟣', order: '🟡', colorless: '⚪' };
   $('f-domain').innerHTML = opt('', '영역: 전체', ui.domain) + DOM_ORDER.map(d => opt(d, `${DOT[d]} ${L.domain[d][1]} · ${L.domain[d][0]}`, ui.domain)).join('');
@@ -2425,7 +2426,7 @@ function matches(c, terms) {
 function filtered() {
   const terms = ui.q.trim().split(/\s+/).filter(Boolean);
   let out = CARDS.filter(c => {
-    if (ui.set && c.set !== ui.set) return false;
+    if (ui.set && !selSets().includes(c.set)) return false;
     if (ui.domain && !(c.d||[]).includes(ui.domain)) return false;
     if (ui.type && !(c.t||[]).includes(ui.type) && !(c.st||[]).includes(ui.type)) return false;
     if (ui.rarity && c.r !== ui.rarity) return false;
@@ -2482,6 +2483,8 @@ function wireLazy(root) {
   root.querySelectorAll('.ti[data-bg]').forEach(el => { if (lazyBg) lazyBg.observe(el); else { el.style.backgroundImage = `url('${el.dataset.bg}')`; BG_SEEN.add(el.dataset.bg); } });
 }
 
+// ui.set holds one set id or several joined by commas
+const selSets = () => (ui.set || '').split(',').filter(id => SETMAP.has(id));
 function renderSummary() {
   let kinds = 0, copies = 0, baseAll = 0, baseOwn = 0;
   const per = Object.fromEntries(SETS.map(s => [s.id, { n: 0, own: 0, cp: 0 }]));
@@ -2495,7 +2498,7 @@ function renderSummary() {
   $('t-kinds').textContent = kinds.toLocaleString(); $('t-all').textContent = CARDS.length.toLocaleString();
   $('t-copies').textContent = copies.toLocaleString(); $('t-pct').textContent = (kinds / CARDS.length * 100).toFixed(1) + '%';
   $('sets').innerHTML = SETS.map(s => { const p = per[s.id];
-    return `<button class="set" type="button" data-set="${s.id}" aria-pressed="${ui.set === s.id}">
+    return `<button class="set" type="button" data-set="${s.id}" aria-pressed="${selSets().includes(s.id)}">
       <span class="nm"><b>${esc(setName(s.id))}</b><code>${s.id}</code></span>
       <span class="ct">${p.own} / ${p.n}종 · ${p.cp}장</span>
       <span class="bar"><i style="width:${(p.own / p.n * 100).toFixed(1)}%"></i></span></button>`; }).join('');
@@ -2832,7 +2835,8 @@ $('lang-en').onclick = () => { ui.lang = 'en'; saveUi(); fillSelects(); render()
 $('hide-alt').onclick = () => { ui.base = !ui.base; ui.limit = 150; saveUi(); fillSelects(); render(); };
 $('reset-f').onclick = () => { Object.assign(ui, { q:'', text:false, set:'', domain:'', type:'', rarity:'', own:'', sort:'set', base:false, limit:150 }); $('q').value = ''; saveUi(); fillSelects(); render(); };
 $('more-btn').onclick = () => { ui.limit += 300; render(); };
-$('sets').onclick = ev => { const b = ev.target.closest('[data-set]'); if (!b) return; ui.set = ui.set === b.dataset.set ? '' : b.dataset.set; ui.limit = 150; saveUi(); fillSelects(); render(); };
+// set cards toggle like filter chips: any number can be on at once (none = all sets)
+$('sets').onclick = ev => { const b = ev.target.closest('[data-set]'); if (!b) return; const on = new Set(selSets()), id = b.dataset.set; on.has(id) ? on.delete(id) : on.add(id); ui.set = SETS.map(x => x.id).filter(x => on.has(x)).join(','); ui.limit = 150; saveUi(); fillSelects(); render(); };
 $('list').onclick = ev => {
   const btn = ev.target.closest('[data-act]'); if (!btn) return;
   const id = btn.closest('[data-id]').dataset.id;
