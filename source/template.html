@@ -2709,7 +2709,7 @@ function renderHome() {
       <h3>한국 환경 샘플 덱</h3>
       <p class="sub">한국어판 스탠다드 환경 적법성에 맞춰 구성된 덱 예시입니다. 사이드보드까지 확인하고 내 덱으로 가져옵니다.</p>
       <span class="go">샘플 덱 보기 ›</span>
-      ${fanArt(fill(KD.decks.map(o => BYID.get(o.L)), []))}
+      ${fanArt(['ogn-247-298', 'ogs-019-024', 'ogn-265-298'].map(id => BYID.get(id)).filter(Boolean))}
     </button>
     <button class="hcard feat dark" type="button" data-go="meta">
       <span class="k">메타 덱 · ${esc(m.ko)} 메타 ${metaN}개</span>
