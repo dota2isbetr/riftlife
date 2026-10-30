@@ -916,7 +916,10 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
 <script>
 (() => {
 const RAW = JSON.parse(document.getElementById('card-data').textContent);
-const CARDS = RAW.cards, SETS = RAW.sets;
+// sets in release order (left to right everywhere); unknown future sets go last in their data order
+const SET_ORDER = ['OGN','OGS','SFD','UNL','VEN','RAD'];
+const setRank = id => { const i = SET_ORDER.indexOf(id); return i < 0 ? 99 : i; };
+const CARDS = RAW.cards, SETS = [...RAW.sets].sort((a, b) => setRank(a.id) - setRank(b.id));
 const BYID = new Map(CARDS.map(c => [c.id, c]));
 const BYCODE = new Map(CARDS.map(c => [c.code.toUpperCase(), c]));
 const IMG = 'https://cmsassets.rgpub.io/sanity/images/dsfx7636/game_data_live/';
@@ -964,7 +967,6 @@ for (const c of CARDS) c._alt = c.r === 'showcase' || c.r === 'promo' || !!c.x |
 // Set order: gallery cards keep their array position; extras (appended for stable ix) slot in after the printing named in `after`.
 { const pos = new Map(); CARDS.forEach((c, i) => { if (!c.ex) pos.set(c.id, c._o = i); });
   CARDS.forEach((c, i) => { if (c.ex) c._o = (pos.get(c.after) ?? CARDS.length) + 0.5 + i / 1e6; }); }
-const HAS_EXTRAS = CARDS.some(c => c.ex);
 const DOM_ORDER = Object.keys(L.domain), RAR_ORDER = Object.keys(L.rarity);
 
 /* ---------- search index ---------- */
@@ -1085,7 +1087,6 @@ const setName = id => { const s = SETMAP.get(id); return ko() ? s.ko : s.en; };
 
 /* ---------- deck helpers ---------- */
 const MD = JSON.parse(document.getElementById('meta-data').textContent);
-const SET_ORDER = ['OGN','OGS','SFD','UNL','VEN','RAD'];
 const isAlt = c => !!c.x || /-star-/.test(c.id) || /-\d+[a-z]-/.test(c.id);
 const isSig = c => (c.st || []).includes('signature');
 const has = (c, t) => (c.t || []).includes(t) || (c.st || []).includes(t);
@@ -1093,7 +1094,7 @@ const nameKey = c => c.n + '|' + (c.s || '');          // every printing of one 
 const PRINTS = new Map();
 for (const c of CARDS) { const k = nameKey(c); if (!PRINTS.has(k)) PRINTS.set(k, []); PRINTS.get(k).push(c); }
 const CANON = new Map();
-for (const [k, cs] of PRINTS) CANON.set(k, [...cs].sort((a, b) => SET_ORDER.indexOf(a.set) - SET_ORDER.indexOf(b.set) || isAlt(a) - isAlt(b) || a.no - b.no)[0]);
+for (const [k, cs] of PRINTS) CANON.set(k, [...cs].sort((a, b) => setRank(a.set) - setRank(b.set) || isAlt(a) - isAlt(b) || a.no - b.no)[0]);
 const canon = c => CANON.get(nameKey(c));
 const CANON_LIST = [...CANON.values()].filter(c => !has(c, 'token'));
 const CHAMP_NAMES = new Set(), CHAMP_KO = new Map();
@@ -1478,7 +1479,7 @@ function renderEditor() {
             <input id="pk-q" type="search" autocomplete="off" aria-label="카드 검색">
             <select id="pk-sort" aria-label="정렬"><option value="cost">에너지순</option><option value="name">이름순</option><option value="own">보유 많은 순</option><option value="deck">덱에 넣은 카드 먼저</option></select>
             <select id="pk-type" aria-label="유형"><option value="">유형: 전체</option>${['champion', 'unit', 'spell', 'gear'].map(t => `<option value="${t}">${L.type[t][0]}</option>`).join('')}</select>
-            <select id="pk-set" aria-label="확장팩 세트"><option value="">세트: 전체</option><option value="KR">한국 환경 (오리진·증명의 전장)</option>${SET_ORDER.filter(id => SETMAP.has(id)).map(id => `<option value="${id}">${esc(setName(id))} (${id})</option>`).join('')}</select>
+            <select id="pk-set" aria-label="확장팩 세트"><option value="">세트: 전체</option><option value="KR">한국 환경 (오리진·증명의 전장)</option>${SETS.map(x => `<option value="${x.id}">${esc(setName(x.id))} (${x.id})</option>`).join('')}</select>
             <label class="chk"><input id="pk-owned" type="checkbox"> 보유 카드만</label>
             <label class="chk" title="전설의 영역과 시그니처 규칙에 맞는 카드만 보여 줍니다"><input id="pk-legal" type="checkbox"> 덱 규칙에 맞는 카드만</label>
             <label class="chk" title="현재 공식 금지 목록(Standard)에 있는 카드를 숨깁니다"><input id="pk-noban" type="checkbox"> 밴 카드 숨기기</label>
@@ -2438,7 +2439,7 @@ function filtered() {
   if (ui.sort === 'name') { const col = new Intl.Collator(ko() ? 'ko' : 'en'); out.sort((a, b) => col.compare(nm(a), nm(b))); }
   else if (ui.sort === 'qty') out.sort((a, b) => inv.q(b.id) - inv.q(a.id));
   else if (ui.sort === 'cost') out.sort((a, b) => (a.e ?? 99) - (b.e ?? 99));
-  else if (HAS_EXTRAS) out.sort((a, b) => a._o - b._o);
+  else out.sort((a, b) => setRank(a.set) - setRank(b.set) || a._o - b._o);
   return out;
 }
 
