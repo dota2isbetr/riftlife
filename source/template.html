@@ -432,7 +432,9 @@ h2.vh{margin:0;font-size:18px}
 .sectabs button{border:1px solid var(--line);background:var(--bg);border-radius:7px;padding:6px 12px;font-weight:600;font-size:13px}
 .sectabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 #kr-sum{margin-bottom:26px}.kr-env{margin:0 0 14px}.kr-env button{padding:8px 16px;font-size:14px}
-.kr-env .beta{font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:1px 6px;margin-left:4px;border-radius:999px;background:var(--accent-soft);color:var(--accent);vertical-align:2px}
+.beta{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.04em;line-height:1.5;padding:0 7px;margin-left:4px;border-radius:999px;background:var(--accent-soft);color:var(--accent);vertical-align:2px;text-transform:lowercase}
+.beta-note{display:flex;gap:10px;align-items:baseline;margin:0 0 6px;padding:12px 14px;border-radius:10px;background:var(--accent-soft);color:var(--ink);font-size:13.5px;line-height:1.55;word-break:keep-all}
+.beta-note .beta{margin:0;background:var(--accent);color:var(--bg);flex:none}
 .bt-ctl{margin-bottom:6px}
 .bt-ctl input[type="search"]{flex:1 1 200px;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 .bt-info{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
@@ -1177,7 +1179,7 @@ const LOOK = new Map();
   }
   for (const c of cs) { put(c.n, c); if (c.nk) put(c.nk, c); }
 }
-const HEAD = /^(legend|전설|chosen champion|champion|선택 챔피언|챔피언|main deck|main|메인 덱|메인|battlefields?|전장|rune pool|rune deck|runes|룬 덱|룬|sideboard|side ?board|사이드보드|사이드)\s*(?:[:：]\s*(.*))?$/i;
+const HEAD = /^(legend|전설|chosen champion|champion|선택 챔피언|챔피언|main ?deck|main|메인 ?덱|메인|battlefields?|전장|rune pool|rune deck|runes|룬 덱|룬|sideboard|side ?board|사이드보드|사이드)\s*(?:[:：]\s*(.*))?$/i;
 const secOf = h => { h = h.toLowerCase(); return /legend|전설/.test(h) ? 'legend' : /champion|챔피언/.test(h) ? 'champion' : /battle|전장/.test(h) ? 'bf' : /rune|룬/.test(h) ? 'runes' : /side|사이드/.test(h) ? 'side' : 'main'; };
 const newDeck = name => ({ name: name || '새 덱', legend: null, champion: null, main: {}, bf: [], runes: {}, side: {}, created: Date.now(), updated: Date.now() });
 function addTo(dk, c, sec, n = 1) {
@@ -2305,7 +2307,7 @@ function renderKr() {
   if (ku.sort === 'own') list.sort((a, b) => b.own.pct - a.own.pct || byName(a, b));
   else list.sort(byName);
   const best = pool.map(x => ({ x, own: deckOwn(krDeck(x.o), om) })).sort((a, b) => b.own.pct - a.own.pct)[0];
-  $('kr-sum').innerHTML = `<p class="hint" style="margin:0">한국어판 스탠다드 환경 적법성에 맞춰 구성된 덱 예시입니다. (${env.sets}, 샘플 덱 ${pool.length}개)</p>
+  $('kr-sum').innerHTML = `${env.beta ? `<p class="beta-note" role="note"><span class="beta">beta</span>한국어판 스피릿포지드 출시 (12월 중반) 이후에 다시 업데이트 예정이며 지금은 베타입니다.</p>` : ''}<p class="hint" style="margin:0">한국어판 스탠다드 환경 적법성에 맞춰 구성된 덱 예시입니다. (${env.sets}, 샘플 덱 ${pool.length}개)</p>
     ${best ? `<p style="margin:0;font-size:13px">내 컬렉션으로 가장 가까운 덱: <b>${esc(best.x.o.t)}</b> · 보유 ${best.own.pct}% · 부족 ${best.own.miss}장</p>` : ''}`;
   $('kr-list').innerHTML = list.length ? list.map(({ o, i, lg, own }) => {
     const ch = BYID.get(o.C), banned = [o.L, o.C, ...o.m.map(x => x[0]), ...o.b].filter(id => isBanned(BYID.get(id))).length;
@@ -2313,7 +2315,7 @@ function renderKr() {
       <span class="mthumb" aria-hidden="true">${tileArt(lg)}</span>
       <div class="cardbody">
       <span class="top">${esc(krDoms(o))}${o.s.length ? ' · 사이드 포함' : ''}</span>
-      <b>${esc(o.t)}</b>
+      <b>${esc(o.t)}${o.beta ? ' <span class="beta">beta</span>' : ''}</b>
       <span class="hint">${esc(legendLabel(lg))}${ch ? ' · ' + esc(dName(ch)) : ''}</span>
       <span class="ownbar" aria-hidden="true"><i style="width:${own.pct}%"></i></span>
       <span class="hint">보유 ${own.have}/${own.total}장 (${own.pct}%) · 부족 ${own.miss}장</span>
@@ -2321,7 +2323,7 @@ function renderKr() {
       <div class="act"><button class="mini" type="button" data-act="view">덱 보기</button><button class="mini" type="button" data-act="take">내 덱으로 가져오기</button></div>
       </div>
     </article>`;
-  }).join('') : `<p class="empty">${env.beta ? `${esc(env.ko)} 샘플 덱은 준비 중입니다. 한국어판 스피릿포지드 출시(12월)에 맞춰 추가됩니다.` : '조건에 맞는 덱이 없습니다.'}</p>`;
+  }).join('') : `<p class="empty">${env.beta ? `${esc(env.ko)} 샘플 덱은 준비 중입니다.` : '조건에 맞는 덱이 없습니다.'}</p>`;
   wireLazy($('kr-list'));
 }
 $('k-sort').onchange = ev => { ku.sort = ev.target.value; saveKu(); renderKr(); };
@@ -2330,8 +2332,9 @@ function takeKr(i) { const id = decks.create(krDeck(KD.decks[i])); closeDetail()
 function openKrSheet(i) {
   const o = KD.decks[i], lg = BYID.get(o.L);
   openDeckSheet({ dk: krDeck(o), lg, champ: BYID.get(o.C),
-    head: `한국 환경 샘플 덱 · ${esc(krDoms(o))}`, title: o.t, sub: legendLabel(lg),
-    link: KR_SITE + encodeURIComponent(o.img), linkText: '원본 덱 이미지 ↗', take: () => takeKr(i), back: () => openKrSheet(i) });
+    head: `${esc((KR_ENVS.find(e => e.id === (o.env || 'OGN')) || KR_ENVS[0]).ko)}${o.beta ? ' beta' : ''} · ${esc(krDoms(o))}`, title: o.t, sub: legendLabel(lg),
+    note: o.beta ? '한국어판 스피릿포지드 출시 (12월 중반) 이후에 다시 업데이트 예정인 베타 덱입니다' : '',
+    link: o.img ? KR_SITE + encodeURIComponent(o.img) : '', linkText: '원본 덱 이미지 ↗', take: () => takeKr(i), back: () => openKrSheet(i) });
 }
 // Ban list sheet: Standard bans in effect today (the global list also applies to the Korean Standard format), newest first.
 const BAN_SRC = { '2026-03-31': 'https://playriftbound.com/en-us/news/announcements/announcing-riftbounds-first-bans/',
