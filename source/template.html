@@ -357,6 +357,9 @@ h2.vh{margin:0;font-size:18px}
 .dk-li:hover{border-color:var(--muted)}
 .dk-stage{all:unset;box-sizing:border-box;cursor:pointer;position:relative;display:block;height:210px;border-radius:var(--radius) var(--radius) 0 0;background:radial-gradient(120% 90% at 50% 100%,#1B2433 0%,#0B0F14 70%);overflow:hidden}
 .dk-stage:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.dk-bg{position:absolute;left:-12%;width:124%;top:-38%;aspect-ratio:420/588;filter:blur(14px) saturate(1.3) brightness(.6);pointer-events:none}
+.dk-bg .ti,.dk-bg img{display:block;width:100%;height:100%;object-fit:cover;background-repeat:no-repeat}
+.dk-stage::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgb(8 12 18 / .05) 0%,rgb(8 12 18 / .5) 100%);pointer-events:none}
 .dk-stage .dbx{left:calc(50% - 116px);bottom:-30px;transform:scale(.8);transform-origin:bottom center;z-index:1}
 .dk-lg{position:absolute;left:calc(50% + 12px);bottom:18px;width:104px;aspect-ratio:420/588;border-radius:7px;overflow:hidden;background:#1B2433;transform:rotate(6deg);transform-origin:50% 100%;box-shadow:0 12px 26px rgb(0 0 0 / .5);z-index:2}
 .dk-lg .ti,.dk-lg img{display:block;width:100%;height:100%;object-fit:contain;background-repeat:no-repeat}
@@ -1297,7 +1300,8 @@ function renderDeckHome() {
     const lg = BYID.get(dk.legend), ch = BYID.get(dk.champion), s = deckSummary(dk, om), name = dk.name || '이름 없는 덱';
     return `<li class="dk-li dbx-host" data-li="${id}">
       <button class="dk-stage" type="button" data-deck="${id}" aria-label="${esc(name)} 편집">
-        ${deckBox('dk-box', popCards(dk))}
+        ${lg ? `<span class="dk-bg" aria-hidden="true">${tileArt(lg)}</span>` : ''}
+        ${deckBox('dk-box', popCards(dk), boxTheme(id, lg))}
         ${lg ? `<span class="dk-lg" aria-hidden="true">${tileArt(lg)}</span>` : '<span class="dk-lg empty" aria-hidden="true">전설<br>미선택</span>'}
       </button>
       <div class="dk-info">
@@ -2734,34 +2738,42 @@ function renderHome() {
 }
 // Home "deck builder" card: two closed deck boxes; on hover the front one slides forward, its lid lifts and four cards burst out.
 const DBX_CARDS = ['ogn-247-298', 'ogn-039-298', 'ogn-248-298', 'ogn-027-298'];   // Kai'Sa legend, Kai'Sa champion, Icathian Rain, Darius
+// Box panel colours: the default navy, plus one per domain (the box takes a domain of its deck's legend).
+const DBX_THEMES = { navy: ['#2B3E6B', '#1B2848'], fury: ['#B8322E', '#6A1416'], calm: ['#2F7F47', '#174A26'], mind: ['#2C62B3', '#163564'],
+  body: ['#C4561A', '#5E2606'], chaos: ['#6E40A6', '#3A1D62'], order: ['#C29A1A', '#755A08'], colorless: ['#5D6873', '#2F363E'] };
 const DBX_DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
   <linearGradient id="dbx-cu" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E99A66"/><stop offset=".55" stop-color="#C06A3D"/><stop offset="1" stop-color="#8E4726"/></linearGradient>
   <linearGradient id="dbx-cu-side" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A8562F"/><stop offset="1" stop-color="#6E3419"/></linearGradient>
-  <linearGradient id="dbx-navy" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2B3E6B"/><stop offset="1" stop-color="#1B2848"/></linearGradient></defs></svg>`;
+  ${Object.entries(DBX_THEMES).map(([k, [a, b]]) => `<linearGradient id="dbx-p-${k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient>`).join('')}</defs></svg>`;
 $('dbx-defs').innerHTML = DBX_DEFS;   // shared gradients for every deck box on the page (home and my decks)
-function deckBoxParts() {
+function deckBoxParts(theme) {
+  const P = `url(#dbx-p-${theme})`, dark = DBX_THEMES[theme][1];
   // one box = 140x172 drawing units: front face 120x150, side and top faces skewed 20 up-right
-  const panel = (y0, y1) => `<rect x="2" y="${y0}" width="116" height="${y1 - y0}" rx="3" fill="url(#dbx-cu)"/><rect x="9" y="${y0 + 7}" width="102" height="${y1 - y0 - 14}" rx="2" fill="url(#dbx-navy)"/>`;
+  const panel = (y0, y1) => `<rect x="2" y="${y0}" width="116" height="${y1 - y0}" rx="3" fill="url(#dbx-cu)"/><rect x="9" y="${y0 + 7}" width="102" height="${y1 - y0 - 14}" rx="2" fill="${P}"/>`;
   const back = `<svg class="dbx-l dbx-back" viewBox="0 0 140 172" aria-hidden="true"><polygon points="2,22 22,2 138,2 118,22" fill="#0A1120"/><polygon points="118,22 138,2 138,150 118,170" fill="#0A1120"/></svg>`;
   const body = `<svg class="dbx-l dbx-body" viewBox="0 0 140 172" aria-hidden="true">
-    <polygon points="118,66 138,46 138,150 118,170" fill="url(#dbx-cu-side)"/><polygon points="122,72 134,60 134,146 122,158" fill="#1B2848"/>
+    <polygon points="118,66 138,46 138,150 118,170" fill="url(#dbx-cu-side)"/><polygon points="122,72 134,60 134,146 122,158" fill="${dark}"/>
     ${panel(66, 170)}
     <path d="M9 77h14l-14 14zM111 77H97l14 14zM9 159h14l-14-14zM111 159H97l14-14z" fill="#9B4F2B"/>
     <path d="M40 84v62M80 84v62" stroke="#C06A3D" stroke-width="2" stroke-linecap="round" opacity=".55"/>
     <g transform="translate(42 98) scale(1.125)"><use href="#rl-mark" width="32" height="32" style="color:#E99A66"/></g></svg>`;
   const lid = `<svg class="dbx-l dbx-lid" viewBox="0 0 140 172" aria-hidden="true">
-    <polygon points="2,22 22,2 138,2 118,22" fill="#D88556"/><polygon points="14,18 28,6 126,6 112,18" fill="url(#dbx-navy)"/>
+    <polygon points="2,22 22,2 138,2 118,22" fill="#D88556"/><polygon points="14,18 28,6 126,6 112,18" fill="${P}"/>
     <polygon points="118,22 138,2 138,46 118,66" fill="url(#dbx-cu-side)"/>
     ${panel(22, 66)}<path d="M44 34h32l-6 10H50z" fill="#C06A3D"/><path d="M2 65h116" stroke="#5A2A14" stroke-width="2"/></svg>`;
   return { back, body, lid };
 }
-let DBX_PARTS = null;
+const DBX_PARTS = new Map();
 // one deck box; `cards` (up to 4) pop out of it when its host is hovered
-function deckBox(cls, cards = []) {
-  const { back, body, lid } = DBX_PARTS || (DBX_PARTS = deckBoxParts());
+function deckBox(cls, cards = [], theme = 'navy') {
+  if (!DBX_THEMES[theme]) theme = 'navy';
+  if (!DBX_PARTS.has(theme)) DBX_PARTS.set(theme, deckBoxParts(theme));
+  const { back, body, lid } = DBX_PARTS.get(theme);
   const inner = cards.length ? `<span class="dbx-cards">${cards.map((c, i) => `<span class="dbx-card" style="--i:${i}">${tileArt(c)}</span>`).join('')}</span>` : '';
   return `<span class="dbx ${cls}">${back}${inner}${body}${lid}</span>`;
 }
+// a deck's box colour: one of its legend's domains, picked at random once per deck and kept stable
+const boxTheme = (id, lg) => { const d = (lg && lg.d || []).filter(x => DBX_THEMES[x]); if (!d.length) return 'navy'; let h = 0; for (const ch of id) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return d[h % d.length]; };
 function deckBoxArt() {
   return `<span class="dbx-scene" aria-hidden="true">${deckBox('dbx-a')}${deckBox('dbx-b', DBX_CARDS.map(id => BYID.get(id)).filter(Boolean))}</span>`;
 }
