@@ -425,6 +425,40 @@ table.st td{text-align:right;padding:4px 0 4px 8px;color:var(--muted);white-spac
 table.st thead td{font-size:11px}
 table.st tr+tr th,table.st tr+tr td{border-top:1px solid var(--line)}
 
+/* drag and drop */
+#bt-grid .bt-img,#ws-body .dt{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#bt-grid .bt-img img,#ws-body .dt img{-webkit-user-drag:none}
+#ws-body .dt{cursor:grab}
+body.dragging,body.dragging *{cursor:grabbing!important}
+body.dragging{-webkit-user-select:none;user-select:none}
+.drag-src{opacity:.35;filter:saturate(.4)}
+.drag-ghost{position:fixed;left:0;top:0;z-index:60;width:128px;pointer-events:none;will-change:transform}
+.dg-card{width:128px;aspect-ratio:420/588;border-radius:9px;overflow:hidden;background:var(--sunk);box-shadow:0 22px 44px rgb(0 0 0 / .38),0 0 0 1px rgb(255 255 255 / .08)}
+.dg-card .ti,.dg-card img{display:block;width:100%;height:100%;object-fit:contain;background-repeat:no-repeat}
+.dg-label{position:absolute;left:50%;top:calc(100% + 8px);transform:translateX(-50%);white-space:nowrap;background:var(--ink);color:var(--bg);font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;box-shadow:0 4px 12px rgb(0 0 0 / .2)}
+.dg-label.no{background:var(--surface);color:var(--muted);box-shadow:0 0 0 1px var(--line)}
+.dg-label.rm{background:var(--danger);color:#fff}
+@media (prefers-reduced-motion:no-preference){
+  .dg-card{animation:dg-pick .16s ease-out}
+  @keyframes dg-pick{from{transform:scale(.9)}to{transform:scale(1.06)}}
+  .dg-card{transform:scale(1.06)}
+  .drag-ghost.fly{transition:transform .26s cubic-bezier(.2,.8,.25,1),opacity .26s ease}
+  .drag-ghost.back{transition:transform .3s cubic-bezier(.3,1.3,.5,1),opacity .3s ease}
+  .drag-ghost.poof{transition:transform .22s ease-in,opacity .22s ease-in}
+  .dt.landed{animation:dt-land .6s ease-out}
+  @keyframes dt-land{0%{box-shadow:0 0 0 0 var(--rift);transform:scale(.97)}35%{box-shadow:0 0 0 3px var(--rift);transform:scale(1.02)}100%{box-shadow:0 0 0 0 transparent;transform:none}}
+}
+body.drag-from-pool #ed-ws .sec[data-drop],body.drag-from-deck #ed-ws .sec[data-drop]{outline:1.5px dashed transparent;outline-offset:2px;border-radius:10px;transition:outline-color .15s,background-color .15s}
+body.drag-from-pool #ed-ws .sec[data-drop]{outline-color:var(--line)}
+body.drag-from-deck #ed-ws .sec[data-drop]{outline-color:var(--line)}
+#ed-ws .sec.drop-hover{outline-color:var(--rift)!important;background:var(--rift-soft)}
+body.drag-from-pool #ed-ws.drop-hover{box-shadow:0 0 0 2px var(--rift)}
+body.drag-from-deck #ed-browser{transition:box-shadow .15s}
+body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
+.drop-trash{position:fixed;z-index:55;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);padding:14px 26px;border-radius:999px;background:var(--surface);color:var(--danger);font-weight:600;font-size:14px;border:1.5px dashed var(--danger);box-shadow:0 8px 24px rgb(0 0 0 / .18)}
+.drop-trash.drop-hover{background:var(--danger);color:#fff;border-style:solid}
+.ed-switch [data-drop].drop-hover{background:var(--rift);color:var(--surface)}
+
 /* meta decks */
 .meta-sum{display:grid;gap:4px;margin:4px 0 6px}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 14px}
@@ -1035,7 +1069,7 @@ $('dk-paste-go').onclick = () => {
 let edId = null, edBuilt = null;
 const SECS = [['legend', '전설'], ['champion', '챔피언'], ['main', '주 덱'], ['bf', '전장'], ['side', '보조 덱'], ['runes', '룬']];
 const SEC_LABEL = Object.fromEntries(SECS);
-const pk = { sec: 'legend', q: '', type: '', sort: 'cost', owned: false, legal: true, limit: 60 };
+const pk = { sec: 'legend', q: '', type: '', sort: 'cost', owned: false, legal: true, noBan: false, limit: 60 };
 const ws = { view: 'list', group: 'none', sort: 'cost', dir: 1, issues: false, pane: 'browse' };
 const LIMITS = { legend: [1, 1], champion: [1, 1], main: [39, null], bf: [3, 3], side: [0, 10], runes: [12, 12] };
 
@@ -1074,10 +1108,10 @@ function renderEditor() {
     edBuilt = edId;
     $('deck-edit').innerHTML = `
       <div class="ed-switch" role="group" aria-label="편집 화면">
-        <button type="button" data-pane="browse">카드 고르기</button><button type="button" data-pane="deck">덱 보기 <span id="sw-count"></span></button>
+        <button type="button" data-pane="browse">카드 고르기</button><button type="button" data-pane="deck" data-drop="auto">덱 보기 <span id="sw-count"></span></button>
       </div>
       <div class="ed-grid" id="ed-grid">
-        <section class="panel browser" id="ed-browser" aria-label="카드 고르기">
+        <section class="panel browser" id="ed-browser" aria-label="카드 고르기" data-drop="remove">
           <div class="sectabs" id="bt-tabs" role="tablist"></div>
           <div class="filters bt-ctl">
             <input id="pk-q" type="search" autocomplete="off" aria-label="카드 검색">
@@ -1085,12 +1119,13 @@ function renderEditor() {
             <select id="pk-type" aria-label="유형"><option value="">유형: 전체</option>${['champion', 'unit', 'spell', 'gear'].map(t => `<option value="${t}">${L.type[t][0]}</option>`).join('')}</select>
             <label class="chk"><input id="pk-owned" type="checkbox"> 보유 카드만</label>
             <label class="chk" title="전설의 영역과 시그니처 규칙에 맞는 카드만 보여 줍니다"><input id="pk-legal" type="checkbox"> 덱 규칙에 맞는 카드만</label>
+            <label class="chk" title="현재 공식 금지 목록(Standard)에 있는 카드를 숨깁니다"><input id="pk-noban" type="checkbox"> 밴 카드 숨기기</label>
           </div>
           <div class="bt-info"><span class="hint" id="bt-hint"></span><span class="hint" id="bt-count"></span></div>
           <div class="bt-grid" id="bt-grid"></div>
           <div class="more" id="bt-more" hidden><button type="button" data-act="more">더 보기</button></div>
         </section>
-        <section class="panel ws" id="ed-ws" aria-label="덱 작업 공간">
+        <section class="panel ws" id="ed-ws" aria-label="덱 작업 공간" data-drop="auto">
           <div class="ws-head">
             <button class="mini" type="button" data-act="back">← 내 덱</button>
             <span class="ws-title">덱 작업 공간</span><span class="save" id="ws-save"></span>
@@ -1110,16 +1145,20 @@ function renderEditor() {
           <div id="ed-confirm"></div>
           <div class="ws-body" id="ws-body"></div>
         </section>
-      </div>`;
+      </div>
+      <div class="drop-trash" id="drop-trash" data-drop="remove" hidden>여기에 놓으면 덱에서 1장 빼기</div>`;
     $('ed-name').value = dk.name || '';
-    $('pk-q').value = pk.q; $('pk-sort').value = pk.sort; $('pk-type').value = pk.type; $('pk-owned').checked = pk.owned; $('pk-legal').checked = pk.legal;
+    $('pk-q').value = pk.q; $('pk-sort').value = pk.sort; $('pk-type').value = pk.type; $('pk-owned').checked = pk.owned; $('pk-legal').checked = pk.legal; $('pk-noban').checked = pk.noBan;
     $('ed-name').oninput = ev => { const d = decks.data[edId]; if (d) { d.name = ev.target.value; decks.save(edId); } };
     let t; $('pk-q').oninput = ev => { clearTimeout(t); t = setTimeout(() => { pk.q = ev.target.value; pk.limit = 60; renderBrowser(); }, 120); };
     $('pk-sort').onchange = ev => { pk.sort = ev.target.value; renderBrowser(); };
     $('pk-type').onchange = ev => { pk.type = ev.target.value; pk.limit = 60; renderBrowser(); };
     $('pk-owned').onchange = ev => { pk.owned = ev.target.checked; pk.limit = 60; renderBrowser(); };
     $('pk-legal').onchange = ev => { pk.legal = ev.target.checked; pk.limit = 60; renderBrowser(); };
+    $('pk-noban').onchange = ev => { pk.noBan = ev.target.checked; pk.limit = 60; renderBrowser(); };
     $('deck-edit').onclick = onEditorClick;
+    $('deck-edit').addEventListener('pointerdown', onDragDown);
+    $('deck-edit').addEventListener('dragstart', ev => ev.preventDefault());
     $('deck-edit').onchange = ev => {
       const s = ev.target.dataset.set; if (!s) return;
       ws[s] = s === 'dir' ? +ev.target.value : ev.target.value; renderWorkspace();
@@ -1161,6 +1200,7 @@ function browserList(dk, om) {
   if (terms.length) list = list.filter(c => matches(c, terms));
   let out = list.map(c => ({ c, legal: legal(c), n: inDeck(dk, c), own: om.get(nameKey(c)) || 0 }));
   if (pk.legal) out = out.filter(x => x.legal);
+  if (pk.noBan) out = out.filter(x => !isBanned(x.c));
   const by = { cost: (a, b) => (a.c.e ?? 99) - (b.c.e ?? 99), name: () => 0, own: (a, b) => b.own - a.own, deck: (a, b) => b.n - a.n }[pk.sort];
   return out.sort((a, b) => (b.legal - a.legal) || by(a, b) || dName(a.c).localeCompare(dName(b.c), ko() ? 'ko' : 'en'));
 }
@@ -1172,7 +1212,7 @@ function renderBrowser() {
   const hints = {
     legend: '전설이 덱의 영역(색)과 챔피언을 정합니다. 카드를 눌러 고르세요.',
     champion: lg ? `${champKo(champTag(lg))} 챔피언 유닛 중 하나를 선택 챔피언으로 고르세요.` : '먼저 전설을 고르세요.',
-    main: '카드를 누를 때마다 1장씩 추가됩니다. 같은 카드는 선택 챔피언·보조 덱과 합쳐 3장까지입니다.',
+    main: '누르거나 오른쪽 덱으로 끌어다 놓으면 추가됩니다. 덱 카드는 끌어서 주 덱↔보조 덱으로 옮기거나, 이쪽으로 끌어와 뺄 수 있습니다. 같은 카드는 3장까지입니다.',
     bf: '서로 다른 전장 3장을 고르세요.', side: '보조 덱(사이드보드)은 10장까지입니다.', runes: '룬 덱은 전설 영역의 룬으로 12장입니다.',
   };
   $('bt-hint').textContent = !lg && pk.sec !== 'legend' ? '전설을 먼저 고르면 영역에 맞는 카드만 추려서 보여 줍니다.' : hints[pk.sec];
@@ -1221,8 +1261,8 @@ function listView(dk, om) {
   const head = (sec, extra = '') => `<header><h4>${SEC_LABEL[sec]}</h4>${extra}${countBadge(dk, sec)}</header>`;
   const tiles = (rs, sec) => `<div class="dt-grid">${rs.map(([c, n]) => deckTile(c, n, sec, om, need)).join('')}</div>`;
   let h = `<div class="sec-pair">
-    <section class="sec">${head('legend')}${lg ? tiles([[lg, 1]], 'legend') : addBtn('legend')}</section>
-    <section class="sec">${head('champion')}${ch ? tiles([[ch, 1]], 'champion') : addBtn('champion')}</section></div>`;
+    <section class=\"sec\" data-drop=\"legend\">${head('legend')}${lg ? tiles([[lg, 1]], 'legend') : addBtn('legend')}</section>
+    <section class=\"sec\" data-drop=\"champion\">${head('champion')}${ch ? tiles([[ch, 1]], 'champion') : addBtn('champion')}</section></div>`;
   const opt = (k, v, label) => `<option value="${v}"${String(ws[k]) === String(v) ? ' selected' : ''}>${label}</option>`;
   const ctl = `<span class="sec-ctl"><select data-set="group" aria-label="그룹">${opt('group', 'none', '그룹화 안 함')}${opt('group', 'type', '유형별')}${opt('group', 'cost', '에너지별')}${opt('group', 'domain', '영역별')}</select>
     <select data-set="sort" aria-label="정렬">${opt('sort', 'cost', '에너지')}${opt('sort', 'name', '이름')}${opt('sort', 'count', '장수')}${opt('sort', 'short', '부족한 카드')}</select>
@@ -1234,15 +1274,15 @@ function listView(dk, om) {
     for (const r of main) { const [gk, gl] = groupKey(r[0]); if (!groups.has(gk)) groups.set(gk, [gl, []]); groups.get(gk)[1].push(r); }
     body = [...groups].sort((a, b) => ws.group === 'none' ? 0 : ws.dir * (a[0] - b[0])).map(([, [gl, rs]]) => (gl ? `<h5>${esc(gl)} <span>${sum(rs)}장</span></h5>` : '') + tiles(rs, 'main')).join('') + addBtn('main');
   }
-  h += `<section class="sec">${head('main', ctl)}${body}</section>`;
+  h += `<section class=\"sec\" data-drop=\"main\">${head('main', ctl)}${body}</section>`;
   const bf = (dk.bf || []).map(id => [BYID.get(id), 1]).filter(r => r[0]);
-  h += `<section class="sec">${head('bf')}${bf.length ? tiles(bf, 'bf') : ''}${bf.length < 3 ? addBtn('bf') : ''}</section>`;
+  h += `<section class=\"sec\" data-drop=\"bf\">${head('bf')}${bf.length ? tiles(bf, 'bf') : ''}${bf.length < 3 ? addBtn('bf') : ''}</section>`;
   const sd = sortTiles(rows(dk.side), om);
-  h += `<section class="sec">${head('side')}${sd.length ? tiles(sd, 'side') : ''}${addBtn('side')}</section>`;
+  h += `<section class=\"sec\" data-drop=\"side\">${head('side')}${sd.length ? tiles(sd, 'side') : ''}${addBtn('side')}</section>`;
   const rs = rows(dk.runes);
   let runeBtns = '';
   if (lg) runeBtns = lg.d.map(d => CANON_LIST.find(c => has(c, 'rune') && (c.d || [])[0] === d)).filter(Boolean).map(c => `<button class="mini" type="button" data-act="rune" data-rid="${c.id}">+ ${esc(dName(c))}</button>`).join('');
-  h += `<section class="sec">${head('runes')}${rs.length ? tiles(rs, 'runes') : ''}<div class="rune-add">${runeBtns || addBtn('runes')}</div></section>`;
+  h += `<section class=\"sec\" data-drop=\"runes\">${head('runes')}${rs.length ? tiles(rs, 'runes') : ''}<div class="rune-add">${runeBtns || addBtn('runes')}</div></section>`;
   return h;
 }
 function artView(dk) {
@@ -1308,8 +1348,7 @@ function copyText(text, label) {
 }
 $('copybox-close').onclick = () => { $('copybox').hidden = true; };
 
-function addCard(dk, c) {
-  const sec = pk.sec;
+function addCard(dk, c, sec = pk.sec) {
   if (sec === 'legend') {
     dk.legend = c.id;
     if (dk.champion && BYID.get(dk.champion).n !== champTag(c)) dk.champion = null;
@@ -1346,6 +1385,7 @@ function removeCard(dk, id, sec) {
   const s = dk[sec]; if (!s[id]) return; if (--s[id] <= 0) delete s[id];
 }
 function onEditorClick(ev) {
+  if (DRAG.justDragged) return;   // the click that ends a drag is not a tap
   const b = ev.target.closest('[data-act],[data-sec],[data-view],[data-pane]'); if (!b) return;
   const dk = decks.data[edId];
   if (b.dataset.pane && !b.dataset.act) { ws.pane = b.dataset.pane; renderWorkspace(); scrollTo(0, 0); return; }
@@ -1380,6 +1420,191 @@ function onEditorClick(ev) {
     $('ed-del-no').onclick = () => { $('ed-confirm').innerHTML = ''; };
   }
 }
+
+/* ---------- deck editor: drag and drop ----------
+   Mouse: press and move a few pixels. Touch: press and hold, then move.
+   Pool cards drop into a deck section; deck cards move between sections or drop on the card pool / trash bar to come out. */
+const DRAG = { st: null, justDragged: false };
+const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+const GHOST_W = 128, GHOST_H = GHOST_W * 588 / 420;
+function dragSource(target) {
+  const img = target.closest('#bt-grid .bt-img');
+  if (img) return { from: 'pool', id: img.closest('.bt').dataset.id, el: img };
+  const dt = target.closest('#ws-body .dt');
+  if (dt && !target.closest('.dt-ctl')) return { from: dt.dataset.sec, id: dt.dataset.id, el: dt.querySelector('.dt-art') || dt };
+  return null;
+}
+function onDragDown(ev) {
+  if (DRAG.st || (ev.pointerType === 'mouse' && ev.button !== 0)) return;
+  const src = dragSource(ev.target); if (!src) return;
+  const st = DRAG.st = { ...src, x0: ev.clientX, y0: ev.clientY, x: ev.clientX, y: ev.clientY, pid: ev.pointerId, touch: ev.pointerType !== 'mouse', active: false };
+  if (st.touch) st.timer = setTimeout(() => { if (DRAG.st === st) beginDrag(st); }, 260);
+  addEventListener('pointermove', onDragMove, { passive: false });
+  addEventListener('pointerup', onDragUp);
+  addEventListener('pointercancel', onDragCancel);
+}
+function onDragMove(ev) {
+  const st = DRAG.st; if (!st || ev.pointerId !== st.pid) return;
+  st.x = ev.clientX; st.y = ev.clientY;
+  if (!st.active) {
+    const dist = Math.hypot(st.x - st.x0, st.y - st.y0);
+    if (st.touch) { if (dist > 10) endDragListeners(); return; }   // moved before the hold finished: it's a scroll
+    if (dist < 6) return;
+    beginDrag(st);
+  }
+  ev.preventDefault();
+  updateDropZone(st);
+}
+function beginDrag(st) {
+  st.active = true; clearTimeout(st.timer);
+  const c = BYID.get(st.id), r = st.el.getBoundingClientRect();
+  const g = document.createElement('div');
+  g.className = 'drag-ghost';
+  g.innerHTML = `<div class="dg-card">${tileArt(c)}</div><span class="dg-label"></span>`;
+  g.querySelectorAll('[data-bg]').forEach(el => { el.style.backgroundImage = `url('${el.dataset.bg}')`; });
+  document.body.appendChild(g);
+  st.ghost = g; st.label = g.querySelector('.dg-label');
+  st.gx = r.left + r.width / 2; st.gy = r.top + r.height / 2; st.vx = 0; st.src = r;
+  st.el.classList.add('drag-src');
+  document.body.classList.add('dragging', st.from === 'pool' ? 'drag-from-pool' : 'drag-from-deck');
+  if (st.from !== 'pool') $('drop-trash').hidden = false;
+  try { if (st.touch && navigator.vibrate) navigator.vibrate(10); } catch {}
+  updateDropZone(st);
+  st.raf = requestAnimationFrame(dragFrame);
+}
+function dragFrame() {
+  const st = DRAG.st; if (!st || !st.active) return;
+  const k = reduceMotion() ? 1 : 0.32;
+  const nx = st.gx + (st.x - st.gx) * k, ny = st.gy + (st.y - st.gy) * k;
+  st.vx = st.vx * 0.78 + (nx - st.gx) * 0.22; st.gx = nx; st.gy = ny;
+  const tilt = reduceMotion() ? 0 : Math.max(-14, Math.min(14, st.vx * 1.1));
+  st.ghost.style.transform = `translate(${(nx - GHOST_W / 2).toFixed(1)}px,${(ny - GHOST_H * 0.4).toFixed(1)}px) rotate(${tilt.toFixed(2)}deg)`;
+  // keep scrolling while the card is held near an edge (the window, or the sticky workspace / pool panels)
+  const edge = 56, vh = innerHeight;
+  if (st.y < edge) scrollBy(0, -12); else if (st.y > vh - edge) scrollBy(0, 12);
+  for (const id of ['ed-ws', 'ed-browser']) {
+    const p = $(id); if (!p || p.scrollHeight <= p.clientHeight) continue;
+    const b = p.getBoundingClientRect();
+    if (st.x < b.left || st.x > b.right) continue;
+    if (st.y < b.top + edge && st.y > b.top) p.scrollTop -= 12; else if (st.y > b.bottom - edge && st.y < b.bottom) p.scrollTop += 12;
+  }
+  st.raf = requestAnimationFrame(dragFrame);
+}
+function dropTarget(c, from, zone) {
+  if (!zone) return null;
+  const kind = has(c, 'legend') ? 'legend' : has(c, 'rune') ? 'runes' : has(c, 'battlefield') ? 'bf' : 'card';
+  if (from === 'pool') {
+    if (zone === 'remove') return { act: 'none', label: '덱 쪽에 놓으세요' };
+    let sec = zone === 'auto' ? (pk.sec === 'side' ? 'side' : pk.sec === 'champion' ? 'champion' : 'main') : zone;
+    if (kind === 'legend') sec = 'legend';
+    else if (kind === 'runes') sec = 'runes';
+    else if (kind === 'bf') sec = sec === 'side' ? 'side' : 'bf';
+    else if (sec === 'champion' && !has(c, 'champion')) sec = 'main';
+    else if (!['main', 'side', 'champion'].includes(sec)) sec = 'main';
+    return { act: 'add', sec, label: `${SEC_LABEL[sec]}${sec === 'legend' || sec === 'champion' ? '으로 지정' : '에 추가'}` };
+  }
+  if (zone === 'remove') return { act: 'remove', label: '덱에서 1장 빼기' };
+  if (zone === 'auto' || zone === from) return { act: 'none', label: '' };
+  if (from === 'main' && zone === 'side') return { act: 'move', sec: 'side', label: '보조 덱으로 옮기기' };
+  if (from === 'side' && zone === 'main' && kind === 'card') return { act: 'move', sec: 'main', label: '주 덱으로 옮기기' };
+  if (from === 'side' && zone === 'bf' && kind === 'bf') return { act: 'move', sec: 'bf', label: '전장으로 옮기기' };
+  if (from === 'bf' && zone === 'side') return { act: 'move', sec: 'side', label: '보조 덱으로 옮기기' };
+  if (from === 'champion' && (zone === 'main' || zone === 'side')) return { act: 'move', sec: zone, label: `${SEC_LABEL[zone]}으로 옮기기` };
+  if (from === 'main' && zone === 'champion' && has(c, 'champion')) return { act: 'move', sec: 'champion', label: '선택 챔피언으로 지정' };
+  return { act: 'none', label: '여기로는 옮길 수 없습니다' };
+}
+function updateDropZone(st) {
+  const el = document.elementFromPoint(st.x, st.y), zEl = el && el.closest('[data-drop]');
+  if (st.zEl !== zEl) { if (st.zEl) st.zEl.classList.remove('drop-hover'); if (zEl) zEl.classList.add('drop-hover'); st.zEl = zEl; }
+  st.res = dropTarget(BYID.get(st.id), st.from, zEl ? zEl.dataset.drop : null);
+  const t = st.res && st.res.label;
+  st.label.textContent = t || ''; st.label.hidden = !t;
+  st.label.className = 'dg-label' + (st.res && st.res.act === 'none' ? ' no' : st.res && st.res.act === 'remove' ? ' rm' : '');
+}
+function endDragListeners() {
+  const st = DRAG.st; if (st) clearTimeout(st.timer);
+  removeEventListener('pointermove', onDragMove); removeEventListener('pointerup', onDragUp); removeEventListener('pointercancel', onDragCancel);
+  if (!st || !st.active) DRAG.st = null;
+}
+function finishDragUI(st) {
+  cancelAnimationFrame(st.raf);
+  if (st.zEl) st.zEl.classList.remove('drop-hover');
+  st.el.classList.remove('drag-src');
+  document.body.classList.remove('dragging', 'drag-from-pool', 'drag-from-deck');
+  $('drop-trash').hidden = true;
+  DRAG.st = null; DRAG.justDragged = true; setTimeout(() => { DRAG.justDragged = false; }, 0);
+}
+function flyGhost(g, to, opts = {}) {
+  // animate the ghost from where it is to a rect (scaled to fit), or shrink it away
+  if (reduceMotion()) { g.remove(); return; }
+  const cur = g.getBoundingClientRect();
+  let tf;
+  // the ghost scales about its centre, so aim its centre at the target's centre
+  if (to) { const s = Math.max(0.2, Math.min(1, to.width / GHOST_W)); tf = `translate(${to.left + to.width / 2 - GHOST_W / 2}px,${to.top + to.height / 2 - GHOST_H / 2}px) rotate(0deg) scale(${s})`; }
+  else tf = `translate(${cur.left + cur.width / 2 - GHOST_W / 2}px,${cur.top + cur.height / 2 - GHOST_H / 2 + 30}px) rotate(${opts.spin || 8}deg) scale(.55)`;
+  g.classList.add(opts.cls || 'fly');
+  requestAnimationFrame(() => { g.style.transform = tf; if (!to || opts.fade) g.style.opacity = '0'; });
+  setTimeout(() => g.remove(), opts.ms || 260);
+}
+function onDragUp(ev) {
+  const st = DRAG.st; if (!st || ev.pointerId !== st.pid) return;
+  endDragListeners();
+  if (!st.active) return;
+  const res = st.res, dk = decks.data[edId], c = BYID.get(st.id), g = st.ghost;
+  st.label.hidden = true;
+  finishDragUI(st);
+  let msg = '', ok = false, landSec = null;
+  if (res && res.act === 'add') {
+    const before = JSON.stringify(dk);
+    msg = addCard(dk, c, res.sec); ok = JSON.stringify(dk) !== before; landSec = res.sec === 'champion' && !has(c, 'champion') ? 'main' : res.sec;
+  } else if (res && res.act === 'remove') {
+    removeCard(dk, st.id, st.from); ok = true; msg = `${dName(c)} 1장을 뺐습니다.`;
+  } else if (res && res.act === 'move') {
+    const r = moveCard(dk, st.id, st.from, res.sec); ok = r.ok; msg = r.msg; landSec = res.sec;
+  }
+  if (ok) {
+    edited();
+    if (res.act === 'remove') { flyGhost(g, null, { cls: 'poof', ms: 240 }); }
+    else {
+      const sel = `#ws-body .dt[data-id="${CSS.escape(landSec === 'champion' || landSec === 'legend' ? (landSec === 'legend' ? dk.legend : dk.champion) : st.id)}"][data-sec="${landSec}"]`;
+      const tile = document.querySelector(sel) || (st.zEl && document.contains(st.zEl) ? st.zEl : null);
+      const tr = tile ? (tile.querySelector('.dt-art') || tile).getBoundingClientRect() : null;
+      flyGhost(g, tr && tr.width ? tr : null, { fade: true, ms: 280 });
+      if (tile && tile.classList.contains('dt')) { tile.classList.add('landed'); setTimeout(() => tile.classList.remove('landed'), 700); }
+    }
+    if (msg) toast(msg);
+  } else {
+    if (msg) toast(msg);
+    const back = document.contains(st.el) ? st.el.getBoundingClientRect() : null;
+    flyGhost(g, back && back.width ? back : null, { cls: 'back', ms: 300, fade: !back });
+  }
+}
+function onDragCancel(ev) {
+  const st = DRAG.st; if (!st || ev.pointerId !== st.pid) return;
+  endDragListeners(); if (!st.active) return;
+  finishDragUI(st); flyGhost(st.ghost, document.contains(st.el) ? st.el.getBoundingClientRect() : null, { cls: 'back', ms: 300 });
+}
+function moveCard(dk, id, from, to) {
+  const c = BYID.get(id);
+  if (to === 'side' && sum(rows(dk.side)) >= 10) return { ok: false, msg: '보조 덱은 10장까지입니다.' };
+  if (to === 'bf') { if (dk.bf.length >= 3) return { ok: false, msg: '전장은 3장까지입니다.' }; if (dk.bf.some(x => nameKey(BYID.get(x)) === nameKey(c))) return { ok: false, msg: '이미 넣은 전장입니다.' }; }
+  if (to === 'champion') {
+    const lg = BYID.get(dk.legend);
+    if (lg && c.n !== champTag(lg)) return { ok: false, msg: `선택 챔피언은 ${champKo(champTag(lg))}만 고를 수 있습니다.` };
+    if (dk.champion) dk.main[dk.champion] = (dk.main[dk.champion] || 0) + 1;   // the old champion goes back into the main deck
+    removeCard(dk, id, from); dk.champion = id;
+    return { ok: true, msg: `선택 챔피언: ${dName(c)}` };
+  }
+  removeCard(dk, id, from);
+  if (to === 'bf') dk.bf.push(id); else dk[to][id] = (dk[to][id] || 0) + 1;
+  return { ok: true, msg: `${dName(c)} → ${SEC_LABEL[to]}` };
+}
+document.addEventListener('touchmove', ev => { if (DRAG.st && DRAG.st.active) ev.preventDefault(); }, { passive: false });
+document.addEventListener('contextmenu', ev => { if (DRAG.st && ev.target.closest && ev.target.closest('#deck-edit')) ev.preventDefault(); });
+document.addEventListener('keydown', ev => {
+  const st = DRAG.st; if (ev.key !== 'Escape' || !st || !st.active) return;
+  endDragListeners(); finishDragUI(st); flyGhost(st.ghost, document.contains(st.el) ? st.el.getBoundingClientRect() : null, { cls: 'back', ms: 300 });
+}, true);
 
 /* read-only deck list used by the meta-deck sheet */
 function lineHTML(c, n, sec, om, need, editable) {
