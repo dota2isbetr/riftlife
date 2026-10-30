@@ -437,6 +437,8 @@ table.st tr+tr th,table.st tr+tr td{border-top:1px solid var(--line)}
 .hp-text p{margin:4px 0 0;white-space:pre-line}
 .hp-text .en{color:var(--muted);font-size:12.5px;line-height:1.55}
 #ws-body .dt-art{cursor:zoom-in}
+.dl-lead{display:inline-flex;align-items:center;gap:8px}
+.dl-art{width:30px;height:30px;border-radius:5px;flex:none;background-color:var(--sunk);background-repeat:no-repeat}
 @media (prefers-reduced-motion:no-preference){.hover-card:not([hidden]){animation:hp-in .14s ease-out}@keyframes hp-in{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}}
 
 /* drag and drop */
@@ -1465,7 +1467,7 @@ function onEditorClick(ev) {
     const tag = champTag(BYID.get(dk.legend));
     const metas = MD.metas.filter(m => MD.decks.some(o => MD.events[o.e].meta === m.id && champTag(CARDS[o.L]) === tag));
     if (!metas.length) { toast(`${champKo(tag)}의 공개된 대회 덱이 아직 없습니다.`); return; }
-    Object.assign(mu, { meta: metas[metas.length - 1].id, rank: 'all', legend: tag }); saveMu(); location.hash = 'meta'; return;
+    Object.assign(mu, { meta: (metas.find(m => m.id === KR_META) || metas[metas.length - 1]).id, rank: 'all', legend: tag }); saveMu(); location.hash = 'meta'; return;
   }
   if (act === 'copy-en') return copyText(deckText(dk, 'en'), '영문 덱리스트');
   if (act === 'copy-ko') return copyText(deckText(dk, 'ko'), '한글 덱리스트');
@@ -1678,33 +1680,36 @@ function previewHTML(c) {
       ${isBanned(c) ? '<span><span class="pill bad">현재 금지 카드</span></span>' : ''}</div>`;
 }
 function showPreview(art) {
-  const tile = art.closest('.dt'), c = tile && BYID.get(tile.dataset.id); if (!c) return;
+  const tile = art.closest('[data-id]'), c = tile && BYID.get(tile.dataset.id); if (!c) return;
   const h = $('hover-card');
   h.innerHTML = previewHTML(c);
   h.querySelectorAll('[data-bg]').forEach(el => { el.style.backgroundImage = `url('${el.dataset.bg}')`; BG_SEEN.add(el.dataset.bg); });
   h.hidden = false;
   // beside the thumbnail: left of it when there is room (over the card pool), otherwise right; kept inside the viewport
   const r = art.getBoundingClientRect(), w = h.offsetWidth, hh = h.offsetHeight, gap = 14, pad = 8;
-  let left = r.left - w - gap;
-  if (left < pad) left = r.right + gap;
+  const side = art.closest('#sheet') ? $('sheet').getBoundingClientRect() : r;   // side-sheet rows open the preview beside the sheet itself
+  let left = side.left - w - gap;
+  if (left < pad) left = side.right + gap;
   left = Math.max(pad, Math.min(left, innerWidth - w - pad));
   const top = Math.max(pad + 48, Math.min(r.top - 40, innerHeight - hh - pad));
   h.style.left = left + 'px'; h.style.top = top + 'px';
 }
 function onHoverPreview(ev) {
   if (!canHover.matches || (DRAG.st && DRAG.st.active)) return;
-  const art = ev.target.closest('#ws-body .dt-art');
+  const art = ev.target.closest('#ws-body .dt-art, #sheet .dl-line');
   if (!art) { if (hpFor) hidePreview(); return; }
   if (hpFor === art) return;
   hidePreview(); hpFor = art;
   hpTimer = setTimeout(() => { if (hpFor === art && document.contains(art)) showPreview(art); }, 140);
 }
 addEventListener('scroll', () => { if (hpFor) hidePreview(); }, { passive: true, capture: true });
+$('sheet').addEventListener('mouseover', onHoverPreview);   // meta-deck lists in the side sheet
+$('sheet').addEventListener('mouseleave', hidePreview);
 
 /* read-only deck list used by the meta-deck sheet */
 function lineHTML(c, n, sec, om, need, editable) {
   const have = om.get(nameKey(c)) || 0, req = need.get(nameKey(c)) || n, short = sec !== 'side' && have < req;
-  const ctl = !editable ? `<b class="cnt">${n}</b>` : sec === 'bf'
+  const ctl = !editable ? `<span class="dl-lead"><b class="cnt">${n}</b><span class="ti dl-art" ${cropAttrs(c, 30, 30)} aria-hidden="true"></span></span>` : sec === 'bf'
     ? `<span class="sstep"><button type="button" data-act="dec" aria-label="빼기">×</button></span>`
     : `<span class="sstep"><button type="button" data-act="dec" aria-label="1장 빼기">−</button><b>${n}</b><button type="button" data-act="inc" aria-label="1장 더하기">+</button></span>`;
   return `<li class="dl-line" data-id="${c.id}" data-sec="${sec}">${ctl}
@@ -1728,9 +1733,11 @@ function deckListHTML(dk, om, editable) {
   return `<div class="dl">${h}</div>`;
 }
 /* ---------- meta decks ---------- */
+const KR_META = 'OGN';   // the Korean release is still in the Origins environment
 const MU_KEY = 'rb-ledger-meta-v1';
-const mu = Object.assign({ meta: MD.metas[MD.metas.length - 1].id, rank: 'top4', sort: 'rank', legend: '' }, lsGet(MU_KEY) || {});
-if (!MD.metas.some(m => m.id === mu.meta)) mu.meta = MD.metas[MD.metas.length - 1].id;
+const mu = Object.assign({ meta: KR_META, rank: 'top4', sort: 'rank', legend: '' }, lsGet(MU_KEY) || {});
+if (mu.mv !== 2) { mu.meta = KR_META; mu.legend = ''; mu.mv = 2; }   // the default moved to the Korean environment; switch earlier viewers once
+if (!MD.metas.some(m => m.id === mu.meta)) mu.meta = MD.metas.some(m => m.id === KR_META) ? KR_META : MD.metas[MD.metas.length - 1].id;
 const saveMu = () => lsSet(MU_KEY, mu);
 const metaDeck = o => ({
   name: `${legendLabel(CARDS[o.L])} (${MD.events[o.e].ko} #${o.r ?? '-'})`, legend: CARDS[o.L].id, champion: o.C != null ? CARDS[o.C].id : null,
@@ -1742,7 +1749,7 @@ const inRank = o => mu.rank === 'all' || (o.r != null && o.r <= (mu.rank === 'to
 function renderMeta() {
   $('m-meta').innerHTML = MD.metas.map(m => {
     const evs = MD.events.filter(e => e.meta === m.id);
-    return `<option value="${m.id}"${m.id === mu.meta ? ' selected' : ''}>${m.ko} (${m.en}) 메타 · 대회 ${evs.length}개 · ${evs[0].date.slice(0, 7)}~${evs[evs.length - 1].date.slice(0, 7)}</option>`;
+    return `<option value="${m.id}"${m.id === mu.meta ? ' selected' : ''}>${m.ko} (${m.en}) 메타${m.id === KR_META ? ' · 한국 환경' : ''} · 대회 ${evs.length}개 · ${evs[0].date.slice(0, 7)}~${evs[evs.length - 1].date.slice(0, 7)}</option>`;
   }).join('');
   $('m-rank').value = mu.rank; $('m-sort').value = mu.sort;
   const om = ownedMap(), m = MD.metas.find(x => x.id === mu.meta);
@@ -1815,6 +1822,7 @@ function openMetaSheet(i) {
   $('ms-take').onclick = () => takeMeta(i);
   $('ms-copy').onclick = () => copyText(deckText(dk, 'en'), '영문 덱리스트');
   $('ms-miss').onclick = () => copyText(missingText(dk), '부족 카드 목록');
+  wireLazy($('sheet'));
   $('sheet').querySelectorAll('[data-cid],[data-act="card"]').forEach(el => el.onclick = () => openDetail(el.dataset.cid || el.closest('[data-id]').dataset.id));
   $('d-close').focus();
 }
@@ -1970,6 +1978,7 @@ function richText(s) {
   return h;
 }
 function openDetail(id) {
+  hidePreview();
   const c = BYID.get(id); if (!c) return;
   if (!openId) lastFocus = document.activeElement;
   openId = id;
@@ -2015,6 +2024,7 @@ function openDetail(id) {
   if (document.activeElement === document.body || !$('sheet').contains(document.activeElement)) $('d-close').focus();
 }
 function closeDetail() {
+  hidePreview();
   openId = null; sheetBack = null; $('sheet').hidden = true; $('scrim').hidden = true;
   if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
 }
@@ -2103,9 +2113,9 @@ for (const s of SETS) {
 }
 function renderHome() {
   const om = ownedMap();
-  // promo strip: the newest meta's latest event
-  const m = MD.metas[MD.metas.length - 1], evs = MD.events.filter(e => e.meta === m.id), last = evs[evs.length - 1];
-  $('promo').innerHTML = `${esc(m.ko)} 메타 공식 대회 덱 ${MD.decks.filter(o => MD.events[o.e].meta === m.id).length}개 반영 · 최근 대회: ${esc(last.ko)} RQ (${last.date}).<a href="#meta">메타 덱 보기 ›</a>`;
+  // promo strip: the Korean environment's meta and its latest event
+  const m = MD.metas.find(x => x.id === KR_META) || MD.metas[MD.metas.length - 1], evs = MD.events.filter(e => e.meta === m.id), last = evs[evs.length - 1];
+  $('promo').innerHTML = `${esc(m.ko)} 메타${m.id === KR_META ? '(현재 한국 환경)' : ''} 공식 대회 덱 ${MD.decks.filter(o => MD.events[o.e].meta === m.id).length}개 반영 · 최근 대회: ${esc(last.ko)} RQ (${last.date}).<a href="#meta">메타 덱 보기 ›</a>`;
   const per = Object.fromEntries(SETS.map(s => [s.id, { n: 0, own: 0 }]));
   let kinds = 0, base = 0, baseOwn = 0, copies = 0;
   for (const c of CARDS) { const q = inv.q(c.id), p = per[c.set]; if (c._alt) continue; p.n++; base++; if (q) { p.own++; baseOwn++; } }
