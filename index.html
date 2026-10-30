@@ -408,11 +408,6 @@ h2.vh{margin:0;font-size:18px}
 .checks .e{color:var(--danger)} .checks .w{color:var(--accent)} .checks .ok{color:var(--rift)}
 .curve{display:flex;gap:4px;flex-wrap:wrap;font-size:12px;margin:4px 0 6px}
 .curve span{background:var(--sunk);border-radius:5px;padding:2px 7px;font-family:var(--f-mono)}
-.dl h4{margin:14px 0 4px;font-size:12px;letter-spacing:.05em;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
-.dl ul{list-style:none;margin:0;padding:0}
-.dl-line{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;padding:3px 0;font-size:13.5px}
-.dl-line .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dl-line .cnt{font-family:var(--f-mono);min-width:18px;text-align:right}
 .own-ok{color:var(--muted);font-size:12px;white-space:nowrap}
 .own-short{color:var(--danger);font-weight:600;font-size:12px;white-space:nowrap}
 .sstep{display:inline-flex;align-items:center;gap:2px}
@@ -444,7 +439,7 @@ h2.vh{margin:0;font-size:18px}
 .bt-img{all:unset;box-sizing:border-box;cursor:pointer;display:block;aspect-ratio:420/588;max-width:100%;border-radius:8px;overflow:hidden;background:var(--sunk);box-shadow:0 0 0 1px var(--line)}
 .bt-img:hover{box-shadow:0 0 0 2px var(--accent)}
 .bt-img:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.bt-img .ti,.bt-img img,.art-card .ti,.art-card img{display:block;width:100%;height:100%;object-fit:contain;background-repeat:no-repeat}
+.bt-img .ti,.bt-img img{display:block;width:100%;height:100%;object-fit:contain;background-repeat:no-repeat}
 .bt.in .bt-img{box-shadow:0 0 0 2px var(--rift)}
 .bt.off{opacity:.45}
 .bt-n{position:absolute;top:6px;right:6px;background:var(--rift);color:var(--surface);font-family:var(--f-mono);font-size:12px;font-weight:600;padding:1px 8px;border-radius:999px}
@@ -512,9 +507,36 @@ h2.vh{margin:0;font-size:18px}
 .addslot{width:100%;margin-top:6px;border:1px dashed var(--line);background:transparent;border-radius:8px;padding:10px;color:var(--muted);font-weight:500}
 .addslot:hover{border-color:var(--accent);color:var(--ink)}
 .rune-add{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
-.art-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
-.art-card{all:unset;box-sizing:border-box;cursor:pointer;position:relative;display:block;aspect-ratio:420/588;max-width:100%;border-radius:7px;overflow:hidden;background:var(--sunk)}
-.art-card:focus-visible{outline:2px solid var(--accent)}
+
+/* deck board (full-art view and deck sheets) */
+.sheet.wide{width:min(1480px,100%)}
+.board{container:board / inline-size;background:radial-gradient(120% 80% at 70% 0%,#1B2A4A 0%,#0E1626 55%,#0A101C 100%);color:#E9EEF2;border-radius:14px;padding:24px 26px 28px;min-width:0}
+.bd-grid{display:grid;grid-template-columns:minmax(0,23%) minmax(0,1fr);gap:26px 38px;align-items:start}
+.bd-left,.bd-right{min-width:0;container-type:inline-size}
+.bd-h{display:flex;align-items:center;gap:10px;margin:0 0 10px;font-size:13px;font-weight:700;letter-spacing:.02em;color:#E0A84A;white-space:nowrap}
+.bd-h i{font-style:normal;opacity:.75}
+.bd-h::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgb(224 168 74 / .45),rgb(224 168 74 / .08))}
+.bd-card{all:unset;box-sizing:border-box;cursor:pointer;position:relative;display:block;width:100%;aspect-ratio:420/588;border-radius:7px;overflow:hidden;background:#15203A;box-shadow:0 6px 16px rgb(0 0 0 / .45);transition:transform .15s ease}
+.bd-card:hover{transform:translateY(-3px)}
+.bd-card:focus-visible{outline:2px solid #E0A84A;outline-offset:2px}
+.bd-card .ti,.bd-card img{display:block;width:100%;height:100%;object-fit:contain;background-repeat:no-repeat}
+.bd-card.land{aspect-ratio:588/420}
+.bd-card.land img{object-fit:cover}
+.bd-rot{position:absolute;left:50%;top:50%;width:71.43%;height:140%;transform:translate(-50%,-50%) rotate(90deg)}
+.bd-empty{border:1px dashed #3A4A66;background:transparent;box-shadow:none;cursor:default}
+.bd-n{position:absolute;left:5%;bottom:4%;padding:1px 7px;border-radius:6px;background:#16264A;border:1.5px solid #8EA3CC;color:#fff;font:700 clamp(11px,1.15cqw + 4px,17px)/1.25 var(--f-mono);box-shadow:0 2px 6px rgb(0 0 0 / .5)}
+.bd-lc{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px}
+.bd-bf{display:grid;gap:14px;justify-items:center}
+.bd-bf .bd-card{width:64%}
+.bd-main{display:flex;flex-wrap:wrap;justify-content:center;gap:14px 12px}
+.bd-main .bd-card{width:calc((100cqw - 72px) / 7)}
+.bd-bottom{display:flex;flex-wrap:wrap;justify-content:center;gap:18px 44px;margin-top:22px}
+.bd-row{display:flex;flex-wrap:wrap;gap:10px}
+.bd-row .bd-card{width:calc((100cqw - 72px) / 7 * .7)}
+.bd-row .bd-n{font-size:clamp(10px,.8cqw + 4px,14px);padding:0 5px}
+@container board (max-width:700px){.bd-grid{grid-template-columns:minmax(0,1fr)}.bd-left{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 20px}.bd-left .bd-lc{margin:0}.bd-left>.bd-h,.bd-left>.bd-bf{grid-column:2}.bd-left>.bd-h{grid-row:1;align-self:start}.bd-left>.bd-bf{grid-row:1;margin-top:28px}}
+@container board (max-width:560px){.bd-main .bd-card{width:calc((100cqw - 36px) / 4)}.bd-row .bd-card{width:calc((100cqw - 36px) / 4 * .8)}.bd-left{grid-template-columns:minmax(0,1fr)}.bd-left>.bd-h,.bd-left>.bd-bf{grid-column:1;grid-row:auto;margin-top:0}.bd-left .bd-lc{margin-bottom:18px}.bd-bf{grid-template-columns:repeat(3,minmax(0,1fr))}.bd-bf .bd-card{width:100%}.board{padding:18px 16px 20px}}
+
 .curve-chart{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:2px;height:150px;align-items:end;border-bottom:1px solid var(--line);padding-top:16px}
 .cv-col{display:grid;grid-template-rows:auto 1fr;height:100%;align-items:end;position:relative;cursor:default}
 .cv-val{text-align:center;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
@@ -592,12 +614,6 @@ table.an td.pc{color:var(--ink);background:linear-gradient(90deg,var(--rift-soft
 .hp-text p{margin:4px 0 0;white-space:pre-line}
 .hp-text .en{color:var(--muted);font-size:12.5px;line-height:1.55}
 #ws-body .dt-art{cursor:zoom-in}
-.dl-lead{display:inline-flex;align-items:center;gap:8px}
-.dl-card{width:54px;aspect-ratio:420/588;border-radius:4px;overflow:hidden;flex:none;background:var(--sunk);box-shadow:0 2px 6px rgb(0 0 0 / .18)}
-.dl-card .ti,.dl-card img{display:block;width:100%;height:100%;object-fit:contain;background-repeat:no-repeat}
-#sheet .dl-line{padding:5px 0;gap:12px;font-size:14px}
-#sheet .dl-lead{gap:10px}
-#sheet .dl h4{margin-top:20px}
 @media (prefers-reduced-motion:no-preference){.hover-card:not([hidden]){animation:hp-in .14s ease-out}@keyframes hp-in{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}}
 
 /* drag and drop */
@@ -862,7 +878,7 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
     <div class="meta-grid" id="kr-list"></div>
   </section>
 
-  <p class="foot">카드 데이터: playriftbound.com 공식 카드 갤러리 (영문·한국어, <span id="fetched"></span> 기준, <span id="n-cards"></span>종). 한국어 이름은 공식 한국어판이 있는 오리진 세트만 <b>공식</b>이며, 이후 세트의 챔피언 이름은 리그 오브 레전드 한국어 표기를 따른 <b>추정</b>입니다. 한글명이 없는 카드는 상세 화면에서 내 번역을 직접 넣을 수 있고, 검색에도 반영됩니다. 갤러리에 없는 프로모·지역 한정 카드와 일부 토큰은 playriftbound.com 공식 뉴스에 공개된 카드 이미지를 기준으로 추가했습니다(상세 화면에 출처 표시). 카드 이미지 © Riot Games, 비영리 목적으로 허가를 받아 사용합니다. 메타 덱: playriftbound.com 공식 Organized Play 기사의 지역 예선(RQ) 덱리스트이며, 메타는 각 대회에서 사용된 가장 최신 확장팩 기준으로 나눴습니다. 금지 카드는 공식 금지 목록(Standard)을 기준으로 표시합니다. <span class="build">빌드 2026-10-30 22:26 KST</span></p>
+  <p class="foot">카드 데이터: playriftbound.com 공식 카드 갤러리 (영문·한국어, <span id="fetched"></span> 기준, <span id="n-cards"></span>종). 한국어 이름은 공식 한국어판이 있는 오리진 세트만 <b>공식</b>이며, 이후 세트의 챔피언 이름은 리그 오브 레전드 한국어 표기를 따른 <b>추정</b>입니다. 한글명이 없는 카드는 상세 화면에서 내 번역을 직접 넣을 수 있고, 검색에도 반영됩니다. 갤러리에 없는 프로모·지역 한정 카드와 일부 토큰은 playriftbound.com 공식 뉴스에 공개된 카드 이미지를 기준으로 추가했습니다(상세 화면에 출처 표시). 카드 이미지 © Riot Games, 비영리 목적으로 허가를 받아 사용합니다. 메타 덱: playriftbound.com 공식 Organized Play 기사의 지역 예선(RQ) 덱리스트이며, 메타는 각 대회에서 사용된 가장 최신 확장팩 기준으로 나눴습니다. 금지 카드는 공식 금지 목록(Standard)을 기준으로 표시합니다. <span class="build">빌드 2026-10-30 22:32 KST</span></p>
   <footer class="legal">
     <p>Copyright © 2026 riftlife.life</p>
     <p>RiftLife 는 Riot Games의 "Legal Jibber Jabber" 정책을 준수하여 만들었습니다. 모든 지적 재산권의 소유권은 Riot Games에 있으며 RiftLife는 그 어떤 수익 창출이나 영리 목적 활동을 하지 않습니다. 또한 Riot Games는 RiftLife를 제작하지 않았고 스폰서를 제공한 적이 없습니다. RiftLife는 개인 기록 보관 및 교육 목적만을 가지고 있는 완전 비영리 웹입니다.</p>
@@ -4311,13 +4327,31 @@ function listView(dk, om) {
   h += `<section class=\"sec a-runes\" data-drop=\"runes\">${head('runes')}${rs.length ? tiles(rs, 'runes') : ''}<div class="rune-add">${runeBtns || addBtn('runes')}</div></section>`;
   return `<div class="ws-list">${h}</div>`;
 }
-function artView(dk) {
-  const ch = BYID.get(dk.champion), lg = BYID.get(dk.legend);
-  const grid = rs => `<div class="art-grid">${rs.map(([c, n]) => `<button class="art-card" type="button" data-act="card" data-cid="${c.id}" title="${esc(dName(c))}">${tileArt(c)}${n > 1 ? `<span class="bt-n">×${n}</span>` : ''}</button>`).join('')}</div>`;
-  const parts = [['전설 · 챔피언', [lg && [lg, 1], ch && [ch, 1]].filter(Boolean)], ['주 덱', sortRows(rows(dk.main))], ['전장', (dk.bf || []).map(id => [BYID.get(id), 1])], ['보조 덱', sortRows(rows(dk.side))], ['룬', rows(dk.runes)]];
-  const h = parts.filter(([, rs]) => rs.length).map(([t, rs]) => `<h5>${t} <span>${sum(rs)}장</span></h5>${grid(rs)}`).join('');
-  return h || '<p class="empty">아직 카드가 없습니다. 왼쪽에서 전설부터 고르세요.</p>';
+// Deck "board": legend and champion over the battlefields on the left, the main deck as a centred card wall on the right,
+// runes and sideboard side by side under it. Used by the editor's full-art view and the read-only deck sheets.
+function deckBoardHTML(dk) {
+  const lg = BYID.get(dk.legend), ch = BYID.get(dk.champion);
+  const byCost = rs => rs.sort((a, b) => (a[0].e ?? 99) - (b[0].e ?? 99) || TYPE_RANK(a[0]) - TYPE_RANK(b[0]) || dName(a[0]).localeCompare(dName(b[0]), 'ko'));
+  const main = byCost(rows(dk.main)), side = byCost(rows(dk.side)), runes = rows(dk.runes), bf = (dk.bf || []).map(id => BYID.get(id)).filter(Boolean);
+  if (!lg && !ch && !main.length && !bf.length) return '<p class="empty">아직 카드가 없습니다. 왼쪽에서 전설부터 고르세요.</p>';
+  const art = c => c.rot && USE_PACK ? `<span class="bd-rot">${tileArt(c)}</span>` : tileArt(c);   // battlefields sit rotated in the sheets
+  const card = (c, n, land) => `<button class="bd-card${land ? ' land' : ''}" type="button" data-act="card" data-cid="${c.id}" title="${esc(dName(c))}">${art(c)}${n ? `<span class="bd-n">×${n}</span>` : ''}</button>`;
+  const head = (t, n) => `<h4 class="bd-h">${t}${n != null ? ` <i>//</i> ${n}장` : ''}</h4>`;
+  const slot = c => c ? card(c, 0) : '<span class="bd-card bd-empty"></span>';
+  return `<div class="board"><div class="bd-grid">
+    <div class="bd-left">
+      <div class="bd-lc"><div>${head('전설')}${slot(lg)}</div><div>${head('챔피언')}${slot(ch)}</div></div>
+      ${head('전장', bf.length)}<div class="bd-bf">${bf.map(c => card(c, 0, true)).join('')}</div>
+    </div>
+    <div class="bd-right">
+      ${head('주 덱', sum(main))}<div class="bd-main">${main.map(([c, n]) => card(c, n)).join('')}</div>
+      <div class="bd-bottom">
+        ${runes.length ? `<div>${head('룬', sum(runes))}<div class="bd-row">${runes.map(([c, n]) => card(c, n)).join('')}</div></div>` : ''}
+        ${side.length ? `<div>${head('보조 덱', sum(side))}<div class="bd-row">${side.map(([c, n]) => card(c, n)).join('')}</div></div>` : ''}
+      </div>
+    </div></div></div>`;
 }
+function artView(dk) { return deckBoardHTML(dk); }
 function statsView(dk, om) {
   const ch = BYID.get(dk.champion), main = [...rows(dk.main), ...(ch ? [[ch, 1]] : [])], total = sum(main);
   if (!total) return '<p class="empty">주 덱에 카드를 넣으면 통계가 나옵니다.</p>';
@@ -4825,42 +4859,14 @@ function showPreview(art) {
 }
 function onHoverPreview(ev) {
   if (!canHover.matches || (DRAG.st && DRAG.st.active)) return;
-  const art = ev.target.closest('#ws-body .dt-art, #sheet .dl-line');
+  const art = ev.target.closest('#ws-body .dt-art');
   if (!art) { if (hpFor) hidePreview(); return; }
   if (hpFor === art) return;
   hidePreview(); hpFor = art;
   hpTimer = setTimeout(() => { if (hpFor === art && document.contains(art)) showPreview(art); }, 140);
 }
 addEventListener('scroll', () => { if (hpFor) hidePreview(); }, { passive: true, capture: true });
-$('sheet').addEventListener('mouseover', onHoverPreview);   // meta-deck lists in the side sheet
-$('sheet').addEventListener('mouseleave', hidePreview);
 
-/* read-only deck list used by the meta-deck sheet */
-function lineHTML(c, n, sec, om, need, editable) {
-  const have = om.get(nameKey(c)) || 0, req = need.get(nameKey(c)) || n, short = sec !== 'side' && have < req;
-  const ctl = !editable ? `<span class="dl-lead"><b class="cnt">${n}</b><span class="dl-card" aria-hidden="true">${tileArt(c)}</span></span>` : sec === 'bf'
-    ? `<span class="sstep"><button type="button" data-act="dec" aria-label="빼기">×</button></span>`
-    : `<span class="sstep"><button type="button" data-act="dec" aria-label="1장 빼기">−</button><b>${n}</b><button type="button" data-act="inc" aria-label="1장 더하기">+</button></span>`;
-  return `<li class="dl-line" data-id="${c.id}" data-sec="${sec}">${ctl}
-    <button class="nm" type="button" data-act="card" title="${esc(enName(c))}">${esc(dName(c))}${isBanned(c) ? ' <span class="pill bad">금지</span>' : ''}</button>
-    <span class="${short ? 'own-short' : 'own-ok'}">${c.e != null ? `⬡${c.e} · ` : ''}${short ? `보유 ${have}/${req}` : `보유 ${have}`}</span></li>`;
-}
-function deckListHTML(dk, om, editable) {
-  const need = deckNeeds(dk), lg = BYID.get(dk.legend), ch = BYID.get(dk.champion);
-  const main = sortRows(rows(dk.main)), groups = [['챔피언 유닛', 0], ['유닛', 1], ['주문', 2], ['도구', 3], ['기타', 4]];
-  const sec = (title, count, body) => `<h4><span>${title}</span><span>${count}</span></h4><ul>${body}</ul>`;
-  let h = '';
-  for (const [title, r] of groups) { const g = main.filter(([c]) => TYPE_RANK(c) === r); if (g.length) h += sec(title, sum(g) + '장', g.map(([c, n]) => lineHTML(c, n, 'main', om, need, editable)).join('')); }
-  const bf = (dk.bf || []).map(id => BYID.get(id)).filter(Boolean);
-  h += sec('전장', `${bf.length}/3`, bf.map(c => lineHTML(c, 1, 'bf', om, need, editable)).join('') || '<li class="hint">아직 없음</li>');
-  const rs = rows(dk.runes);
-  let runeBtns = '';
-  if (editable && lg) runeBtns = lg.d.map(d => CANON_LIST.find(c => has(c, 'rune') && (c.d || [])[0] === d)).filter(Boolean).map(c => `<button class="mini" type="button" data-act="rune" data-rid="${c.id}">+ ${esc(dName(c))}</button>`).join(' ');
-  h += sec('룬 덱', `${sum(rs)}/12`, rs.map(([c, n]) => lineHTML(c, n, 'runes', om, need, editable)).join('') + (runeBtns ? `<li class="pk-btns" style="justify-content:flex-start;padding-top:4px">${runeBtns}</li>` : ''));
-  const sd = sortRows(rows(dk.side));
-  if (sd.length || editable) h += sec('사이드보드', sum(sd) + '장', sd.map(([c, n]) => lineHTML(c, n, 'side', om, need, editable)).join('') || '<li class="hint">비어 있음</li>');
-  return `<div class="dl">${h}</div>`;
-}
 /* ---------- meta decks ---------- */
 const KR_META = 'OGN';   // the Korean release is still in the Origins environment
 const MU_KEY = 'rb-ledger-meta-v1';
@@ -4935,7 +4941,7 @@ let sheetBack = null;
 function openDeckSheet({ dk, lg, champ, head, title, sub, note, link, linkText, take, back }) {
   const om = ownedMap(), own = deckOwn(dk, om);
   if (!openId && $('sheet').hidden) lastFocus = document.activeElement;
-  openId = null; sheetBack = back;
+  openId = null; sheetBack = back; $('sheet').classList.add('wide');
   $('sheet').innerHTML = `
     <header>
       <div><div class="code">${head}</div>
@@ -4945,8 +4951,7 @@ function openDeckSheet({ dk, lg, champ, head, title, sub, note, link, linkText, 
     <div><div class="ownbar" aria-hidden="true"><i style="width:${own.pct}%"></i></div>
     <p class="hint" style="margin:6px 0 0">내 컬렉션 기준 보유 ${own.have}/${own.total}장 (${own.pct}%) · 부족 ${own.miss}장. 사이드보드는 계산에서 뺐습니다.${note ? ' ' + esc(note) + '.' : ''}</p></div>
     <div class="filters"><button class="btn" type="button" id="ms-take">내 덱으로 가져오기</button><button class="ghost" type="button" id="ms-copy">영문 덱리스트 복사</button><button class="ghost" type="button" id="ms-miss"${own.miss ? '' : ' disabled'}>부족 카드 복사</button></div>
-    <div class="slot"><span class="th sm" style="${thumbStyle(lg, 32)}" aria-hidden="true"></span><span><span class="hint">선택 챔피언</span><br>${champ ? `<button class="nm" type="button" data-cid="${champ.id}">${esc(dName(champ))}</button>` : '—'}</span></div>
-    <div id="ms-list">${deckListHTML(dk, om, false)}</div>
+    <div id="ms-list">${deckBoardHTML(dk)}</div>
     ${link ? `<a class="artlink" href="${link}" target="_blank" rel="noopener">${esc(linkText)}</a>` : ''}`;
   $('sheet').hidden = false; $('scrim').hidden = false;
   $('d-close').onclick = closeDetail;
@@ -5029,6 +5034,7 @@ const KR_SETS = new Set(['OGN', 'OGS']);
 function banCard(n) { const k = normName(n); return CANON_LIST.find(c => normName(enName(c)) === k || normName(c.n) === k) || CARDS.find(c => !c._alt && (normName(enName(c)) === k || normName(c.n) === k)); }
 function openBanSheet() {
   if (!openId && $('sheet').hidden) lastFocus = document.activeElement;
+  $('sheet').classList.remove('wide');
   const back = () => openBanSheet(); back.label = '← 밴리스트';
   openId = null; sheetBack = back;
   const groups = MD.bans.filter(b => b.date <= TODAY).sort((a, b) => b.date.localeCompare(a.date));
@@ -5211,7 +5217,7 @@ function richText(s) {
   return h;
 }
 function openDetail(id) {
-  hidePreview();
+  hidePreview(); $('sheet').classList.remove('wide');
   const c = BYID.get(id); if (!c) return;
   if (!openId) lastFocus = document.activeElement;
   openId = id;
@@ -5259,7 +5265,7 @@ function openDetail(id) {
 }
 function closeDetail() {
   hidePreview();
-  openId = null; sheetBack = null; $('sheet').hidden = true; $('scrim').hidden = true;
+  openId = null; sheetBack = null; $('sheet').hidden = true; $('scrim').hidden = true; $('sheet').classList.remove('wide');
   if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
 }
 
