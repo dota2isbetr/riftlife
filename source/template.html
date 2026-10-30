@@ -227,6 +227,92 @@ h2.vh{margin:0;font-size:18px}
 .sstep b{min-width:20px;text-align:center;font-family:var(--f-mono);font-weight:500}
 .acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
 
+/* deck editor: card browser + deck workspace */
+.ed-switch{display:none;margin-bottom:10px}
+.ed-switch button{flex:1;border:1px solid var(--line);background:var(--surface);padding:9px;font-weight:600}
+.ed-switch button:first-child{border-radius:8px 0 0 8px}.ed-switch button:last-child{border-radius:0 8px 8px 0;border-left:0}
+.ed-switch button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.ed-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:16px;align-items:start}
+.browser,.ws{position:sticky;top:calc(env(safe-area-inset-top,0px) + 8px);max-height:calc(100vh - 24px);overflow-y:auto}
+.sectabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.sectabs button{border:1px solid var(--line);background:var(--bg);border-radius:7px;padding:6px 12px;font-weight:600;font-size:13px}
+.sectabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.bt-ctl{margin-bottom:6px}
+.bt-ctl input[type="search"]{flex:1 1 200px;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.bt-info{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.bt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:12px 10px}
+.bt-grid .empty{grid-column:1 / -1}
+.bt{position:relative;display:grid;gap:4px;min-width:0;align-content:start}
+.bt-img{all:unset;box-sizing:border-box;cursor:pointer;display:block;aspect-ratio:420/588;max-width:100%;border-radius:8px;overflow:hidden;background:var(--sunk);box-shadow:0 0 0 1px var(--line)}
+.bt-img:hover{box-shadow:0 0 0 2px var(--accent)}
+.bt-img:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.bt-img .ti,.bt-img img,.art-card .ti,.art-card img{display:block;width:100%;height:100%;object-fit:contain;background-repeat:no-repeat}
+.bt.in .bt-img{box-shadow:0 0 0 2px var(--rift)}
+.bt.off{opacity:.45}
+.bt-n{position:absolute;top:6px;right:6px;background:var(--rift);color:var(--surface);font-family:var(--f-mono);font-size:12px;font-weight:600;padding:1px 8px;border-radius:999px}
+.bt-ban{position:absolute;top:6px;left:6px;background:var(--danger);color:#fff;font-size:11px;font-weight:600;padding:1px 7px;border-radius:999px}
+.bt-foot{display:grid;min-width:0;line-height:1.3}
+.bt-name{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hint.dim{opacity:.7}
+.bt-act{display:flex;gap:4px}
+.bt-act .mini{padding:2px 8px}
+.ws-head{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.ws-title{font-size:12px;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.save{font-size:12px;color:var(--muted)}
+.save.ok{color:var(--rift)}
+.ws-head .spacer{flex:1}
+.ws-name{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.ws-name input{flex:1 1 200px;min-width:0;font-size:16px;font-weight:600;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 12px}
+.ws-tabs{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.issues{border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:13px;font-weight:600;background:var(--bg)}
+.issues.bad{color:var(--danger);background:var(--accent-soft);border-color:transparent}
+.issues.warn{color:var(--accent);background:var(--accent-soft);border-color:transparent}
+.issues.ok{color:var(--rift);background:var(--rift-soft);border-color:transparent}
+.ws-issues{background:var(--bg);border-radius:8px;padding:8px 10px 8px 6px}
+.ws-body{display:grid;gap:4px}
+.sec{border-top:1px solid var(--line);padding:10px 0 8px;min-width:0}
+.sec header{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.sec h4{margin:0;font-size:12.5px;letter-spacing:.08em;color:var(--muted);margin-right:auto}
+.sec h5{margin:10px 0 6px;font-size:12px;color:var(--muted);font-weight:600}
+.sec h5 span{font-family:var(--f-mono);font-weight:400}
+.sec-ctl{display:flex;gap:4px;flex-wrap:wrap}
+.sec-ctl select{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:3px 6px;font-size:12px}
+.sec-pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0 14px}
+.cnt{font-family:var(--f-mono);font-weight:600;font-size:13px;padding:1px 9px;border-radius:6px}
+.cnt.need{background:var(--accent-soft);color:var(--accent)}
+.cnt.ok{background:var(--rift-soft);color:var(--rift)}
+.cnt.over{background:var(--accent-soft);color:var(--danger)}
+.dt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px}
+.dt{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:10px;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:5px 6px 5px 5px;min-width:0}
+.dt.banned{border-color:var(--danger)}
+.dt-art{width:52px;height:52px;border-radius:6px;background-color:var(--sunk);background-repeat:no-repeat}
+.dt-mid{display:grid;gap:2px;min-width:0}
+.dt-mid .nm{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dt-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px}
+.qty{font-family:var(--f-mono);color:var(--rift);font-size:13px}
+.dt-ctl{display:grid;gap:3px}
+.dt-ctl button{border:1px solid var(--line);background:var(--surface);width:26px;height:24px;border-radius:5px;line-height:1;padding:0;color:var(--muted)}
+.dt-ctl button:hover{color:var(--ink);border-color:var(--muted)}
+.addslot{width:100%;margin-top:6px;border:1px dashed var(--line);background:transparent;border-radius:8px;padding:10px;color:var(--muted);font-weight:500}
+.addslot:hover{border-color:var(--accent);color:var(--ink)}
+.rune-add{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.art-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.art-card{all:unset;box-sizing:border-box;cursor:pointer;position:relative;display:block;aspect-ratio:420/588;max-width:100%;border-radius:7px;overflow:hidden;background:var(--sunk)}
+.art-card:focus-visible{outline:2px solid var(--accent)}
+.curve-chart{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:2px;height:150px;align-items:end;border-bottom:1px solid var(--line);padding-top:16px}
+.cv-col{display:grid;grid-template-rows:auto 1fr;height:100%;align-items:end;position:relative;cursor:default}
+.cv-val{text-align:center;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.cv-bar{display:block;width:62%;max-width:34px;margin:0 auto;background:var(--rift);border-radius:4px 4px 0 0;min-height:0}
+.cv-col:hover .cv-bar{background:var(--accent)}
+.cv-x{position:absolute;bottom:-20px;left:0;right:0;text-align:center;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.curve-chart + *{margin-top:24px}
+.sec .curve-chart{margin-bottom:24px}
+table.st{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+table.st th{text-align:left;font-weight:500;padding:4px 6px 4px 0}
+table.st td{text-align:right;padding:4px 0 4px 8px;color:var(--muted);white-space:nowrap}
+table.st thead td{font-size:11px}
+table.st tr+tr th,table.st tr+tr td{border-top:1px solid var(--line)}
+
 /* meta decks */
 .meta-sum{display:grid;gap:4px;margin:4px 0 6px}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 14px}
@@ -248,9 +334,10 @@ h2.vh{margin:0;font-size:18px}
 .copybox p{margin:0;font-size:13px}
 
 @media (max-width:860px){
+  .ed-switch{display:flex}
   .ed-grid{grid-template-columns:minmax(0,1fr)}
-  .deckpane{position:static;max-height:none}
-  .pk-list{max-height:62vh;overflow-y:auto}
+  .browser,.ws{position:static;max-height:none;overflow:visible}
+  .ed-grid[data-pane="browse"] .ws,.ed-grid[data-pane="deck"] .browser{display:none}
 }
 @media (max-width:560px){
   .pk-row{grid-template-columns:32px minmax(0,1fr)}
@@ -712,9 +799,9 @@ const decks = {
   data: {}, dirty: new Set(), busy: new Map(), timers: new Map(),
   save(id) { if (this.data[id]) this.data[id].updated = Date.now(); this.schedule(id); },
   remove(id) { delete this.data[id]; this.schedule(id); },
-  schedule(id) { this.dirty.add(id); clearTimeout(this.timers.get(id)); this.timers.set(id, setTimeout(() => this.flush(id), 700)); },
+  schedule(id) { this.dirty.add(id); clearTimeout(this.timers.get(id)); this.timers.set(id, setTimeout(() => this.flush(id), 700)); edSaveState(); },
   async flush(id) {
-    if (inv.mode !== 'db') { this.dirty.delete(id); lsSet(DK_KEY, this.data); return; }
+    if (inv.mode !== 'db') { this.dirty.delete(id); lsSet(DK_KEY, this.data); edSaveState(); return; }
     if (this.busy.get(id)) { this.schedule(id); return; }
     this.dirty.delete(id); this.busy.set(id, true);
     try { const d = this.data[id]; if (d) await inv.col.doc(id).set(d); else await inv.col.doc(id).delete(); }
@@ -722,7 +809,7 @@ const decks = {
       if (err && err.code === 'invalid_argument') { inv.toLocal('이 링크에서는 계정 저장 권한이 없어, 이 브라우저에만 저장합니다.'); lsSet(DK_KEY, this.data); lsSet(LS_KEY, inv.data); }
       else if (err && err.code === 'quota_exceeded') toast('저장 공간이 가득 찼습니다. 쓰지 않는 덱을 지워 주세요.');
       else { toast('덱 저장이 잠시 실패했습니다. 곧 다시 시도합니다.'); this.dirty.add(id); setTimeout(() => this.flush(id), 1500 + Math.random() * 1500); }
-    } finally { this.busy.set(id, false); }
+    } finally { this.busy.set(id, false); edSaveState(); }
   },
   pending(id) { return this.dirty.has(id) || this.busy.get(id); },
   create(dk) { const id = 'deck-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); this.data[id] = dk; this.save(id); return id; },
@@ -781,59 +868,111 @@ $('dk-paste-go').onclick = () => {
   openEditor(id);
 };
 
-/* ---------- deck builder: editor ---------- */
+/* ---------- deck builder: editor (card browser on the left, deck workspace on the right) ---------- */
 let edId = null, edBuilt = null;
-const pk = { q: '', type: '', owned: false, limit: 80 };
-function openEditor(id) { edId = id; edBuilt = null; pk.limit = 80; if (location.hash !== '#decks') location.hash = 'decks'; else renderActive(); scrollTo(0, 0); }
+const SECS = [['legend', '전설'], ['champion', '챔피언'], ['main', '주 덱'], ['bf', '전장'], ['side', '보조 덱'], ['runes', '룬']];
+const SEC_LABEL = Object.fromEntries(SECS);
+const pk = { sec: 'legend', q: '', type: '', sort: 'cost', owned: false, legal: true, limit: 60 };
+const ws = { view: 'list', group: 'none', sort: 'cost', dir: 1, issues: false, pane: 'browse' };
+const LIMITS = { legend: [1, 1], champion: [1, 1], main: [39, null], bf: [3, 3], side: [0, 10], runes: [12, 12] };
+
+function openEditor(id) {
+  edId = id; edBuilt = null; pk.limit = 60; pk.q = ''; ws.issues = false; ws.pane = 'browse';
+  const dk = decks.data[id];
+  pk.sec = !dk.legend ? 'legend' : !dk.champion ? 'champion' : 'main';
+  if (location.hash !== '#decks') location.hash = 'decks'; else renderActive();
+  scrollTo(0, 0);
+}
 function closeEditor() { edId = null; edBuilt = null; $('deck-edit').hidden = true; $('deck-home').hidden = false; }
+
+// Square crop of a card's illustration from the large image sheets (W = rendered card width).
+function cropAttrs(c, w, h, W = w / 0.62, cx = 0.55, cy = 0.27) {
+  const f = n => n.toFixed(1);
+  if (!USE_PACK) { const H = W * 1039 / 744; return `data-bg="${cdn(c, 240)}" style="background-size:${f(W)}px ${f(H)}px;background-position:${f(w / 2 - cx * W)}px ${f(h / 2 - cy * H)}px"`; }
+  const per = G.dn * G.dn, k = c.ix % per, H = W * G.ch / G.cw;
+  return `data-bg="img/d${pad3(Math.floor(c.ix / per))}.webp" style="background-size:${f(G.dn * W)}px ${f(G.dn * H)}px;background-position:${f(w / 2 - ((k % G.dn) + cx) * W)}px ${f(h / 2 - (Math.floor(k / G.dn) + cy) * H)}px"`;
+}
+function secCount(dk, sec) {
+  if (sec === 'legend') return dk.legend ? 1 : 0;
+  if (sec === 'champion') return dk.champion ? 1 : 0;
+  if (sec === 'bf') return (dk.bf || []).length;
+  return sum(rows(dk[sec]));
+}
+function countBadge(dk, sec) {
+  const n = secCount(dk, sec), [min, max] = LIMITS[sec];
+  const st = max != null && n > max ? 'over' : n >= min ? 'ok' : 'need';
+  return `<span class="cnt ${st}">${n}/${max ?? min}</span>`;
+}
+
 function renderEditor() {
   const dk = decks.data[edId];
   $('deck-home').hidden = true; $('deck-edit').hidden = false;
   if (edBuilt !== edId) {
     edBuilt = edId;
     $('deck-edit').innerHTML = `
-      <div class="ed-top"><button class="ghost" type="button" id="ed-back">← 내 덱 목록</button><input id="ed-name" aria-label="덱 이름" value="${esc(dk.name || '')}"></div>
-      <div class="ed-grid">
-        <section class="panel" aria-label="카드 고르기">
-          <h3 id="pk-title"></h3>
-          <div class="filters pk-ctl">
-            <input id="pk-q" type="search" autocomplete="off" placeholder="카드 검색 (한글·영문·초성)" value="${esc(pk.q)}" aria-label="카드 검색">
-            <select id="pk-type" aria-label="유형"><option value="">유형: 전체</option>${['champion','unit','spell','gear','battlefield','rune'].map(t => `<option value="${t}"${pk.type === t ? ' selected' : ''}>${L.type[t][0]}</option>`).join('')}</select>
-            <label class="chk"><input id="pk-owned" type="checkbox"${pk.owned ? ' checked' : ''}> 보유 카드만</label>
+      <div class="ed-switch" role="group" aria-label="편집 화면">
+        <button type="button" data-pane="browse">카드 고르기</button><button type="button" data-pane="deck">덱 보기 <span id="sw-count"></span></button>
+      </div>
+      <div class="ed-grid" id="ed-grid">
+        <section class="panel browser" id="ed-browser" aria-label="카드 고르기">
+          <div class="sectabs" id="bt-tabs" role="tablist"></div>
+          <div class="filters bt-ctl">
+            <input id="pk-q" type="search" autocomplete="off" aria-label="카드 검색">
+            <select id="pk-sort" aria-label="정렬"><option value="cost">에너지순</option><option value="name">이름순</option><option value="own">보유 많은 순</option><option value="deck">덱에 넣은 카드 먼저</option></select>
+            <select id="pk-type" aria-label="유형"><option value="">유형: 전체</option>${['champion', 'unit', 'spell', 'gear'].map(t => `<option value="${t}">${L.type[t][0]}</option>`).join('')}</select>
+            <label class="chk"><input id="pk-owned" type="checkbox"> 보유 카드만</label>
+            <label class="chk" title="전설의 영역과 시그니처 규칙에 맞는 카드만 보여 줍니다"><input id="pk-legal" type="checkbox"> 덱 규칙에 맞는 카드만</label>
           </div>
-          <p class="hint" id="pk-hint"></p>
-          <ul class="pk-list" id="pk-list"></ul>
-          <div class="more" id="pk-more" hidden><button type="button" id="pk-more-btn">더 보기</button></div>
+          <div class="bt-info"><span class="hint" id="bt-hint"></span><span class="hint" id="bt-count"></span></div>
+          <div class="bt-grid" id="bt-grid"></div>
+          <div class="more" id="bt-more" hidden><button type="button" data-act="more">더 보기</button></div>
         </section>
-        <section class="panel deckpane" id="deckpane" aria-label="덱 구성"></section>
+        <section class="panel ws" id="ed-ws" aria-label="덱 작업 공간">
+          <div class="ws-head">
+            <button class="mini" type="button" data-act="back">← 내 덱</button>
+            <span class="ws-title">덱 작업 공간</span><span class="save" id="ws-save"></span>
+            <span class="spacer"></span>
+            <button class="mini" type="button" data-act="copy-en" title="영문 덱리스트를 복사합니다">영문 복사</button>
+            <button class="mini" type="button" data-act="copy-ko" title="한글 덱리스트를 복사합니다">한글 복사</button>
+            <button class="mini" type="button" data-act="dup">복제</button>
+            <button class="mini" type="button" data-act="del">삭제</button>
+          </div>
+          <div class="ws-name"><input id="ed-name" aria-label="덱 이름" placeholder="덱 이름"><button class="mini" type="button" data-act="meta" id="ws-meta" title="메타 덱 탭에서 이 챔피언의 대회 덱을 봅니다">이 챔피언 대회 덱</button></div>
+          <div class="ws-tabs">
+            <div class="seg" role="group" aria-label="보기"><button type="button" data-view="list">리스트</button><button type="button" data-view="art">풀 아트</button><button type="button" data-view="stats">통계</button></div>
+            <button class="issues" type="button" id="ws-issues-btn" data-act="issues" aria-expanded="false"></button>
+            <span class="pill" id="ws-own"></span>
+          </div>
+          <ul class="checks ws-issues" id="ws-issues" hidden></ul>
+          <div id="ed-confirm"></div>
+          <div class="ws-body" id="ws-body"></div>
+        </section>
       </div>`;
-    $('ed-back').onclick = () => { closeEditor(); renderDeckHome(); };
+    $('ed-name').value = dk.name || '';
+    $('pk-q').value = pk.q; $('pk-sort').value = pk.sort; $('pk-type').value = pk.type; $('pk-owned').checked = pk.owned; $('pk-legal').checked = pk.legal;
     $('ed-name').oninput = ev => { const d = decks.data[edId]; if (d) { d.name = ev.target.value; decks.save(edId); } };
-    let t; $('pk-q').oninput = ev => { clearTimeout(t); t = setTimeout(() => { pk.q = ev.target.value; pk.limit = 80; renderPicker(); }, 120); };
-    $('pk-type').onchange = ev => { pk.type = ev.target.value; pk.limit = 80; renderPicker(); };
-    $('pk-owned').onchange = ev => { pk.owned = ev.target.checked; renderPicker(); };
-    $('pk-more-btn').onclick = () => { pk.limit += 120; renderPicker(); };
+    let t; $('pk-q').oninput = ev => { clearTimeout(t); t = setTimeout(() => { pk.q = ev.target.value; pk.limit = 60; renderBrowser(); }, 120); };
+    $('pk-sort').onchange = ev => { pk.sort = ev.target.value; renderBrowser(); };
+    $('pk-type').onchange = ev => { pk.type = ev.target.value; pk.limit = 60; renderBrowser(); };
+    $('pk-owned').onchange = ev => { pk.owned = ev.target.checked; pk.limit = 60; renderBrowser(); };
+    $('pk-legal').onchange = ev => { pk.legal = ev.target.checked; pk.limit = 60; renderBrowser(); };
     $('deck-edit').onclick = onEditorClick;
-    $('deck-edit').onchange = ev => { if (ev.target.id === 'ed-champ') { decks.data[edId].champion = ev.target.value || null; edited(); } };
+    $('deck-edit').onchange = ev => {
+      const s = ev.target.dataset.set; if (!s) return;
+      ws[s] = s === 'dir' ? +ev.target.value : ev.target.value; renderWorkspace();
+    };
   }
-  renderPicker(); renderPane();
+  renderBrowser(); renderWorkspace();
 }
-function edited() { decks.save(edId); renderPane(); renderPicker(); }
+function edited() { decks.save(edId); renderBrowser(); renderWorkspace(); }
+function edSaveState() {
+  const el = $('ws-save'); if (!el || !edId) return;
+  const pending = decks.pending(edId);
+  el.className = 'save' + (pending ? '' : ' ok');
+  el.textContent = pending ? '저장 중…' : inv.mode === 'db' ? '✓ 계정에 저장됨' : '✓ 이 브라우저에 저장됨';
+}
 
-function pickerList(dk, om) {
-  const lg = BYID.get(dk.legend), terms = pk.q.trim().split(/\s+/).filter(Boolean);
-  let list;
-  if (!lg) list = CANON_LIST.filter(c => has(c, 'legend'));
-  else {
-    const ok = new Set([...lg.d, 'colorless']), tag = champTag(lg);
-    list = CANON_LIST.filter(c => !has(c, 'legend') && (c.d || []).every(d => ok.has(d)) && (!isSig(c) || c.s === tag || (c.tg || []).includes(tag)));
-    if (pk.type) list = list.filter(c => has(c, pk.type));
-  }
-  if (pk.owned) list = list.filter(c => (om.get(nameKey(c)) || 0) > 0);
-  if (terms.length) list = list.filter(c => matches(c, terms));
-  const tag = lg ? champTag(lg) : '';
-  return list.sort((a, b) => ((b.n === tag && has(b, 'champion')) - (a.n === tag && has(a, 'champion'))) || TYPE_RANK(a) - TYPE_RANK(b) || (a.e ?? 99) - (b.e ?? 99) || dName(a).localeCompare(dName(b), ko() ? 'ko' : 'en'));
-}
+/* left: card browser */
 function inDeck(dk, c) {
   const k = nameKey(c); let n = 0;
   for (const [x, m] of [...rows(dk.main), ...rows(dk.side), ...rows(dk.runes)]) if (nameKey(x) === k) n += m;
@@ -841,29 +980,245 @@ function inDeck(dk, c) {
   if ((dk.bf || []).some(id => nameKey(BYID.get(id)) === k)) n++;
   return n;
 }
-function renderPicker() {
+function browserList(dk, om) {
+  const lg = BYID.get(dk.legend), tag = lg ? champTag(lg) : '', sec = pk.sec;
+  const ok = lg ? new Set([...lg.d, 'colorless']) : null;
+  const legal = c => sec === 'legend' || !lg || ((c.d || []).every(d => ok.has(d)) && (!isSig(c) || c.s === tag || (c.tg || []).includes(tag)) && (sec !== 'champion' || c.n === tag));
+  let list = CANON_LIST.filter(c => {
+    if (sec === 'legend') return has(c, 'legend');
+    if (sec === 'champion') return has(c, 'champion');
+    if (sec === 'bf') return has(c, 'battlefield');
+    if (sec === 'runes') return has(c, 'rune');
+    if (has(c, 'legend') || has(c, 'rune')) return false;
+    return sec === 'side' || !has(c, 'battlefield');
+  });
+  if (pk.type && (sec === 'main' || sec === 'side')) list = list.filter(c => has(c, pk.type));
+  if (pk.owned) list = list.filter(c => (om.get(nameKey(c)) || 0) > 0);
+  const terms = pk.q.trim().split(/\s+/).filter(Boolean);
+  if (terms.length) list = list.filter(c => matches(c, terms));
+  let out = list.map(c => ({ c, legal: legal(c), n: inDeck(dk, c), own: om.get(nameKey(c)) || 0 }));
+  if (pk.legal) out = out.filter(x => x.legal);
+  const by = { cost: (a, b) => (a.c.e ?? 99) - (b.c.e ?? 99), name: () => 0, own: (a, b) => b.own - a.own, deck: (a, b) => b.n - a.n }[pk.sort];
+  return out.sort((a, b) => (b.legal - a.legal) || by(a, b) || dName(a.c).localeCompare(dName(b.c), ko() ? 'ko' : 'en'));
+}
+function renderBrowser() {
   const dk = decks.data[edId], om = ownedMap(), lg = BYID.get(dk.legend);
-  $('pk-title').textContent = lg ? '카드 추가' : '1단계: 전설 고르기';
-  $('pk-hint').textContent = lg ? `${lg.d.map(d => `${L.domain[d][0]}(${L.domain[d][1]})`).join('·')} 영역과 무색 카드, ${champKo(champTag(lg))} 시그니처만 보여 줍니다.` : '전설이 덱의 영역(색)과 선택 챔피언을 정합니다.';
-  $('pk-type').hidden = !lg;
-  const list = pickerList(dk, om), shown = list.slice(0, pk.limit), tag = lg ? champTag(lg) : '';
-  $('pk-list').innerHTML = shown.length ? shown.map(c => {
-    const own = om.get(nameKey(c)) || 0, inn = inDeck(dk, c);
-    const types = [...(c.st || []), ...(c.t || [])].map(t => lbl('type', t)).join(' ');
-    let btns;
-    if (has(c, 'legend')) btns = `<button class="mini${dk.legend === c.id ? ' on' : ''}" type="button" data-act="legend">${dk.legend === c.id ? '선택됨' : '선택'}</button>`;
-    else if (has(c, 'battlefield')) btns = `<button class="mini" type="button" data-act="add">+ 전장</button><button class="mini" type="button" data-act="side">+ 사이드</button>`;
-    else if (has(c, 'rune')) btns = `<button class="mini" type="button" data-act="add">+ 룬</button>`;
-    else btns = (has(c, 'champion') && c.n === tag ? `<button class="mini${dk.champion && nameKey(BYID.get(dk.champion)) === nameKey(c) ? ' on' : ''}" type="button" data-act="champ">챔피언 지정</button>` : '') + `<button class="mini" type="button" data-act="add">+ 메인</button><button class="mini" type="button" data-act="side">+ 사이드</button>`;
-    return `<li class="pk-row" data-id="${c.id}">
-      <span class="th sm" style="${thumbStyle(c, 32)}" aria-hidden="true"></span>
-      <span style="min-width:0"><button class="nm" type="button" data-act="card">${esc(dName(c))}</button>${isBanned(c) ? ' <span class="pill bad">금지</span>' : ''}
-        <span class="hint"><span class="dom">${(c.d || []).map(d => `<i style="--c:var(--d-${d})"></i>`).join('')}</span> ${esc(types)}${c.e != null ? ` · ⬡${c.e}` : ''} · 보유 ${own}${inn ? ` · 덱 ${inn}` : ''}</span></span>
-      <span class="pk-btns">${btns}</span></li>`;
-  }).join('') : `<li class="empty">조건에 맞는 카드가 없습니다.</li>`;
-  $('pk-more').hidden = list.length <= pk.limit;
+  $('bt-tabs').innerHTML = SECS.map(([k, label]) => `<button type="button" role="tab" data-sec="${k}" aria-selected="${pk.sec === k}">${label}</button>`).join('');
+  $('pk-type').hidden = !(pk.sec === 'main' || pk.sec === 'side');
+  $('pk-q').placeholder = `${SEC_LABEL[pk.sec]} 카드 검색 (한글·영문·초성)`;
+  const hints = {
+    legend: '전설이 덱의 영역(색)과 챔피언을 정합니다. 카드를 눌러 고르세요.',
+    champion: lg ? `${champKo(champTag(lg))} 챔피언 유닛 중 하나를 선택 챔피언으로 고르세요.` : '먼저 전설을 고르세요.',
+    main: '카드를 누를 때마다 1장씩 추가됩니다. 같은 카드는 선택 챔피언·보조 덱과 합쳐 3장까지입니다.',
+    bf: '서로 다른 전장 3장을 고르세요.', side: '보조 덱(사이드보드)은 10장까지입니다.', runes: '룬 덱은 전설 영역의 룬으로 12장입니다.',
+  };
+  $('bt-hint').textContent = !lg && pk.sec !== 'legend' ? '전설을 먼저 고르면 영역에 맞는 카드만 추려서 보여 줍니다.' : hints[pk.sec];
+  const list = browserList(dk, om), shown = list.slice(0, pk.limit);
+  $('bt-count').textContent = `${SEC_LABEL[pk.sec]}: ${list.length.toLocaleString()}장`;
+  const picked = id => (pk.sec === 'legend' && dk.legend === id) || (pk.sec === 'champion' && dk.champion && nameKey(BYID.get(dk.champion)) === nameKey(BYID.get(id)));
+  $('bt-grid').innerHTML = shown.length ? shown.map(({ c, legal, n, own }) => {
+    const sel = picked(c.id), badge = (pk.sec === 'legend' || pk.sec === 'champion') ? (sel ? '<span class="bt-n">선택됨</span>' : '') : (n ? `<span class="bt-n">×${n}</span>` : '');
+    return `<div class="bt${legal ? '' : ' off'}${sel || (n && pk.sec !== 'legend' && pk.sec !== 'champion') ? ' in' : ''}" data-id="${c.id}">
+      <button class="bt-img" type="button" data-act="add" aria-label="${esc(dName(c))} ${pk.sec === 'legend' || pk.sec === 'champion' ? '선택' : '추가'}" title="${esc(enName(c))}">${tileArt(c)}</button>
+      ${badge}${isBanned(c) ? '<span class="bt-ban">금지</span>' : ''}
+      <div class="bt-foot"><span class="bt-name">${esc(dName(c))}</span><span class="${own ? 'hint' : 'hint dim'}">보유 ${own}</span></div>
+      <div class="bt-act">${n && pk.sec !== 'legend' ? '<button class="mini" type="button" data-act="dec" aria-label="1장 빼기">−</button>' : ''}<button class="mini" type="button" data-act="card">정보</button></div>
+    </div>`;
+  }).join('') : `<p class="empty">조건에 맞는 카드가 없습니다.</p>`;
+  $('bt-more').hidden = list.length <= pk.limit;
+  wireLazy($('bt-grid'));
 }
 
+/* right: deck workspace */
+function deckTile(c, n, sec, om, need) {
+  const have = om.get(nameKey(c)) || 0, req = need.get(nameKey(c)) || n, short = sec !== 'side' && have < req;
+  const fixed = sec === 'legend' || sec === 'champion';
+  return `<div class="dt${isBanned(c) ? ' banned' : ''}" data-id="${c.id}" data-sec="${sec}">
+    <span class="ti dt-art" ${cropAttrs(c, 52, 52)} aria-hidden="true"></span>
+    <div class="dt-mid">
+      <button class="nm" type="button" data-act="card" title="${esc(enName(c))}">${esc(dName(c))}</button>
+      <span class="dt-meta">${fixed ? '' : `<b class="qty">${n}x</b>`}${c.e != null ? `<span class="cost">⬡${c.e}</span>` : ''}<span class="${short ? 'own-short' : 'own-ok'}">${short ? `보유 ${have}/${req}` : `보유 ${have}`}</span>${isBanned(c) ? '<span class="pill bad">금지</span>' : ''}</span>
+    </div>
+    <div class="dt-ctl">${fixed ? `<button type="button" data-act="unset" aria-label="빼기">×</button>` : sec === 'bf' ? `<button type="button" data-act="dec" aria-label="빼기">×</button>` : `<button type="button" data-act="inc" aria-label="1장 더하기">+</button><button type="button" data-act="dec" aria-label="1장 빼기">−</button>`}</div>
+  </div>`;
+}
+const addBtn = sec => `<button class="addslot" type="button" data-act="goto" data-sec="${sec}">+ ${SEC_LABEL[sec]} 추가</button>`;
+function groupKey(c) {
+  if (ws.group === 'type') return [TYPE_RANK(c), ['챔피언 유닛', '유닛', '주문', '도구', '기타'][TYPE_RANK(c)]];
+  if (ws.group === 'cost') { const e = c.e ?? 99; return [e, e === 99 ? '비용 없음' : `에너지 ${e}`]; }
+  if (ws.group === 'domain') { const d = (c.d || [])[0] || 'colorless'; return [DOM_ORDER.indexOf(d) + ((c.d || []).length > 1 ? 10 : 0), (c.d || []).length > 1 ? '다중 영역' : L.domain[d][0]]; }
+  return [0, ''];
+}
+function sortTiles(rs, om) {
+  const by = { cost: (a, b) => (a[0].e ?? 99) - (b[0].e ?? 99), name: (a, b) => dName(a[0]).localeCompare(dName(b[0]), ko() ? 'ko' : 'en'), count: (a, b) => a[1] - b[1], short: (a, b) => ((om.get(nameKey(a[0])) || 0) - a[1]) - ((om.get(nameKey(b[0])) || 0) - b[1]) }[ws.sort];
+  return rs.sort((a, b) => ws.dir * (by(a, b) || dName(a[0]).localeCompare(dName(b[0]), ko() ? 'ko' : 'en')));
+}
+function listView(dk, om) {
+  const need = deckNeeds(dk), lg = BYID.get(dk.legend), ch = BYID.get(dk.champion);
+  const head = (sec, extra = '') => `<header><h4>${SEC_LABEL[sec]}</h4>${extra}${countBadge(dk, sec)}</header>`;
+  const tiles = (rs, sec) => `<div class="dt-grid">${rs.map(([c, n]) => deckTile(c, n, sec, om, need)).join('')}</div>`;
+  let h = `<div class="sec-pair">
+    <section class="sec">${head('legend')}${lg ? tiles([[lg, 1]], 'legend') : addBtn('legend')}</section>
+    <section class="sec">${head('champion')}${ch ? tiles([[ch, 1]], 'champion') : addBtn('champion')}</section></div>`;
+  const opt = (k, v, label) => `<option value="${v}"${String(ws[k]) === String(v) ? ' selected' : ''}>${label}</option>`;
+  const ctl = `<span class="sec-ctl"><select data-set="group" aria-label="그룹">${opt('group', 'none', '그룹화 안 함')}${opt('group', 'type', '유형별')}${opt('group', 'cost', '에너지별')}${opt('group', 'domain', '영역별')}</select>
+    <select data-set="sort" aria-label="정렬">${opt('sort', 'cost', '에너지')}${opt('sort', 'name', '이름')}${opt('sort', 'count', '장수')}${opt('sort', 'short', '부족한 카드')}</select>
+    <select data-set="dir" aria-label="정렬 방향">${opt('dir', 1, '오름차순')}${opt('dir', -1, '내림차순')}</select></span>`;
+  const main = sortTiles(rows(dk.main), om);
+  let body = addBtn('main');
+  if (main.length) {
+    const groups = new Map();
+    for (const r of main) { const [gk, gl] = groupKey(r[0]); if (!groups.has(gk)) groups.set(gk, [gl, []]); groups.get(gk)[1].push(r); }
+    body = [...groups].sort((a, b) => ws.group === 'none' ? 0 : ws.dir * (a[0] - b[0])).map(([, [gl, rs]]) => (gl ? `<h5>${esc(gl)} <span>${sum(rs)}장</span></h5>` : '') + tiles(rs, 'main')).join('') + addBtn('main');
+  }
+  h += `<section class="sec">${head('main', ctl)}${body}</section>`;
+  const bf = (dk.bf || []).map(id => [BYID.get(id), 1]).filter(r => r[0]);
+  h += `<section class="sec">${head('bf')}${bf.length ? tiles(bf, 'bf') : ''}${bf.length < 3 ? addBtn('bf') : ''}</section>`;
+  const sd = sortTiles(rows(dk.side), om);
+  h += `<section class="sec">${head('side')}${sd.length ? tiles(sd, 'side') : ''}${addBtn('side')}</section>`;
+  const rs = rows(dk.runes);
+  let runeBtns = '';
+  if (lg) runeBtns = lg.d.map(d => CANON_LIST.find(c => has(c, 'rune') && (c.d || [])[0] === d)).filter(Boolean).map(c => `<button class="mini" type="button" data-act="rune" data-rid="${c.id}">+ ${esc(dName(c))}</button>`).join('');
+  h += `<section class="sec">${head('runes')}${rs.length ? tiles(rs, 'runes') : ''}<div class="rune-add">${runeBtns || addBtn('runes')}</div></section>`;
+  return h;
+}
+function artView(dk) {
+  const ch = BYID.get(dk.champion), lg = BYID.get(dk.legend);
+  const grid = rs => `<div class="art-grid">${rs.map(([c, n]) => `<button class="art-card" type="button" data-act="card" data-cid="${c.id}" title="${esc(dName(c))}">${tileArt(c)}${n > 1 ? `<span class="bt-n">×${n}</span>` : ''}</button>`).join('')}</div>`;
+  const parts = [['전설 · 챔피언', [lg && [lg, 1], ch && [ch, 1]].filter(Boolean)], ['주 덱', sortRows(rows(dk.main))], ['전장', (dk.bf || []).map(id => [BYID.get(id), 1])], ['보조 덱', sortRows(rows(dk.side))], ['룬', rows(dk.runes)]];
+  const h = parts.filter(([, rs]) => rs.length).map(([t, rs]) => `<h5>${t} <span>${sum(rs)}장</span></h5>${grid(rs)}`).join('');
+  return h || '<p class="empty">아직 카드가 없습니다. 왼쪽에서 전설부터 고르세요.</p>';
+}
+function statsView(dk, om) {
+  const ch = BYID.get(dk.champion), main = [...rows(dk.main), ...(ch ? [[ch, 1]] : [])], total = sum(main);
+  if (!total) return '<p class="empty">주 덱에 카드를 넣으면 통계가 나옵니다.</p>';
+  const curve = [0, 1, 2, 3, 4, 5, 6, 7].map(e => sum(main.filter(([c]) => c.e != null && Math.min(c.e, 7) === e)));
+  const peak = Math.max(...curve, 1), costed = main.filter(([c]) => c.e != null);
+  const avg = sum(costed) ? (costed.reduce((a, [c, n]) => a + c.e * n, 0) / sum(costed)).toFixed(2) : '-';
+  const bars = curve.map((n, e) => `<div class="cv-col" title="에너지 ${e === 7 ? '7 이상' : e}: ${n}장"><span class="cv-val">${n || ''}</span><span class="cv-bar" style="height:${(n / peak * 100).toFixed(1)}%"></span><span class="cv-x">${e === 7 ? '7+' : e}</span></div>`).join('');
+  const types = [['챔피언 유닛', 0], ['유닛', 1], ['주문', 2], ['도구', 3]].map(([t, r]) => [t, sum(main.filter(([c]) => TYPE_RANK(c) === r))]);
+  const lg = BYID.get(dk.legend), doms = (lg ? lg.d : DOM_ORDER.slice(0, 6));
+  const domRows = [...doms, 'colorless'].map(d => [d, sum(main.filter(([c]) => (c.d || []).includes(d))), sum(rows(dk.runes).filter(([c]) => (c.d || []).includes(d)))]).filter(r => r[1] || r[2]);
+  const own = deckOwn(dk, om), miss = [];
+  for (const [k, n] of deckNeeds(dk)) { const m = n - (om.get(k) || 0); if (m > 0) miss.push([CANON.get(k), m]); }
+  return `
+    <section class="sec"><header><h4>에너지 분포</h4><span class="hint">주 덱 ${total}장 · 평균 ${avg}</span></header>
+      <div class="curve-chart" role="img" aria-label="에너지별 장수: ${curve.map((n, e) => `${e === 7 ? '7 이상' : e} ${n}장`).join(', ')}">${bars}</div></section>
+    <div class="sec-pair">
+      <section class="sec"><header><h4>유형</h4></header><table class="st"><tbody>${types.map(([t, n]) => `<tr><th>${t}</th><td>${n}장</td><td>${(n / total * 100).toFixed(0)}%</td></tr>`).join('')}</tbody></table></section>
+      <section class="sec"><header><h4>영역</h4></header><table class="st"><thead><tr><th></th><td>주 덱</td><td>룬</td></tr></thead><tbody>${domRows.map(([d, n, r]) => `<tr><th><span class="rune" style="--c:var(--d-${d})"></span> ${L.domain[d][0]}</th><td>${n}장</td><td>${r}장</td></tr>`).join('')}</tbody></table></section>
+    </div>
+    <section class="sec"><header><h4>내 컬렉션 기준</h4><span class="hint">보유 ${own.have}/${own.total}장 (${own.pct}%)</span></header>
+      <div class="ownbar" aria-hidden="true"><i style="width:${own.pct}%"></i></div>
+      ${miss.length ? `<table class="st"><tbody>${miss.sort((a, b) => b[1] - a[1]).map(([c, m]) => `<tr><th>${esc(dName(c))}</th><td class="own-short">${m}장 부족</td></tr>`).join('')}</tbody></table>` : '<p class="hint">필요한 카드를 모두 보유하고 있습니다.</p>'}
+    </section>`;
+}
+function renderWorkspace() {
+  const dk = decks.data[edId], om = ownedMap(), v = validate(dk), own = deckOwn(dk, om);
+  for (const b of $('ed-ws').querySelectorAll('[data-view]')) b.setAttribute('aria-pressed', b.dataset.view === ws.view);
+  const nIssues = v.E.length + v.W.length;
+  const ib = $('ws-issues-btn');
+  ib.className = 'issues' + (v.E.length ? ' bad' : v.W.length ? ' warn' : ' ok');
+  ib.textContent = nIssues ? `문제 ${nIssues}개 ${ws.issues ? '▴' : '▾'}` : '✓ 덱 규칙 충족';
+  ib.setAttribute('aria-expanded', ws.issues && nIssues ? 'true' : 'false');
+  $('ws-issues').hidden = !(ws.issues && nIssues);
+  $('ws-issues').innerHTML = v.E.map(e => `<li class="e">${esc(e)}</li>`).join('') + v.W.map(w => `<li class="w">${esc(w)}</li>`).join('');
+  $('ws-own').className = 'pill ' + (own.miss ? 'warn' : 'ok');
+  $('ws-own').textContent = own.total ? (own.miss ? `컬렉션 부족 ${own.miss}장` : '모두 보유') : '';
+  $('ws-meta').hidden = !dk.legend;
+  $('sw-count').textContent = `${v.mainN}/40`;
+  $('ed-grid').dataset.pane = ws.pane;
+  for (const b of $('deck-edit').querySelectorAll('[data-pane]')) b.setAttribute('aria-pressed', b.dataset.pane === ws.pane);
+  $('ws-body').innerHTML = ws.view === 'art' ? artView(dk) : ws.view === 'stats' ? statsView(dk, om) : listView(dk, om);
+  wireLazy($('ws-body'));
+  edSaveState();
+}
+
+function missingText(dk) {
+  const om = ownedMap(), out = [];
+  for (const [k, n] of deckNeeds(dk)) { const m = n - (om.get(k) || 0); if (m > 0) out.push(`${m} ${dName(CANON.get(k))}`); }
+  return out.join('\n');
+}
+function copyText(text, label) {
+  const fallback = () => { $('copybox-text').value = text; $('copybox').hidden = false; $('copybox-text').select(); };
+  try { navigator.clipboard.writeText(text).then(() => toast(`${label}을(를) 복사했습니다.`), fallback); } catch { fallback(); }
+}
+$('copybox-close').onclick = () => { $('copybox').hidden = true; };
+
+function addCard(dk, c) {
+  const sec = pk.sec;
+  if (sec === 'legend') {
+    dk.legend = c.id;
+    if (dk.champion && BYID.get(dk.champion).n !== champTag(c)) dk.champion = null;
+    if (!dk.name || dk.name === '새 덱') { dk.name = legendLabel(c); $('ed-name').value = dk.name; }
+    if (!dk.champion) pk.sec = 'champion';
+    pk.q = ''; $('pk-q').value = '';
+    return `${legendLabel(c)} 전설을 골랐습니다.${dk.champion ? '' : ' 이제 선택 챔피언을 고르세요.'}`;
+  }
+  if (sec === 'champion') {
+    const lg = BYID.get(dk.legend);
+    if (lg && c.n !== champTag(lg)) return `선택 챔피언은 ${champKo(champTag(lg))}만 고를 수 있습니다.`;
+    if (dk.champion !== c.id && inDeck(dk, c) - (dk.champion && nameKey(BYID.get(dk.champion)) === nameKey(c) ? 1 : 0) >= 3) return `${dName(c)}: 이미 3장입니다.`;
+    dk.champion = c.id; if (pk.sec === 'champion') { pk.sec = 'main'; pk.q = ''; $('pk-q').value = ''; }
+    return `선택 챔피언: ${dName(c)}. 이제 주 덱을 채우세요.`;
+  }
+  if (sec === 'bf') {
+    if ((dk.bf || []).some(id => nameKey(BYID.get(id)) === nameKey(c))) return '이미 넣은 전장입니다.';
+    if (dk.bf.length >= 3) return '전장은 3장까지입니다.';
+    dk.bf.push(c.id); return `${dName(c)} 추가 · 전장 ${dk.bf.length}/3`;
+  }
+  if (sec === 'runes') {
+    if (sum(rows(dk.runes)) >= 12) return '룬 덱은 12장까지입니다.';
+    dk.runes[c.id] = (dk.runes[c.id] || 0) + 1; return `${dName(c)} 추가 · 룬 ${sum(rows(dk.runes))}/12`;
+  }
+  if (inDeck(dk, c) >= 3) return `${dName(c)}: 이미 3장입니다 (선택 챔피언·보조 덱 포함).`;
+  if (sec === 'side' && sum(rows(dk.side)) >= 10) return '보조 덱은 10장까지입니다.';
+  const s = dk[sec]; s[c.id] = (s[c.id] || 0) + 1;
+  return `${dName(c)} 추가 · ${sec === 'main' ? `주 덱 ${sum(rows(dk.main))}/39` : `보조 덱 ${sum(rows(dk.side))}/10`}`;
+}
+function removeCard(dk, id, sec) {
+  if (sec === 'legend') { if (dk.legend === id) dk.legend = null; return; }
+  if (sec === 'champion') { if (dk.champion && nameKey(BYID.get(dk.champion)) === nameKey(BYID.get(id))) dk.champion = null; return; }
+  if (sec === 'bf') { dk.bf = dk.bf.filter(x => x !== id); return; }
+  const s = dk[sec]; if (!s[id]) return; if (--s[id] <= 0) delete s[id];
+}
+function onEditorClick(ev) {
+  const b = ev.target.closest('[data-act],[data-sec],[data-view],[data-pane]'); if (!b) return;
+  const dk = decks.data[edId];
+  if (b.dataset.pane && !b.dataset.act) { ws.pane = b.dataset.pane; renderWorkspace(); scrollTo(0, 0); return; }
+  if (b.dataset.view) { ws.view = b.dataset.view; renderWorkspace(); return; }
+  if (b.closest('#bt-tabs')) { pk.sec = b.dataset.sec; pk.limit = 60; renderBrowser(); return; }
+  const act = b.dataset.act, holder = b.closest('[data-id]'), id = holder && holder.dataset.id, c = id && BYID.get(id);
+  if (act === 'card') { openDetail(b.dataset.cid || id); return; }
+  if (act === 'more') { pk.limit += 90; renderBrowser(); return; }
+  if (act === 'add') { toast(addCard(dk, c)); edited(); return; }
+  if (act === 'dec' && holder.closest('#bt-grid')) {
+    const sec = pk.sec === 'main' && !dk.main[id] && dk.side[id] ? 'side' : pk.sec;
+    removeCard(dk, id, sec); edited(); return;
+  }
+  if (act === 'inc') { const sec = holder.dataset.sec; if (inDeck(dk, c) >= 3) { toast(`${dName(c)}: 이미 3장입니다.`); return; } if (sec === 'runes' && sum(rows(dk.runes)) >= 12) { toast('룬 덱은 12장까지입니다.'); return; } dk[sec][id] = (dk[sec][id] || 0) + 1; edited(); return; }
+  if (act === 'dec' || act === 'unset') { removeCard(dk, id, holder.dataset.sec); edited(); return; }
+  if (act === 'goto') { pk.sec = b.dataset.sec; pk.limit = 60; ws.pane = 'browse'; renderBrowser(); renderWorkspace(); $('ed-browser').scrollIntoView({ block: 'start' }); $('pk-q').focus({ preventScroll: true }); return; }
+  if (act === 'rune') { const r = b.dataset.rid; if (sum(rows(dk.runes)) >= 12) { toast('룬 덱은 12장까지입니다.'); return; } dk.runes[r] = (dk.runes[r] || 0) + 1; edited(); return; }
+  if (act === 'issues') { ws.issues = !ws.issues; renderWorkspace(); return; }
+  if (act === 'back') { closeEditor(); renderDeckHome(); return; }
+  if (act === 'meta') {
+    const tag = champTag(BYID.get(dk.legend));
+    const metas = MD.metas.filter(m => MD.decks.some(o => MD.events[o.e].meta === m.id && champTag(CARDS[o.L]) === tag));
+    if (!metas.length) { toast(`${champKo(tag)}의 공개된 대회 덱이 아직 없습니다.`); return; }
+    Object.assign(mu, { meta: metas[metas.length - 1].id, rank: 'all', legend: tag }); saveMu(); location.hash = 'meta'; return;
+  }
+  if (act === 'copy-en') return copyText(deckText(dk, 'en'), '영문 덱리스트');
+  if (act === 'copy-ko') return copyText(deckText(dk, 'ko'), '한글 덱리스트');
+  if (act === 'dup') { const nid = decks.create({ ...JSON.parse(JSON.stringify(dk)), name: (dk.name || '덱') + ' (복사본)', created: Date.now() }); toast('덱을 복제했습니다.'); openEditor(nid); return; }
+  if (act === 'del') {
+    $('ed-confirm').innerHTML = `<div class="confirm"><span>"${esc(dk.name || '이 덱')}"을(를) 삭제합니다. 되돌릴 수 없습니다.</span><button class="go danger" type="button" id="ed-del-go">삭제</button><button class="ghost" type="button" id="ed-del-no">취소</button></div>`;
+    $('ed-del-go').onclick = () => { decks.remove(edId); closeEditor(); renderDeckHome(); toast('덱을 삭제했습니다.'); };
+    $('ed-del-no').onclick = () => { $('ed-confirm').innerHTML = ''; };
+  }
+}
+
+/* read-only deck list used by the meta-deck sheet */
 function lineHTML(c, n, sec, om, need, editable) {
   const have = om.get(nameKey(c)) || 0, req = need.get(nameKey(c)) || n, short = sec !== 'side' && have < req;
   const ctl = !editable ? `<b class="cnt">${n}</b>` : sec === 'bf'
@@ -889,87 +1244,6 @@ function deckListHTML(dk, om, editable) {
   if (sd.length || editable) h += sec('사이드보드', sum(sd) + '장', sd.map(([c, n]) => lineHTML(c, n, 'side', om, need, editable)).join('') || '<li class="hint">비어 있음</li>');
   return `<div class="dl">${h}</div>`;
 }
-function curveHTML(dk) {
-  const b = new Map(); const ch = BYID.get(dk.champion);
-  for (const [c, n] of [...rows(dk.main), ...(ch ? [[ch, 1]] : [])]) if (c.e != null) { const k = Math.min(c.e, 7); b.set(k, (b.get(k) || 0) + n); }
-  return `<div class="curve" aria-label="에너지 분포">${[0,1,2,3,4,5,6,7].map(e => `<span>⬡${e === 7 ? '7+' : e} ${b.get(e) || 0}</span>`).join('')}</div>`;
-}
-function renderPane() {
-  const dk = decks.data[edId], om = ownedMap(), v = validate(dk), own = deckOwn(dk, om);
-  const lg = BYID.get(dk.legend), ch = BYID.get(dk.champion), tag = lg ? champTag(lg) : '';
-  const champs = lg ? CANON_LIST.filter(c => has(c, 'champion') && c.n === tag) : [];
-  const chCanon = ch ? canon(ch).id : '';
-  $('deckpane').innerHTML = `
-    <div class="slot"><span class="th sm" style="${lg ? thumbStyle(lg, 32) : ''}" aria-hidden="true"></span>
-      <span style="min-width:0"><span class="hint">전설</span><br>${lg ? `<button class="nm" type="button" data-act="card" data-cid="${lg.id}">${esc(legendLabel(lg))}</button>` : '<span class="hint">왼쪽에서 전설을 고르세요</span>'}</span>
-      ${lg ? '<button class="mini" type="button" data-act="clear-legend">변경</button>' : ''}</div>
-    <div class="slot"><span class="th sm" style="${ch ? thumbStyle(ch, 32) : ''}" aria-hidden="true"></span>
-      <span style="min-width:0"><label class="hint" for="ed-champ">선택 챔피언</label><br>
-      <select id="ed-champ"${lg ? '' : ' disabled'}><option value="">${lg ? '선택하세요' : '전설을 먼저 고르세요'}</option>${champs.map(c => `<option value="${c.id}"${c.id === chCanon || c.id === dk.champion ? ' selected' : ''}>${esc(dName(c))}</option>`).join('')}</select></span>
-      ${ch ? `<span class="${(om.get(nameKey(ch)) || 0) < (deckNeeds(dk).get(nameKey(ch)) || 1) ? 'own-short' : 'own-ok'}">보유 ${om.get(nameKey(ch)) || 0}</span>` : ''}</div>
-    <div class="stats"><span>메인 <b>${v.mainN}</b>/40</span><span>룬 <b>${v.runeN}</b>/12</span><span>전장 <b>${v.bfN}</b>/3</span><span>사이드 <b>${v.sideN}</b></span><span>보유로 채운 카드 <b>${own.have}</b>/${own.total}장</span></div>
-    <div class="ownbar" aria-hidden="true"><i style="width:${own.pct}%"></i></div>
-    <ul class="checks">${v.E.map(e => `<li class="e">${esc(e)}</li>`).join('')}${v.W.map(w => `<li class="w">${esc(w)}</li>`).join('')}${!v.E.length ? '<li class="ok">덱 규칙을 모두 충족합니다.</li>' : ''}${own.miss ? `<li class="w">컬렉션에서 ${own.miss}장이 부족합니다.</li>` : own.total ? '<li class="ok">필요한 카드를 모두 보유하고 있습니다.</li>' : ''}</ul>
-    ${curveHTML(dk)}
-    ${deckListHTML(dk, om, true)}
-    <div class="acts">
-      <button class="mini" type="button" data-act="copy-en">영문 덱리스트 복사</button>
-      <button class="mini" type="button" data-act="copy-ko">한글 덱리스트 복사</button>
-      <button class="mini" type="button" data-act="copy-miss"${own.miss ? '' : ' disabled'}>부족 카드 목록 복사</button>
-      <button class="mini" type="button" data-act="dup">덱 복제</button>
-      <button class="mini" type="button" data-act="del">덱 삭제</button>
-    </div>
-    <div id="ed-confirm"></div>`;
-}
-function missingText(dk) {
-  const om = ownedMap(), out = [];
-  for (const [k, n] of deckNeeds(dk)) { const m = n - (om.get(k) || 0); if (m > 0) out.push(`${m} ${dName(CANON.get(k))}`); }
-  return out.join('\n');
-}
-function copyText(text, label) {
-  const fallback = () => { $('copybox-text').value = text; $('copybox').hidden = false; $('copybox-text').select(); };
-  try { navigator.clipboard.writeText(text).then(() => toast(`${label}을(를) 복사했습니다.`), fallback); } catch { fallback(); }
-}
-$('copybox-close').onclick = () => { $('copybox').hidden = true; };
-
-function onEditorClick(ev) {
-  const b = ev.target.closest('[data-act]'); if (!b) return;
-  const dk = decks.data[edId], li = b.closest('[data-id]'), act = b.dataset.act;
-  const c = li ? BYID.get(li.dataset.id) : null;
-  if (act === 'card') { openDetail(b.dataset.cid || li.dataset.id); return; }
-  if (act === 'legend') {
-    dk.legend = c.id;
-    const tag = champTag(c);
-    if (dk.champion && BYID.get(dk.champion).n !== tag) dk.champion = null;
-    if (!dk.champion) { const opts = CANON_LIST.filter(x => has(x, 'champion') && x.n === tag); const om = ownedMap(); dk.champion = (opts.find(x => om.get(nameKey(x))) || opts[0] || {}).id || null; }
-    if (!dk.name || dk.name === '새 덱') { dk.name = legendLabel(c); $('ed-name').value = dk.name; }
-    pk.q = ''; $('pk-q').value = ''; edited(); toast(`${legendLabel(c)} 전설을 골랐습니다. 이제 카드를 추가하세요.`); return;
-  }
-  if (act === 'champ') { dk.champion = c.id; edited(); return; }
-  if (act === 'add' || act === 'side') {
-    addTo(dk, c, act === 'side' ? 'side' : 'main'); edited();
-    const v = validate(dk); toast(`${dName(c)} 추가 · 메인 ${v.mainN}/40 · 룬 ${v.runeN}/12 · 전장 ${v.bfN}/3`); return;
-  }
-  if (act === 'rune') { const r = b.dataset.rid; dk.runes[r] = (dk.runes[r] || 0) + 1; edited(); return; }
-  if (act === 'inc' || act === 'dec') {
-    const sec = li.dataset.sec, id = li.dataset.id;
-    if (sec === 'bf') dk.bf = dk.bf.filter(x => x !== id);
-    else { const s = dk[sec]; s[id] = (s[id] || 0) + (act === 'inc' ? 1 : -1); if (s[id] <= 0) delete s[id]; }
-    edited(); return;
-  }
-  if (act === 'clear-legend') { dk.legend = null; edited(); $('pk-q').focus(); return; }
-  if (act === 'copy-en') return copyText(deckText(dk, 'en'), '영문 덱리스트');
-  if (act === 'copy-ko') return copyText(deckText(dk, 'ko'), '한글 덱리스트');
-  if (act === 'copy-miss') return copyText(missingText(dk), '부족 카드 목록');
-  if (act === 'dup') { const id = decks.create({ ...JSON.parse(JSON.stringify(dk)), name: (dk.name || '덱') + ' (복사본)', created: Date.now() }); toast('덱을 복제했습니다.'); openEditor(id); return; }
-  if (act === 'del') {
-    $('ed-confirm').innerHTML = `<div class="confirm"><span>"${esc(dk.name || '이 덱')}"을(를) 삭제합니다. 되돌릴 수 없습니다.</span><button class="go danger" type="button" id="ed-del-go">삭제</button><button class="ghost" type="button" id="ed-del-no">취소</button></div>`;
-    $('ed-del-go').onclick = () => { decks.remove(edId); closeEditor(); renderDeckHome(); toast('덱을 삭제했습니다.'); };
-    $('ed-del-no').onclick = () => { $('ed-confirm').innerHTML = ''; };
-    return;
-  }
-}
-
 /* ---------- meta decks ---------- */
 const MU_KEY = 'rb-ledger-meta-v1';
 const mu = Object.assign({ meta: MD.metas[MD.metas.length - 1].id, rank: 'top4', sort: 'rank', legend: '' }, lsGet(MU_KEY) || {});
