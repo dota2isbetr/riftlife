@@ -425,6 +425,43 @@ table.st td{text-align:right;padding:4px 0 4px 8px;color:var(--muted);white-spac
 table.st thead td{font-size:11px}
 table.st tr+tr th,table.st tr+tr td{border-top:1px solid var(--line)}
 
+/* deck analysis */
+.tbl{overflow-x:auto}
+table.an td,table.an th{padding:5px 6px}
+table.an tr:first-child td,table.an tr:nth-child(2) td{font-size:11px}
+table.an th{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+table.an td.pc{color:var(--ink);background:linear-gradient(90deg,var(--rift-soft) var(--p),transparent var(--p));font-family:var(--f-mono);font-size:12.5px;min-width:64px}
+.sec .btn[data-act="mulligan"]{margin-top:2px}
+/* mulligan test */
+.mull{position:fixed;z-index:42;left:50%;top:50%;transform:translate(-50%,-50%);width:min(860px,calc(100% - 24px));max-height:calc(100% - 24px);overflow-y:auto;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:14px;box-shadow:0 30px 80px rgb(0 0 0 / .35)}
+#mull-scrim{z-index:41}
+.mull header{display:flex;justify-content:space-between;align-items:start;gap:12px}
+.mull h2{margin:0;font-size:22px;letter-spacing:-.02em}
+.mull-hand{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.mcard{all:unset;box-sizing:border-box;cursor:pointer;position:relative;display:grid;gap:6px;min-width:0}
+.mcard:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:10px}
+.mc-art{display:block;aspect-ratio:420/588;border-radius:10px;overflow:hidden;background:var(--sunk);box-shadow:0 6px 18px rgb(0 0 0 / .18)}
+.mc-art .ti,.mc-art img{display:block;width:100%;height:100%;object-fit:contain;background-repeat:no-repeat}
+.mc-name{font-size:13px;font-weight:600;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mcard.sel .mc-art{box-shadow:0 0 0 3px var(--danger),0 14px 30px rgb(0 0 0 / .25);opacity:.7}
+.mcard.drawn .mc-art{box-shadow:0 0 0 2px var(--rift)}
+.mc-tag{position:absolute;top:8px;left:50%;transform:translateX(-50%);background:var(--danger);color:#fff;font-size:12px;font-weight:600;padding:2px 10px;border-radius:999px;white-space:nowrap}
+.mc-tag.dr{background:var(--rift)}
+.mull .mstats{font-size:12px;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){
+  .mcard .mc-art{transition:transform .2s ease,box-shadow .2s ease,opacity .2s ease}
+  .mcard.sel .mc-art{transform:translateY(-10px) rotate(-2deg)}
+  .mcard.fresh .mc-art{animation:mc-in .35s cubic-bezier(.2,.8,.25,1)}
+  @keyframes mc-in{from{transform:translateY(-30px) rotate(6deg) scale(.9);opacity:0}to{transform:none;opacity:1}}
+}
+@media (max-width:560px){.mull-hand{grid-template-columns:repeat(2,minmax(0,1fr))}.mull{padding:16px}}
+/* deck list delete */
+.dk-li{position:relative}
+.dk-li .dk-item{padding-right:66px}
+.dk-del{position:absolute;top:10px;right:10px}
+.dk-confirm{display:grid;gap:8px;background:var(--accent-soft);border-radius:var(--radius);padding:12px;font-size:13px}
+.dk-confirm div{display:flex;gap:6px}
+.dk-confirm .go{background:var(--danger);color:#fff;border:0;border-radius:6px;padding:6px 12px}
 /* deck card hover preview */
 .hover-card{position:fixed;left:0;top:0;z-index:45;width:300px;pointer-events:none;display:grid;gap:8px;filter:drop-shadow(0 18px 36px rgb(0 0 0 / .32))}
 .hp-card{position:relative;width:300px;aspect-ratio:420/588;border-radius:14px;overflow:hidden;background:var(--sunk)}
@@ -685,6 +722,19 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
 <aside class="sheet" id="sheet" hidden aria-modal="true" role="dialog" aria-labelledby="d-title"></aside>
 <div class="toast" id="toast" hidden role="status"></div>
 <div class="hover-card" id="hover-card" hidden aria-hidden="true"></div>
+<div class="scrim" id="mull-scrim" hidden></div>
+<section class="mull" id="mull" hidden role="dialog" aria-modal="true" aria-labelledby="mull-title">
+  <header><div><h2 id="mull-title">멀리건 테스트</h2><p class="hint" id="mull-hint" style="margin:4px 0 0"></p></div><button class="x" type="button" id="mull-close" aria-label="닫기">✕</button></header>
+  <div class="mull-hand" id="mull-hand"></div>
+  <div class="filters">
+    <button class="btn" type="button" id="mull-go">다시 뽑을 카드를 고르세요</button>
+    <button class="ghost" type="button" id="mull-keep">이대로 확정</button>
+    <button class="ghost" type="button" id="mull-draw">1장 더 뽑기</button>
+    <button class="ghost" type="button" id="mull-new">새로 섞기</button>
+    <span class="mstats" id="mull-stats"></span>
+  </div>
+  <p class="hint" style="margin:0">주 덱(선택 챔피언 제외)을 섞어 4장을 뽑습니다. 다시 뽑은 카드는 덱 맨 아래로 가고, 그 자리는 덱 위에서 새로 채웁니다.</p>
+</section>
 <div class="copybox" id="copybox" hidden role="dialog" aria-label="복사할 텍스트"><p>자동 복사가 막혀 있습니다. 아래 텍스트를 선택해서 복사하세요.</p><textarea id="copybox-text" readonly></textarea><div><button class="ghost" id="copybox-close" type="button">닫기</button></div></div>
 
 <script id="card-data" type="application/json">__DATA__</script>
@@ -1057,7 +1107,7 @@ function renderDeckHome() {
   const arr = Object.entries(decks.data).sort((a, b) => (b[1].updated || 0) - (a[1].updated || 0));
   $('dk-list').innerHTML = arr.length ? arr.map(([id, dk]) => {
     const lg = BYID.get(dk.legend), s = deckSummary(dk, om);
-    return `<li><button class="dk-item" type="button" data-deck="${id}">
+    return `<li class="dk-li" data-li="${id}"><button class="dk-item" type="button" data-deck="${id}">
       <span class="th" style="${lg ? thumbStyle(lg) : ''}" aria-hidden="true"></span>
       <span class="cardbody">
       <b>${esc(dk.name || '이름 없는 덱')}</b>
@@ -1065,10 +1115,20 @@ function renderDeckHome() {
       <span class="pills">${s.pills}</span>
       ${dk.src ? `<span class="hint">출처: ${esc(MD.events[dk.src.e]?.ko || '')} #${dk.src.r ?? '-'} · ${esc(dk.src.p || '')}</span>` : ''}
       </span>
-    </button></li>`;
+    </button><button class="mini dk-del" type="button" data-del="${id}" aria-label="${esc(dk.name || '이름 없는 덱')} 삭제">삭제</button></li>`;
   }).join('') : `<li class="empty">아직 만든 덱이 없습니다. "새 덱 만들기"로 시작하거나, 메타 덱 탭에서 대회 상위 덱을 가져와 보세요.</li>`;
 }
-$('dk-list').onclick = ev => { const b = ev.target.closest('[data-deck]'); if (b) openEditor(b.dataset.deck); };
+$('dk-list').onclick = ev => {
+  const del = ev.target.closest('[data-del]'), go = ev.target.closest('[data-del-go]'), no = ev.target.closest('[data-del-no]');
+  if (del) {
+    const id = del.dataset.del, li = del.closest('.dk-li'), name = (decks.data[id] || {}).name || '이름 없는 덱';
+    li.innerHTML = `<div class="dk-confirm" role="alert"><span>"${esc(name)}" 덱을 삭제할까요? 되돌릴 수 없습니다.</span><div><button class="go" type="button" data-del-go="${id}">삭제</button><button class="ghost" type="button" data-del-no>취소</button></div></div>`;
+    li.querySelector('[data-del-no]').focus(); return;
+  }
+  if (go) { const id = go.dataset.delGo, name = (decks.data[id] || {}).name || '덱'; decks.remove(id); renderDeckHome(); toast(`"${name}" 덱을 삭제했습니다.`); return; }
+  if (no) { renderDeckHome(); return; }
+  const b = ev.target.closest('[data-deck]'); if (b) openEditor(b.dataset.deck);
+};
 $('dk-new').onclick = () => openEditor(decks.create(newDeck()));
 $('dk-paste-btn').onclick = () => { $('dk-paste').hidden = false; $('dk-paste-msg').textContent = ''; $('dk-paste-text').focus(); };
 $('dk-paste-cancel').onclick = () => { $('dk-paste').hidden = true; };
@@ -1186,6 +1246,7 @@ function renderEditor() {
             <button class="mini" type="button" data-act="back">← 내 덱</button>
             <span class="ws-title">덱 작업 공간</span><span class="save" id="ws-save"></span>
             <span class="spacer"></span>
+            <button class="mini" type="button" data-act="mulligan" title="시작 손패 4장을 뽑고 최대 2장 다시 뽑기">멀리건 테스트</button>
             <button class="mini" type="button" data-act="copy-en" title="영문 덱리스트를 복사합니다">영문 복사</button>
             <button class="mini" type="button" data-act="copy-ko" title="한글 덱리스트를 복사합니다">한글 복사</button>
             <button class="mini" type="button" data-act="dup">복제</button>
@@ -1193,7 +1254,7 @@ function renderEditor() {
           </div>
           <div class="ws-name"><input id="ed-name" aria-label="덱 이름" placeholder="덱 이름"><button class="mini" type="button" data-act="meta" id="ws-meta" title="메타 덱 탭에서 이 챔피언의 대회 덱을 봅니다">이 챔피언 대회 덱</button></div>
           <div class="ws-tabs">
-            <div class="seg" role="group" aria-label="보기"><button type="button" data-view="list">리스트</button><button type="button" data-view="art">풀 아트</button><button type="button" data-view="stats">통계</button></div>
+            <div class="seg" role="group" aria-label="보기"><button type="button" data-view="list">리스트</button><button type="button" data-view="art">풀 아트</button><button type="button" data-view="stats">통계</button><button type="button" data-view="analysis">분석</button></div>
             <button class="issues" type="button" id="ws-issues-btn" data-act="issues" aria-expanded="false"></button>
             <span class="pill" id="ws-own"></span>
           </div>
@@ -1390,7 +1451,7 @@ function renderWorkspace() {
   $('sw-count').textContent = `${v.mainN}/40`;
   $('ed-grid').dataset.pane = ws.pane;
   for (const b of $('deck-edit').querySelectorAll('[data-pane]')) b.setAttribute('aria-pressed', b.dataset.pane === ws.pane);
-  morphInto($('ws-body'), ws.view === 'art' ? artView(dk) : ws.view === 'stats' ? statsView(dk, om) : listView(dk, om));
+  morphInto($('ws-body'), ws.view === 'art' ? artView(dk) : ws.view === 'stats' ? statsView(dk, om) : ws.view === 'analysis' ? analysisView(dk) : listView(dk, om));
   wireLazy($('ws-body'));
   edSaveState();
 }
@@ -1462,6 +1523,7 @@ function onEditorClick(ev) {
   if (act === 'goto') { pk.sec = b.dataset.sec; pk.limit = 60; ws.pane = 'browse'; renderBrowser(); renderWorkspace(); $('ed-browser').scrollIntoView({ block: 'start' }); $('pk-q').focus({ preventScroll: true }); return; }
   if (act === 'rune') { const r = b.dataset.rid; if (sum(rows(dk.runes)) >= 12) { toast('룬 덱은 12장까지입니다.'); return; } dk.runes[r] = (dk.runes[r] || 0) + 1; edited(); return; }
   if (act === 'issues') { ws.issues = !ws.issues; renderWorkspace(); return; }
+  if (act === 'mulligan') { openMull(); return; }
   if (act === 'back') { closeEditor(); renderDeckHome(); return; }
   if (act === 'meta') {
     const tag = champTag(BYID.get(dk.legend));
@@ -1478,6 +1540,124 @@ function onEditorClick(ev) {
     $('ed-del-no').onclick = () => { $('ed-confirm').innerHTML = ''; };
   }
 }
+
+/* ---------- deck analysis: exact draw odds (hypergeometric) ----------
+   The library is the main deck without the chosen champion, which starts outside it. Mulligan model: draw 4,
+   put back up to 2 to the bottom and draw replacements; a target card is always kept, so a player still
+   looking for it sends back 2 other cards. */
+const nCk = (n, k) => { if (k < 0 || k > n) return 0; k = Math.min(k, n - k); let r = 1; for (let i = 1; i <= k; i++) r = r * (n - k + i) / i; return r; };
+const pNone = (N, K, n) => n <= 0 ? 1 : nCk(N - K, Math.min(n, N)) / nCk(N, Math.min(n, N));   // none of K targets among n cards drawn from N
+const HAND = 4, MULL = 2;
+const oddsSeen = (N, K, extra, mull) => {   // P(at least one target) after the opening hand (+mulligan) and `extra` further draws
+  if (!K || !N) return 0;
+  if (!mull) return 1 - pNone(N, K, HAND + extra);
+  return 1 - pNone(N, K, HAND) * pNone(N - HAND, K, MULL + extra);
+};
+const pct = p => (p * 100 >= 99.95 ? '100' : (p * 100).toFixed(1)) + '%';
+const pctCell = p => `<td class="pc" style="--p:${(p * 100).toFixed(1)}%">${pct(p)}</td>`;
+function analysisView(dk) {
+  const lib = rows(dk.main), N = sum(lib), ch = BYID.get(dk.champion), lg = BYID.get(dk.legend);
+  const mullBtn = `<button class="btn" type="button" data-act="mulligan"${N >= HAND ? '' : ' disabled'}>멀리건 테스트 열기</button>`;
+  if (N < HAND) return `<section class="sec"><header><h4>분석</h4></header><p class="empty">주 덱에 카드를 ${HAND}장 이상 넣으면 분석이 나옵니다.</p>${mullBtn}</section>`;
+  const cols = [['시작 4장', 0, false], ['멀리건 포함', 0, true], ['+2장', 2, true], ['+4장', 4, true], ['+6장', 6, true]];
+  const head = `<tr><th></th><td>장수</td>${cols.map(([t]) => `<td>${t}</td>`).join('')}</tr>`;
+  const line = (label, K, extraCell = '') => `<tr><th>${label}${extraCell}</th><td>${K}</td>${cols.map(([, x, m]) => pctCell(oddsSeen(N, K, x, m))).join('')}</tr>`;
+  const tag = lg ? champTag(lg) : '';
+  const grp = (f) => sum(lib.filter(([c]) => f(c)));
+  const groups = [
+    ['2~3 에너지 유닛', grp(c => (has(c, 'unit') || has(c, 'champion')) && c.e >= 2 && c.e <= 3)],
+    ['0~1 에너지 카드', grp(c => c.e != null && c.e <= 1)],
+    ['챔피언 유닛 (전체)', grp(c => has(c, 'champion'))],
+    [ch ? `${esc(dName(ch))} (선택 챔피언의 추가 사본)` : '선택 챔피언의 추가 사본', ch ? grp(c => nameKey(c) === nameKey(ch)) : 0],
+    ['시그니처 카드', grp(c => isSig(c))],
+    ['주문', grp(c => has(c, 'spell'))],
+    ['5 에너지 이상', grp(c => c.e != null && c.e >= 5)],
+  ].filter(([, K]) => K > 0);
+  const per = new Map();
+  for (const [c, n] of lib) { const k = nameKey(c); per.set(k, [(per.get(k) || [0])[0] + n, canon(c)]); }
+  const cards = [...per.values()].sort((a, b) => b[0] - a[0] || (a[1].e ?? 99) - (b[1].e ?? 99) || dName(a[1]).localeCompare(dName(b[1]), ko() ? 'ko' : 'en'));
+  // runes: drawn without replacement from the rune deck
+  const rs = rows(dk.runes), R = sum(rs);
+  const rdom = new Map(); for (const [c, n] of rs) { const d = (c.d || [])[0] || 'colorless'; rdom.set(d, (rdom.get(d) || 0) + n); }
+  const atLeast = (K, r, k) => { let p = 0; for (let x = k; x <= Math.min(K, r); x++) p += nCk(K, x) * nCk(R - K, r - x) / nCk(R, r); return p; };
+  const doms = [...rdom];
+  const runeRows = R ? [2, 3, 4, 5, 6].filter(r => r <= R).map(r => {
+    const bothP = doms.length === 2 ? 1 - (1 - atLeast(doms[0][1], r, 1)) - (1 - atLeast(doms[1][1], r, 1)) : null;   // both domains can't be absent together
+    return `<tr><th>룬 ${r}장</th>${doms.map(([, K]) => [1, 2, 3].map(k => pctCell(atLeast(K, r, k))).join('')).join('')}${bothP != null ? pctCell(bothP) : ''}</tr>`;
+  }).join('') : '';
+  return `
+    <section class="sec"><header><h4>멀리건 테스트</h4><span class="hint">주 덱 ${N}장 (선택 챔피언 제외)에서 4장을 뽑고 최대 2장을 다시 뽑습니다.</span></header>${mullBtn}</section>
+    <section class="sec"><header><h4>카드 묶음별 1장 이상 잡을 확률</h4></header>
+      <div class="tbl"><table class="st an">${head}${groups.map(([t, K]) => line(t, K)).join('')}</table></div>
+      <p class="hint">"멀리건 포함"은 찾는 카드가 없을 때 다른 카드 2장을 다시 뽑는 경우입니다. "+n장"은 그 뒤 n장을 더 뽑은 시점입니다. 시작 4장 안의 평균 장수 = 4 × 장수 ÷ ${N}.</p></section>
+    <section class="sec"><header><h4>카드별 1장 이상 잡을 확률</h4></header>
+      <div class="tbl"><table class="st an">${head}${cards.map(([K, c]) => line(esc(dName(c)), K, c.e != null ? ` <span class="cost">⬡${c.e}</span>` : '')).join('')}</table></div></section>
+    ${R ? `<section class="sec"><header><h4>룬 덱 (${R}장)</h4><span class="hint">룬을 n장 꺼냈을 때 각 영역 룬이 나올 확률</span></header>
+      <div class="tbl"><table class="st an"><tr><th></th>${doms.map(([d, K]) => `<td colspan="3"><span class="rune" style="--c:var(--d-${d})"></span> ${L.domain[d] ? L.domain[d][0] : d} ${K}장</td>`).join('')}${doms.length === 2 ? '<td>두 영역 모두</td>' : ''}</tr>
+      <tr><th></th>${doms.map(() => '<td>1장+</td><td>2장+</td><td>3장+</td>').join('')}${doms.length === 2 ? '<td>각 1장+</td>' : ''}</tr>${runeRows}</table></div></section>` : ''}`;
+}
+
+/* ---------- mulligan test ---------- */
+const mull = { lib: [], hand: [], drawn: [], pick: new Set(), phase: 'choose', hands: 0, mulls: 0, back: null };
+function shuffled(a) {
+  const r = new Uint32Array(a.length); crypto.getRandomValues(r);
+  for (let i = a.length - 1; i > 0; i--) { const j = r[i] % (i + 1); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+function mullDeal() {
+  const dk = decks.data[edId], ids = [];
+  for (const [c, n] of rows(dk.main)) for (let i = 0; i < n; i++) ids.push(c.id);
+  if (ids.length < HAND) { toast(`주 덱에 카드가 ${HAND}장 이상 있어야 합니다.`); return false; }
+  const lib = shuffled(ids);
+  mull.hand = lib.splice(0, HAND).map((id, i) => ({ id, k: 'h' + i })); mull.lib = lib; mull.drawn = [];
+  mull.pick.clear(); mull.phase = 'choose'; mull.hands++;
+  return true;
+}
+function mullCard(x, i) {
+  const c = BYID.get(x.id), sel = mull.pick.has(x.k), fresh = x.fresh ? ' fresh' : '';
+  return `<button class="mcard${sel ? ' sel' : ''}${fresh}${x.drawn ? ' drawn' : ''}" type="button" data-mk="${x.k}" aria-pressed="${sel}"${mull.phase === 'choose' && !x.drawn ? '' : ' tabindex="-1"'} title="${esc(enName(c))}">
+    <span class="mc-art">${tileArt(c)}</span>${sel ? '<span class="mc-tag">다시 뽑기</span>' : ''}${x.drawn ? `<span class="mc-tag dr">드로우 ${x.drawn}</span>` : ''}
+    <span class="mc-name">${esc(dName(c))}</span></button>`;
+}
+function renderMull() {
+  const choose = mull.phase === 'choose';
+  $('mull-hint').textContent = choose ? `시작 손패 ${HAND}장입니다. 다시 뽑을 카드를 최대 ${MULL}장까지 누르세요. (${mull.pick.size}/${MULL})` : `확정된 손패입니다. 덱에 ${mull.lib.length}장이 남았습니다.`;
+  $('mull-hand').innerHTML = [...mull.hand, ...mull.drawn].map(mullCard).join('');
+  $('mull-hand').querySelectorAll('[data-bg]').forEach(el => { el.style.backgroundImage = `url('${el.dataset.bg}')`; BG_SEEN.add(el.dataset.bg); });
+  $('mull-go').hidden = !choose; $('mull-keep').hidden = !choose; $('mull-draw').hidden = choose;
+  $('mull-go').disabled = !mull.pick.size;
+  $('mull-go').textContent = mull.pick.size ? `선택한 ${mull.pick.size}장 다시 뽑기` : '다시 뽑을 카드를 고르세요';
+  $('mull-draw').disabled = !mull.lib.length;
+  $('mull-stats').textContent = `이번에 섞은 횟수 ${mull.hands}회 · 멀리건한 횟수 ${mull.mulls}회`;
+  for (const x of [...mull.hand, ...mull.drawn]) delete x.fresh;
+}
+function openMull() {
+  if (!mullDeal()) return;
+  mull.back = document.activeElement; hidePreview();
+  $('mull').hidden = false; $('mull-scrim').hidden = false; renderMull(); $('mull-close').focus();
+}
+function closeMull() { $('mull').hidden = true; $('mull-scrim').hidden = true; if (mull.back && document.contains(mull.back)) mull.back.focus(); }
+$('mull-hand').onclick = ev => {
+  const b = ev.target.closest('[data-mk]'); if (!b || mull.phase !== 'choose') return;
+  const k = b.dataset.mk; if (!mull.hand.some(x => x.k === k)) return;
+  if (mull.pick.has(k)) mull.pick.delete(k);
+  else if (mull.pick.size >= MULL) { toast(`최대 ${MULL}장까지 다시 뽑을 수 있습니다.`); return; }
+  else mull.pick.add(k);
+  renderMull();
+};
+$('mull-go').onclick = () => {
+  if (!mull.pick.size) return;
+  const back = mull.hand.filter(x => mull.pick.has(x.k));
+  mull.hand = mull.hand.map(x => mull.pick.has(x.k) ? { id: mull.lib.shift(), k: x.k + 'r', fresh: true } : x);
+  mull.lib.push(...back.map(x => x.id));   // returned cards go to the bottom of the deck
+  mull.pick.clear(); mull.phase = 'kept'; mull.mulls++; renderMull();
+};
+$('mull-keep').onclick = () => { mull.pick.clear(); mull.phase = 'kept'; renderMull(); };
+$('mull-draw').onclick = () => { if (!mull.lib.length) return; mull.drawn.push({ id: mull.lib.shift(), k: 'd' + mull.drawn.length, drawn: mull.drawn.length + 1, fresh: true }); renderMull(); };
+$('mull-new').onclick = () => { if (mullDeal()) renderMull(); };
+$('mull-close').onclick = closeMull;
+$('mull-scrim').onclick = closeMull;
+document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && !$('mull').hidden) { ev.stopPropagation(); closeMull(); } }, true);
 
 /* ---------- deck editor: drag and drop ----------
    Mouse: press and move a few pixels. Touch: press and hold, then move.
