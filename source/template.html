@@ -530,8 +530,8 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
 .ed-switch [data-drop].drop-hover{background:var(--rift);color:var(--surface)}
 
 /* meta decks */
-.meta-sum{display:grid;gap:4px;margin:4px 0 6px}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 14px}
+.meta-sum{display:grid;gap:6px;margin:14px 0 4px;line-height:1.6}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 28px}
 .chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;font-size:12.5px}
 .chip{display:inline-flex;align-items:center;gap:7px}
 .chip b{font-family:var(--f-mono);font-weight:500}
@@ -539,14 +539,18 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
 .av{width:34px;height:34px;border-radius:50%;flex:none;background-color:var(--sunk);background-repeat:no-repeat;box-shadow:0 0 0 1px var(--line)}
 .chip[aria-pressed="true"] .av{box-shadow:0 0 0 2px var(--accent)}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.meta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
-.mdeck{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px;display:grid;grid-template-columns:40px minmax(0,1fr);gap:12px;align-items:start;min-width:0}
-.mdeck .top{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.meta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:20px}
+.mdeck{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;display:grid;grid-template-columns:108px minmax(0,1fr);gap:20px;align-items:start;min-width:0}
+.mdeck .cardbody{gap:7px}
+.mthumb{display:block;width:108px;aspect-ratio:420/588;border-radius:7px;overflow:hidden;background:var(--sunk);box-shadow:0 6px 18px rgb(0 0 0 / .18)}
+.mthumb .ti,.mthumb img{display:block;width:100%;height:100%;object-fit:contain;background-repeat:no-repeat}
+.mdeck .top{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
 .rankb{font-family:var(--f-mono);font-weight:600;color:var(--accent);font-size:13px}
 .ban-h{font-size:13px;margin:14px 0 6px;color:var(--muted);font-weight:600}.ban-h.sub{margin-top:8px}.ban-ul{list-style:none;margin:0;padding:0;display:grid;gap:4px}
 .ban-row{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 10px;color:inherit;font:inherit;cursor:pointer}.ban-row:hover{border-color:var(--ink)}.ban-nm{display:grid;min-width:0}.ban-row .pill:not(.bad){background:var(--sunk);color:var(--muted)}.ban-nm .hint{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.mdeck b{font-size:15px}
-.mdeck .act{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.mdeck b{font-size:17px;line-height:1.35}
+.mdeck .ownbar{margin-top:6px}
+.mdeck .act{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:12px}
 .mdeck .badges{display:flex;gap:6px;flex-wrap:wrap}
 .copybox{position:fixed;z-index:40;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,calc(100% - 32px));background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:10px;box-shadow:0 20px 50px rgb(0 0 0 / .25)}
 .copybox p{margin:0;font-size:13px}
@@ -561,6 +565,7 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
   .ed-grid[data-pane="browse"] .ws,.ed-grid[data-pane="deck"] .browser{display:none}
 }
 @media (max-width:460px){.topnav .wordmark{display:none}.navlinks a{padding:6px 8px}}
+@media (max-width:560px){.meta-grid{grid-template-columns:minmax(0,1fr);gap:14px}.mdeck{padding:16px;gap:16px;grid-template-columns:84px minmax(0,1fr)}.mthumb{width:84px}.mdeck b{font-size:16px}}
 @media (max-width:660px){.navlinks .long{display:none}.navlinks .short{display:inline}}
 @media (max-width:560px){
   .navlinks .long{display:none}
@@ -2044,7 +2049,7 @@ function renderMeta() {
     const lg = CARDS[o.L], ch = o.C != null ? CARDS[o.C] : null, ev = MD.events[o.e];
     const banned = [o.L, o.C, ...o.m.map(x => x[0]), ...o.b].filter(x => x != null && isBanned(CARDS[x])).length;
     return `<article class="mdeck" data-mi="${i}">
-      <span class="th" style="${thumbStyle(lg)}" aria-hidden="true"></span>
+      <span class="mthumb" aria-hidden="true">${tileArt(lg)}</span>
       <div class="cardbody">
       <span class="top"><span class="rankb">${o.r != null ? '#' + o.r : '-'}</span> · ${esc(ev.ko)} RQ · ${ev.date}${ev.players ? ` · ${ev.players.toLocaleString()}명` : ''}</span>
       <b>${esc(legendLabel(lg))}</b>
@@ -2056,6 +2061,7 @@ function renderMeta() {
       </div>
     </article>`;
   }).join('') : `<p class="empty">조건에 맞는 덱이 없습니다.</p>`;
+  wireLazy($('meta-list'));
 }
 $('m-meta').onchange = ev => { mu.meta = ev.target.value; mu.legend = ''; saveMu(); renderMeta(); };
 $('m-rank').onchange = ev => { mu.rank = ev.target.value; saveMu(); renderMeta(); };
@@ -2135,7 +2141,7 @@ function renderKr() {
   $('kr-list').innerHTML = list.length ? list.map(({ o, i, lg, own }) => {
     const ch = BYID.get(o.C), banned = [o.L, o.C, ...o.m.map(x => x[0]), ...o.b].filter(id => isBanned(BYID.get(id))).length;
     return `<article class="mdeck" data-ki="${i}">
-      <span class="th" style="${thumbStyle(lg)}" aria-hidden="true"></span>
+      <span class="mthumb" aria-hidden="true">${tileArt(lg)}</span>
       <div class="cardbody">
       <span class="top">${esc(krDoms(o))}${o.s.length ? ' · 사이드 포함' : ''}</span>
       <b>${esc(o.t)}</b>
@@ -2147,6 +2153,7 @@ function renderKr() {
       </div>
     </article>`;
   }).join('') : `<p class="empty">조건에 맞는 덱이 없습니다.</p>`;
+  wireLazy($('kr-list'));
 }
 $('k-sort').onchange = ev => { ku.sort = ev.target.value; saveKu(); renderKr(); };
 $('kr-chips').onclick = ev => { const b = ev.target.closest('[data-tag]'); if (!b) return; ku.legend = b.dataset.tag; saveKu(); renderKr(); };
