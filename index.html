@@ -1083,11 +1083,15 @@ function openEditor(id) {
 function closeEditor() { edId = null; edBuilt = null; $('deck-edit').hidden = true; $('deck-home').hidden = false; }
 
 // Square crop of a card's illustration from the large image sheets (W = rendered card width).
+// Image sheets that have been shown once are painted straight away on later renders; only unseen ones wait
+// for the lazy loader. Re-rendering the deck editor otherwise left every card blank for a couple of frames.
+const BG_SEEN = new Set();
+const bgAttrs = (url, style) => BG_SEEN.has(url) ? `style="background-image:url('${url}');${style}"` : `data-bg="${url}" style="${style}"`;
 function cropAttrs(c, w, h, W = w / 0.62, cx = 0.55, cy = 0.27) {
   const f = n => n.toFixed(1);
-  if (!USE_PACK) { const H = W * 1039 / 744; return `data-bg="${cdn(c, 240)}" style="background-size:${f(W)}px ${f(H)}px;background-position:${f(w / 2 - cx * W)}px ${f(h / 2 - cy * H)}px"`; }
+  if (!USE_PACK) { const H = W * 1039 / 744; return bgAttrs(cdn(c, 240), `background-size:${f(W)}px ${f(H)}px;background-position:${f(w / 2 - cx * W)}px ${f(h / 2 - cy * H)}px`); }
   const per = G.dn * G.dn, k = c.ix % per, H = W * G.ch / G.cw;
-  return `data-bg="img/d${pad3(Math.floor(c.ix / per))}.webp" style="background-size:${f(G.dn * W)}px ${f(G.dn * H)}px;background-position:${f(w / 2 - ((k % G.dn) + cx) * W)}px ${f(h / 2 - (Math.floor(k / G.dn) + cy) * H)}px"`;
+  return bgAttrs(`img/d${pad3(Math.floor(c.ix / per))}.webp`, `background-size:${f(G.dn * W)}px ${f(G.dn * H)}px;background-position:${f(w / 2 - ((k % G.dn) + cx) * W)}px ${f(h / 2 - (Math.floor(k / G.dn) + cy) * H)}px`);
 }
 function secCount(dk, sec) {
   if (sec === 'legend') return dk.legend ? 1 : 0;
@@ -1796,7 +1800,7 @@ function rowHTML(c) {
 function tileArt(c) {
   if (!USE_PACK) return `<img src="${cdn(c, 320)}" alt="" loading="lazy">`;
   const per = G.dn * G.dn, k = c.ix % per, n = G.dn - 1;
-  return `<span class="ti" data-bg="img/d${pad3(Math.floor(c.ix / per))}.webp" style="background-size:${G.dn * 100}% ${G.dn * 100}%;background-position:${(k % G.dn) / n * 100}% ${Math.floor(k / G.dn) / n * 100}%"></span>`;
+  return `<span class="ti" ${bgAttrs(`img/d${pad3(Math.floor(c.ix / per))}.webp`, `background-size:${G.dn * 100}% ${G.dn * 100}%;background-position:${(k % G.dn) / n * 100}% ${Math.floor(k / G.dn) / n * 100}%`)}></span>`;
 }
 function tileHTML(c) {
   const q = inv.q(c.id), n = displayName(c);
@@ -1808,10 +1812,10 @@ function tileHTML(c) {
 }
 const itemHTML = c => ui.view === 'album' ? tileHTML(c) : rowHTML(c);
 const lazyBg = 'IntersectionObserver' in window ? new IntersectionObserver(es => {
-  for (const e of es) if (e.isIntersecting) { const el = e.target; el.style.backgroundImage = `url('${el.dataset.bg}')`; lazyBg.unobserve(el); }
+  for (const e of es) if (e.isIntersecting) { const el = e.target; el.style.backgroundImage = `url('${el.dataset.bg}')`; BG_SEEN.add(el.dataset.bg); lazyBg.unobserve(el); }
 }, { rootMargin: '600px 0px' }) : null;
 function wireLazy(root) {
-  root.querySelectorAll('.ti[data-bg]').forEach(el => lazyBg ? lazyBg.observe(el) : (el.style.backgroundImage = `url('${el.dataset.bg}')`));
+  root.querySelectorAll('.ti[data-bg]').forEach(el => { if (lazyBg) lazyBg.observe(el); else { el.style.backgroundImage = `url('${el.dataset.bg}')`; BG_SEEN.add(el.dataset.bg); } });
 }
 
 function renderSummary() {
