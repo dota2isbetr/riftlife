@@ -10,6 +10,7 @@ https://riftlife.life 에 게시된 앱(`/index.html`, `/img/`)을 만드는 원
 | `template.html` | 앱 본체 (HTML·CSS·JS). `__DATA__`, `__META__` 자리에 데이터가 들어감 |
 | `data/cards.json` | 카드 1,408종 (영문·한글, 이미지 시트 위치 `ix`/`wh`/`rot` 포함) |
 | `data/meta.json` | 메타 덱: 대회, 덱리스트, 금지 목록 |
+| `data/samples_kr.json` | 한국 환경 샘플 덱 ("한국 환경 샘플 덱" 탭). 저장소 루트의 덱 이미지에서 옮겨 적음 |
 | `data/decks_raw.json` | 대회 기사에서 파싱한 원본 덱 (meta.json의 입력) |
 | `scripts/` | 데이터 수집·가공 스크립트 (아래 순서) |
 
@@ -48,6 +49,13 @@ https://riftlife.life 에 게시된 앱(`/index.html`, `/img/`)을 만드는 원
 3. `build_page.py` 실행 후 `/index.html`, `/img/`, `source/` 커밋
 
 새 카드 세트로 갤러리를 다시 받아 `pack.py`를 돌린 경우에는 마지막에 `add_extras.py`(이미지가 있으니 `--fetch` 없이)를 다시 실행합니다.
+
+## 한국 환경 샘플 덱 바꾸기
+
+`data/samples_kr.json`의 `decks`를 고치고 `build_page.py`를 실행합니다. 각 덱은 카드 id와 장수로 적습니다 (형식은 파일 맨 위 `note`).
+- 주 덱(`m`)은 선택 챔피언(`C`)을 뺀 39장입니다. 시뮬레이터 이미지의 "메인 40장"에는 챔피언 1장이 들어 있으니 그 1장을 빼고 적습니다.
+- `img`는 저장소 루트에 올린 원본 덱 이미지 파일 이름이고, 덱 보기의 "원본 덱 이미지" 링크가 됩니다.
+- `top: true`면 🏆(챔피언별 1위)로 표시되고 목록 앞에 옵니다.
 
 ## 새 대회 덱이 공개됐을 때
 

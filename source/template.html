@@ -558,6 +558,8 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
   .browser,.ws{position:static;max-height:none;overflow:visible}
   .ed-grid[data-pane="browse"] .ws,.ed-grid[data-pane="deck"] .browser{display:none}
 }
+@media (max-width:460px){.topnav .wordmark{display:none}.navlinks a{padding:6px 8px}}
+@media (max-width:660px){.navlinks .long{display:none}.navlinks .short{display:inline}}
 @media (max-width:560px){
   .navlinks .long{display:none}
   .navlinks .short{display:inline}
@@ -597,6 +599,7 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
     <a id="tab-collection" href="#collection">컬렉션</a>
     <a id="tab-decks" href="#decks"><span class="long">덱 빌더</span><span class="short">덱</span></a>
     <a id="tab-meta" href="#meta"><span class="long">메타 덱</span><span class="short">메타</span></a>
+    <a id="tab-kr" href="#kr"><span class="long">한국 환경 샘플 덱</span><span class="short">샘플</span></a>
   </div>
   <a class="nav-search" href="#collection" id="nav-search" aria-label="카드 검색"><svg viewBox="0 0 20 20" width="17" height="17" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m13 13 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></a>
   <div class="storage" id="storage" data-mode="loading" title="저장 위치"><i></i><span id="storage-text">보관함 불러오는 중…</span></div>
@@ -732,6 +735,19 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
     <div class="meta-grid" id="meta-list"></div>
   </section>
 
+  <section id="v-kr" hidden>
+    <div class="page-head"><h1 class="page-title">한국 환경 샘플 덱</h1></div>
+    <div class="filters">
+      <select id="k-sort" aria-label="정렬">
+        <option value="top">챔피언별 1위 덱 먼저</option>
+        <option value="own">내 보유율 높은 순</option>
+      </select>
+    </div>
+    <div class="meta-sum" id="kr-sum"></div>
+    <div class="chips" id="kr-chips"></div>
+    <div class="meta-grid" id="kr-list"></div>
+  </section>
+
   <p class="foot">카드 데이터: playriftbound.com 공식 카드 갤러리 (영문·한국어, <span id="fetched"></span> 기준, <span id="n-cards"></span>종). 한국어 이름은 공식 한국어판이 있는 오리진 세트만 <b>공식</b>이며, 이후 세트의 챔피언 이름은 리그 오브 레전드 한국어 표기를 따른 <b>추정</b>입니다. 한글명이 없는 카드는 상세 화면에서 내 번역을 직접 넣을 수 있고, 검색에도 반영됩니다. 갤러리에 없는 프로모·지역 한정 카드와 일부 토큰은 playriftbound.com 공식 뉴스에 공개된 카드 이미지를 기준으로 추가했습니다(상세 화면에 출처 표시). 카드 이미지 © Riot Games, 비영리 목적으로 허가를 받아 사용합니다. 메타 덱: playriftbound.com 공식 Organized Play 기사의 지역 예선(RQ) 덱리스트이며, 메타는 각 대회에서 사용된 가장 최신 확장팩 기준으로 나눴습니다. 금지 카드는 공식 금지 목록(Standard)을 기준으로 표시합니다. <span class="build">빌드 __BUILD__</span></p>
 </div>
 
@@ -759,6 +775,7 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
 
 <script id="card-data" type="application/json">__DATA__</script>
 <script id="meta-data" type="application/json">__META__</script>
+<script id="kr-data" type="application/json">__KR__</script>
 <script>
 (() => {
 const RAW = JSON.parse(document.getElementById('card-data').textContent);
@@ -1104,7 +1121,7 @@ const decks = {
 };
 
 /* ---------- views ---------- */
-const VIEWS = ['home', 'collection', 'decks', 'meta'];
+const VIEWS = ['home', 'collection', 'decks', 'meta', 'kr'];
 let view = 'collection';
 function route() {
   const h = location.hash.slice(1);
@@ -1117,6 +1134,7 @@ function renderActive() {
   if (view === 'home') { renderSummary(); renderHome(); return; }
   renderSummary();
   if (view === 'decks') { if (edId && decks.data[edId]) renderEditor(); else { if (edId) closeEditor(); renderDeckHome(); } }
+  else if (view === 'kr') renderKr();
   else renderMeta();
 }
 addEventListener('hashchange', route);
@@ -1138,7 +1156,7 @@ function renderDeckHome() {
       <b>${esc(dk.name || '이름 없는 덱')}</b>
       <span class="hint">${lg ? esc(legendLabel(lg)) : '전설 미선택'} · 메인 ${s.v.mainN}/40 · 보유 ${s.own.have}/${s.own.total}장</span>
       <span class="pills">${s.pills}</span>
-      ${dk.src ? `<span class="hint">출처: ${esc(MD.events[dk.src.e]?.ko || '')} #${dk.src.r ?? '-'} · ${esc(dk.src.p || '')}</span>` : ''}
+      ${dk.src ? `<span class="hint">출처: ${dk.src.kr ? '한국 환경 샘플 덱 · ' + esc(dk.src.kr) : `${esc(MD.events[dk.src.e]?.ko || '')} #${dk.src.r ?? '-'} · ${esc(dk.src.p || '')}`}</span>` : ''}
       </span>
     </button><button class="mini dk-del" type="button" data-del="${id}" aria-label="${esc(dk.name || '이름 없는 덱')} 삭제">삭제</button></li>`;
   }).join('') : `<li class="empty">아직 만든 덱이 없습니다. "새 덱 만들기"로 시작하거나, 메타 덱 탭에서 대회 상위 덱을 가져와 보세요.</li>`;
@@ -2048,31 +2066,97 @@ $('meta-list').onclick = ev => {
 };
 
 let sheetBack = null;
-function openMetaSheet(i) {
-  const o = MD.decks[i], dk = metaDeck(o), om = ownedMap(), own = deckOwn(dk, om), ev = MD.events[o.e], lg = CARDS[o.L];
+// Read-only deck sheet shared by meta decks and sample decks: head line, title, subtitle, note, source link, take action.
+function openDeckSheet({ dk, lg, champ, head, title, sub, note, link, linkText, take, back }) {
+  const om = ownedMap(), own = deckOwn(dk, om);
   if (!openId && $('sheet').hidden) lastFocus = document.activeElement;
-  openId = null; sheetBack = () => openMetaSheet(i);
+  openId = null; sheetBack = back;
   $('sheet').innerHTML = `
     <header>
-      <div><div class="code">${o.r != null ? '#' + o.r : ''} · ${esc(ev.ko)} RQ (${esc(ev.en)}) · ${ev.date}</div>
-      <h2 id="d-title">${esc(legendLabel(lg))}<small>${esc(o.p)}${o.lr ? ` · 전설 내 ${o.lr[0]}위/${o.lr[1]}명` : ''}</small></h2></div>
+      <div><div class="code">${head}</div>
+      <h2 id="d-title">${esc(title)}<small>${esc(sub)}</small></h2></div>
       <button class="x" type="button" id="d-close" aria-label="닫기">✕</button>
     </header>
     <div><div class="ownbar" aria-hidden="true"><i style="width:${own.pct}%"></i></div>
-    <p class="hint" style="margin:6px 0 0">내 컬렉션 기준 보유 ${own.have}/${own.total}장 (${own.pct}%) · 부족 ${own.miss}장. 사이드보드는 계산에서 뺐습니다.${o.note ? ' ' + esc(o.note) + '.' : ''}</p></div>
+    <p class="hint" style="margin:6px 0 0">내 컬렉션 기준 보유 ${own.have}/${own.total}장 (${own.pct}%) · 부족 ${own.miss}장. 사이드보드는 계산에서 뺐습니다.${note ? ' ' + esc(note) + '.' : ''}</p></div>
     <div class="filters"><button class="btn" type="button" id="ms-take">내 덱으로 가져오기</button><button class="ghost" type="button" id="ms-copy">영문 덱리스트 복사</button><button class="ghost" type="button" id="ms-miss"${own.miss ? '' : ' disabled'}>부족 카드 복사</button></div>
-    <div class="slot"><span class="th sm" style="${thumbStyle(lg, 32)}" aria-hidden="true"></span><span><span class="hint">선택 챔피언</span><br>${o.C != null ? `<button class="nm" type="button" data-cid="${CARDS[o.C].id}">${esc(dName(CARDS[o.C]))}</button>` : '—'}</span></div>
+    <div class="slot"><span class="th sm" style="${thumbStyle(lg, 32)}" aria-hidden="true"></span><span><span class="hint">선택 챔피언</span><br>${champ ? `<button class="nm" type="button" data-cid="${champ.id}">${esc(dName(champ))}</button>` : '—'}</span></div>
     <div id="ms-list">${deckListHTML(dk, om, false)}</div>
-    <a class="artlink" href="${ev.url}" target="_blank" rel="noopener">공식 기사 원문 ↗</a>`;
+    ${link ? `<a class="artlink" href="${link}" target="_blank" rel="noopener">${esc(linkText)}</a>` : ''}`;
   $('sheet').hidden = false; $('scrim').hidden = false;
   $('d-close').onclick = closeDetail;
-  $('ms-take').onclick = () => takeMeta(i);
+  $('ms-take').onclick = take;
   $('ms-copy').onclick = () => copyText(deckText(dk, 'en'), '영문 덱리스트');
   $('ms-miss').onclick = () => copyText(missingText(dk), '부족 카드 목록');
   wireLazy($('sheet'));
   $('sheet').querySelectorAll('[data-cid],[data-act="card"]').forEach(el => el.onclick = () => openDetail(el.dataset.cid || el.closest('[data-id]').dataset.id));
   $('d-close').focus();
 }
+function openMetaSheet(i) {
+  const o = MD.decks[i], ev = MD.events[o.e], lg = CARDS[o.L];
+  openDeckSheet({ dk: metaDeck(o), lg, champ: o.C != null ? CARDS[o.C] : null,
+    head: `${o.r != null ? '#' + o.r : ''} · ${esc(ev.ko)} RQ (${esc(ev.en)}) · ${ev.date}`, title: legendLabel(lg),
+    sub: o.p + (o.lr ? ` · 전설 내 ${o.lr[0]}위/${o.lr[1]}명` : ''), note: o.note, link: ev.url, linkText: '공식 기사 원문 ↗',
+    take: () => takeMeta(i), back: () => openMetaSheet(i) });
+}
+
+/* ---------- Korean environment sample decks ---------- */
+const KD = JSON.parse(document.getElementById('kr-data').textContent);
+const KU_KEY = 'rb-ledger-kr-v1';
+const ku = Object.assign({ sort: 'top', legend: '' }, lsGet(KU_KEY) || {});
+const saveKu = () => lsSet(KU_KEY, ku);
+const KR_SITE = 'https://riftlife.life/';   // deck images live at the repo root; absolute so the claude.ai copy links there too
+const krDeck = o => ({
+  name: o.t, legend: o.L, champion: o.C, bf: [...o.b],
+  main: Object.fromEntries(o.m), runes: Object.fromEntries(o.u), side: Object.fromEntries(o.s),
+  src: { kr: o.t }, created: Date.now(), updated: Date.now(),
+});
+const krDoms = o => (BYID.get(o.L).d || []).map(d => L.domain[d][0]).join('·');
+function renderKr() {
+  const om = ownedMap();
+  $('k-sort').value = ku.sort;
+  const pool = KD.decks.map((o, i) => ({ o, i, lg: BYID.get(o.L) }));
+  const tags = new Map();
+  for (const { lg } of pool) { const t = champTag(lg); if (!tags.has(t)) tags.set(t, { n: 0, lg }); tags.get(t).n++; }
+  if (ku.legend && !tags.has(ku.legend)) ku.legend = '';
+  let list = (ku.legend ? pool.filter(x => champTag(x.lg) === ku.legend) : pool).map(x => ({ ...x, own: deckOwn(krDeck(x.o), om) }));
+  if (ku.sort === 'own') list.sort((a, b) => b.own.pct - a.own.pct || b.o.top - a.o.top);
+  else list.sort((a, b) => b.o.top - a.o.top || a.i - b.i);
+  const best = pool.map(x => ({ x, own: deckOwn(krDeck(x.o), om) })).sort((a, b) => b.own.pct - a.own.pct)[0];
+  $('kr-sum').innerHTML = `<p class="hint" style="margin:0">한국어판 스탠다드 포맷(오리진·증명의 전장)으로 짠 샘플 덱 ${pool.length}개입니다. 🏆 표시는 챔피언별 1위 덱입니다. 덱 보기에서 원본 덱 이미지를 열 수 있습니다.</p>
+    ${best ? `<p style="margin:0;font-size:13px">내 컬렉션으로 가장 가까운 덱: <b>${esc(best.x.o.t)}</b> · 보유 ${best.own.pct}% · 부족 ${best.own.miss}장</p>` : ''}`;
+  $('kr-chips').innerHTML = `<button class="chip" type="button" data-tag="" aria-pressed="${!ku.legend}">전체 챔피언<b>${pool.length}</b></button>` +
+    [...tags].sort((a, b) => b[1].n - a[1].n || champKo(a[0]).localeCompare(champKo(b[0]), 'ko')).map(([t, { n, lg }]) => `<button class="chip av-chip" type="button" data-tag="${esc(t)}" aria-pressed="${ku.legend === t}" title="${esc(legendLabel(lg))}"><span class="av" style="${avatarStyle(lg)}" aria-hidden="true"></span>${esc(ko() ? champKo(t) : t)}<b>${n}</b></button>`).join('');
+  $('kr-list').innerHTML = list.length ? list.map(({ o, i, lg, own }) => {
+    const ch = BYID.get(o.C), banned = [o.L, o.C, ...o.m.map(x => x[0]), ...o.b].filter(id => isBanned(BYID.get(id))).length;
+    return `<article class="mdeck" data-ki="${i}">
+      <span class="th" style="${thumbStyle(lg)}" aria-hidden="true"></span>
+      <div class="cardbody">
+      <span class="top">${o.top ? '<span class="rankb">🏆 1위</span> · ' : ''}${esc(krDoms(o))}${o.s.length ? ' · 사이드 포함' : ''}</span>
+      <b>${esc(o.t)}</b>
+      <span class="hint">${esc(legendLabel(lg))}${ch ? ' · ' + esc(dName(ch)) : ''}</span>
+      <span class="ownbar" aria-hidden="true"><i style="width:${own.pct}%"></i></span>
+      <span class="hint">보유 ${own.have}/${own.total}장 (${own.pct}%) · 부족 ${own.miss}장</span>
+      ${banned ? `<span class="badges"><span class="pill bad">현재 금지 카드 ${banned}종</span></span>` : ''}
+      <div class="act"><button class="mini" type="button" data-act="view">덱 보기</button><button class="mini" type="button" data-act="take">내 덱으로 가져오기</button></div>
+      </div>
+    </article>`;
+  }).join('') : `<p class="empty">조건에 맞는 덱이 없습니다.</p>`;
+}
+$('k-sort').onchange = ev => { ku.sort = ev.target.value; saveKu(); renderKr(); };
+$('kr-chips').onclick = ev => { const b = ev.target.closest('[data-tag]'); if (!b) return; ku.legend = b.dataset.tag; saveKu(); renderKr(); };
+function takeKr(i) { const id = decks.create(krDeck(KD.decks[i])); closeDetail(); toast('내 덱으로 가져왔습니다.'); openEditor(id); }
+function openKrSheet(i) {
+  const o = KD.decks[i], lg = BYID.get(o.L);
+  openDeckSheet({ dk: krDeck(o), lg, champ: BYID.get(o.C),
+    head: `${o.top ? '🏆 챔피언별 1위 · ' : ''}한국 환경 샘플 덱 · ${esc(krDoms(o))}`, title: o.t, sub: legendLabel(lg),
+    link: KR_SITE + encodeURIComponent(o.img), linkText: '원본 덱 이미지 ↗', take: () => takeKr(i), back: () => openKrSheet(i) });
+}
+$('kr-list').onclick = ev => {
+  const b = ev.target.closest('[data-act]'); if (!b) return;
+  const i = +b.closest('[data-ki]').dataset.ki;
+  if (b.dataset.act === 'take') takeKr(i); else openKrSheet(i);
+};
 
 function fillSelects() {
   const opt = (v, t, sel) => `<option value="${v}"${sel === v ? ' selected' : ''}>${esc(t)}</option>`;
@@ -2401,6 +2485,13 @@ function renderHome() {
       <p class="sub">공식 지역 예선 상위 덱을 메타별로 모았습니다. 내 보유율이 높은 덱부터 볼 수 있습니다.</p>
       <span class="go">메타 덱 보기 ›</span>
       ${fanArt(fill(metaLegends, []))}
+    </button>
+    <button class="hcard feat" type="button" data-go="kr">
+      <span class="k">한국 환경 · 샘플 덱 ${KD.decks.length}개</span>
+      <h3>한국 환경 샘플 덱</h3>
+      <p class="sub">한국어판 스탠다드 포맷으로 짠 덱을 모았습니다. 챔피언별 1위 덱과 사이드보드까지 확인하고 내 덱으로 가져옵니다.</p>
+      <span class="go">샘플 덱 보기 ›</span>
+      ${fanArt(fill(KD.decks.filter(o => o.top).map(o => BYID.get(o.L)), []))}
     </button>`;
   // collection shelf
   const setBars = SETS.map(s => `<div><span>${esc(s.ko)}</span><span class="hint">${per[s.id].own}/${per[s.id].n}</span><span class="ownbar"><i style="width:${(per[s.id].own / per[s.id].n * 100).toFixed(1)}%"></i></span></div>`).join('');
