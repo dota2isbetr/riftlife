@@ -431,7 +431,7 @@ h2.vh{margin:0;font-size:18px}
 .sectabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
 .sectabs button{border:1px solid var(--line);background:var(--bg);border-radius:7px;padding:6px 12px;font-weight:600;font-size:13px}
 .sectabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-#kr-sum{margin-bottom:26px}.kr-env{margin:0 0 14px}.kr-env button{padding:8px 16px;font-size:14px}
+#kr-sum{margin-bottom:26px}.kr-head{flex-direction:column;align-items:flex-start;gap:10px}.page-lead{margin:0;font-size:clamp(17px,2.2vw,22px);font-weight:500;line-height:1.45;color:var(--muted);letter-spacing:-.01em;word-break:keep-all}.kr-env{margin:0 0 14px}.kr-env button{padding:8px 16px;font-size:14px}
 .beta{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.04em;line-height:1.5;padding:0 7px;margin-left:4px;border-radius:999px;background:var(--accent-soft);color:var(--accent);vertical-align:2px;text-transform:lowercase}
 .beta-note{display:flex;gap:10px;align-items:baseline;margin:0 0 6px;padding:12px 14px;border-radius:10px;background:var(--accent-soft);color:var(--ink);font-size:13.5px;line-height:1.55;word-break:keep-all}
 .beta-note .beta{margin:0;background:var(--accent);color:var(--bg);flex:none}
@@ -843,7 +843,7 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
   </section>
 
   <section id="v-kr" hidden>
-    <div class="page-head"><h1 class="page-title">한국 환경 샘플 덱</h1></div>
+    <div class="page-head kr-head"><h1 class="page-title">한국 환경 샘플 덱</h1><p class="page-lead">한국어판 스탠다드 환경 적법성에 맞춰 구성된 덱 예시입니다.</p></div>
     <div class="sectabs kr-env" id="kr-env" role="tablist" aria-label="한국 환경"></div>
     <div class="filters">
       <select id="k-sort" aria-label="정렬">
@@ -2307,7 +2307,7 @@ function renderKr() {
   if (ku.sort === 'own') list.sort((a, b) => b.own.pct - a.own.pct || byName(a, b));
   else list.sort(byName);
   const best = pool.map(x => ({ x, own: deckOwn(krDeck(x.o), om) })).sort((a, b) => b.own.pct - a.own.pct)[0];
-  $('kr-sum').innerHTML = `${env.beta ? `<p class="beta-note" role="note"><span class="beta">beta</span>한국어판 스피릿포지드 출시 (12월 중반) 이후에 다시 업데이트 예정이며 지금은 베타입니다.</p>` : ''}<p class="hint" style="margin:0">한국어판 스탠다드 환경 적법성에 맞춰 구성된 덱 예시입니다. (${env.sets}, 샘플 덱 ${pool.length}개)</p>
+  $('kr-sum').innerHTML = `${env.beta ? `<p class="beta-note" role="note"><span class="beta">beta</span>한국어판 스피릿포지드 출시 (12월 중반) 이후에 다시 업데이트 예정이며 지금은 베타입니다.</p>` : ''}<p class="hint" style="margin:0">${env.sets} · 샘플 덱 ${pool.length}개</p>
     ${best ? `<p style="margin:0;font-size:13px">내 컬렉션으로 가장 가까운 덱: <b>${esc(best.x.o.t)}</b> · 보유 ${best.own.pct}% · 부족 ${best.own.miss}장</p>` : ''}`;
   $('kr-list').innerHTML = list.length ? list.map(({ o, i, lg, own }) => {
     const ch = BYID.get(o.C), banned = [o.L, o.C, ...o.m.map(x => x[0]), ...o.b].filter(id => isBanned(BYID.get(id))).length;
