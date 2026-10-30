@@ -455,8 +455,13 @@ h2.vh{margin:0;font-size:18px}
 .bt-act{display:flex;gap:4px}
 .bt-act .mini{padding:2px 8px}
 .ws-head{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-.ws-title{font-size:12px;letter-spacing:.08em;color:var(--muted);font-weight:600}
-.save{font-size:12px;color:var(--muted)}
+.ws-head{gap:8px 10px;margin-bottom:14px}
+.ws-back{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:10px;border:1px solid var(--line);background:var(--bg);font-size:15px;font-weight:600;color:var(--ink);line-height:1}
+.ws-back span{font-size:17px}
+.ws-back:hover{border-color:var(--ink)}
+.ws-titles{display:grid;gap:2px;margin-left:4px;line-height:1.25}
+.ws-title{font-size:17px;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+.save{font-size:13.5px;font-weight:500;color:var(--muted)}
 .save.ok{color:var(--rift)}
 .ws-head .spacer{flex:1}
 .ws-name{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
@@ -470,6 +475,7 @@ h2.vh{margin:0;font-size:18px}
 .ws-body{display:grid;gap:4px;container-type:inline-size}
 .ws-list{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"legend champion" "main main" "bf bf" "side side" "runes runes";gap:0 14px;align-items:start}
 .a-legend{grid-area:legend}.a-champion{grid-area:champion}.a-main{grid-area:main}.a-bf{grid-area:bf}.a-side{grid-area:side}.a-runes{grid-area:runes}
+@container (max-width:459px){.ws-list{grid-template-columns:minmax(0,1fr);grid-template-areas:"legend" "champion" "main" "bf" "side" "runes"}}
 /* a wide workspace: legend | champion | battlefields on top; the main deck takes two columns, battlefields, sideboard and runes stack on the right */
 @container (min-width:740px){
   .ws-list{grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);grid-template-areas:"legend champion bf" "main main bf" "main main side" "main main runes";gap:0 18px;grid-template-rows:auto auto auto 1fr}
@@ -492,7 +498,7 @@ h2.vh{margin:0;font-size:18px}
 .cnt.need{background:var(--accent-soft);color:var(--accent)}
 .cnt.ok{background:var(--rift-soft);color:var(--rift)}
 .cnt.over{background:var(--accent-soft);color:var(--danger)}
-.dt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px}
+.dt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(210px,100%),1fr));gap:6px}
 .dt{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:10px;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:5px 6px 5px 5px;min-width:0}
 .dt.banned{border-color:var(--danger)}
 .dt-art{width:52px;height:52px;border-radius:6px;background-color:var(--sunk);background-repeat:no-repeat}
@@ -1463,8 +1469,8 @@ function renderEditor() {
         </section>
         <section class="panel ws" id="ed-ws" aria-label="덱 작업 공간" data-drop="auto">
           <div class="ws-head">
-            <button class="mini" type="button" data-act="back">← 내 덱</button>
-            <span class="ws-title">덱 작업 공간</span><span class="save" id="ws-save"></span>
+            <button class="ws-back" type="button" data-act="back"><span aria-hidden="true">←</span> 내 덱</button>
+            <span class="ws-titles"><span class="ws-title">덱 작업 공간</span><span class="save" id="ws-save" role="status"></span></span>
             <span class="spacer"></span>
             <button class="mini" type="button" data-act="mulligan" title="시작 손패 4장을 뽑고 최대 2장 다시 뽑기">멀리건 테스트</button>
             <button class="mini" type="button" data-act="copy-en" title="영문 덱리스트를 복사합니다">영문 복사</button>
