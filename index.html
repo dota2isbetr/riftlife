@@ -460,7 +460,19 @@ h2.vh{margin:0;font-size:18px}
 .issues.warn{color:var(--accent);background:var(--accent-soft);border-color:transparent}
 .issues.ok{color:var(--rift);background:var(--rift-soft);border-color:transparent}
 .ws-issues{background:var(--bg);border-radius:8px;padding:8px 10px 8px 6px}
-.ws-body{display:grid;gap:4px}
+.ws-body{display:grid;gap:4px;container-type:inline-size}
+.ws-list{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"legend champion" "main main" "bf bf" "side side" "runes runes";gap:0 14px;align-items:start}
+.a-legend{grid-area:legend}.a-champion{grid-area:champion}.a-main{grid-area:main}.a-bf{grid-area:bf}.a-side{grid-area:side}.a-runes{grid-area:runes}
+/* a wide workspace: legend | champion | battlefields on top; the main deck takes two columns, battlefields, sideboard and runes stack on the right */
+@container (min-width:740px){
+  .ws-list{grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);grid-template-areas:"legend champion bf" "main main bf" "main main side" "main main runes";gap:0 18px;grid-template-rows:auto auto auto 1fr}
+  .a-main .dt-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .a-bf .dt-grid,.a-side .dt-grid,.a-runes .dt-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media (min-width:1200px){
+  html.editing .wrap{max-width:none}
+  html.editing .ed-grid{grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:18px}
+}
 .sec{border-top:1px solid var(--line);padding:10px 0 8px;min-width:0}
 .sec header{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
 .sec h4{margin:0;font-size:12.5px;letter-spacing:.08em;color:var(--muted);margin-right:auto}
@@ -837,7 +849,7 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
     <div class="meta-grid" id="kr-list"></div>
   </section>
 
-  <p class="foot">카드 데이터: playriftbound.com 공식 카드 갤러리 (영문·한국어, <span id="fetched"></span> 기준, <span id="n-cards"></span>종). 한국어 이름은 공식 한국어판이 있는 오리진 세트만 <b>공식</b>이며, 이후 세트의 챔피언 이름은 리그 오브 레전드 한국어 표기를 따른 <b>추정</b>입니다. 한글명이 없는 카드는 상세 화면에서 내 번역을 직접 넣을 수 있고, 검색에도 반영됩니다. 갤러리에 없는 프로모·지역 한정 카드와 일부 토큰은 playriftbound.com 공식 뉴스에 공개된 카드 이미지를 기준으로 추가했습니다(상세 화면에 출처 표시). 카드 이미지 © Riot Games, 비영리 목적으로 허가를 받아 사용합니다. 메타 덱: playriftbound.com 공식 Organized Play 기사의 지역 예선(RQ) 덱리스트이며, 메타는 각 대회에서 사용된 가장 최신 확장팩 기준으로 나눴습니다. 금지 카드는 공식 금지 목록(Standard)을 기준으로 표시합니다. <span class="build">빌드 2026-10-30 21:55 KST</span></p>
+  <p class="foot">카드 데이터: playriftbound.com 공식 카드 갤러리 (영문·한국어, <span id="fetched"></span> 기준, <span id="n-cards"></span>종). 한국어 이름은 공식 한국어판이 있는 오리진 세트만 <b>공식</b>이며, 이후 세트의 챔피언 이름은 리그 오브 레전드 한국어 표기를 따른 <b>추정</b>입니다. 한글명이 없는 카드는 상세 화면에서 내 번역을 직접 넣을 수 있고, 검색에도 반영됩니다. 갤러리에 없는 프로모·지역 한정 카드와 일부 토큰은 playriftbound.com 공식 뉴스에 공개된 카드 이미지를 기준으로 추가했습니다(상세 화면에 출처 표시). 카드 이미지 © Riot Games, 비영리 목적으로 허가를 받아 사용합니다. 메타 덱: playriftbound.com 공식 Organized Play 기사의 지역 예선(RQ) 덱리스트이며, 메타는 각 대회에서 사용된 가장 최신 확장팩 기준으로 나눴습니다. 금지 카드는 공식 금지 목록(Standard)을 기준으로 표시합니다. <span class="build">빌드 2026-10-30 21:59 KST</span></p>
   <footer class="legal">
     <p>Copyright © 2026 riftlife.life</p>
     <p>RiftLife 는 Riot Games의 "Legal Jibber Jabber" 정책을 준수하여 만들었습니다. 모든 지적 재산권의 소유권은 Riot Games에 있으며 RiftLife는 그 어떤 수익 창출이나 영리 목적 활동을 하지 않습니다. 또한 Riot Games는 RiftLife를 제작하지 않았고 스폰서를 제공한 적이 없습니다. RiftLife는 개인 기록 보관 및 교육 목적만을 가지고 있는 완전 비영리 웹입니다.</p>
@@ -2679,7 +2691,7 @@ function route() {
   const h = location.hash.slice(1);
   view = VIEWS.includes(h) ? h : 'home';
   for (const v of VIEWS) { $('v-' + v).hidden = v !== view; $('tab-' + v).setAttribute('aria-current', v === view ? 'page' : 'false'); }
-  renderActive();
+  renderActive(); syncEditing();
 }
 function renderActive() {
   if (view === 'collection') { render(); return; }
@@ -2814,7 +2826,9 @@ function openEditor(id) {
   if (location.hash !== '#decks') location.hash = 'decks'; else renderActive();
   scrollTo(0, 0);
 }
-function closeEditor() { edId = null; edBuilt = null; $('deck-edit').hidden = true; $('deck-home').hidden = false; }
+function closeEditor() { edId = null; edBuilt = null; $('deck-edit').hidden = true; $('deck-home').hidden = false; syncEditing(); }
+// wide screens drop the page's side margins while a deck is open in the editor
+const syncEditing = () => document.documentElement.classList.toggle('editing', view === 'decks' && !!edId && !$('deck-edit').hidden);
 
 // Square crop of a card's illustration from the large image sheets (W = rendered card width).
 // Image sheets that have been shown once are painted straight away on later renders; only unseen ones wait
@@ -2876,7 +2890,7 @@ function countBadge(dk, sec) {
 
 function renderEditor() {
   const dk = decks.data[edId];
-  $('deck-home').hidden = true; $('deck-edit').hidden = false;
+  $('deck-home').hidden = true; $('deck-edit').hidden = false; syncEditing();
   if (edBuilt !== edId) {
     edBuilt = edId;
     $('deck-edit').innerHTML = `
@@ -3040,9 +3054,8 @@ function listView(dk, om) {
   const need = deckNeeds(dk), lg = BYID.get(dk.legend), ch = BYID.get(dk.champion);
   const head = (sec, extra = '') => `<header><h4>${SEC_LABEL[sec]}</h4>${extra}${countBadge(dk, sec)}</header>`;
   const tiles = (rs, sec) => `<div class="dt-grid">${rs.map(([c, n]) => deckTile(c, n, sec, om, need)).join('')}</div>`;
-  let h = `<div class="sec-pair">
-    <section class=\"sec\" data-drop=\"legend\">${head('legend')}${lg ? tiles([[lg, 1]], 'legend') : addBtn('legend')}</section>
-    <section class=\"sec\" data-drop=\"champion\">${head('champion')}${ch ? tiles([[ch, 1]], 'champion') : addBtn('champion')}</section></div>`;
+  let h = `<section class=\"sec a-legend\" data-drop=\"legend\">${head('legend')}${lg ? tiles([[lg, 1]], 'legend') : addBtn('legend')}</section>
+    <section class=\"sec a-champion\" data-drop=\"champion\">${head('champion')}${ch ? tiles([[ch, 1]], 'champion') : addBtn('champion')}</section>`;
   const opt = (k, v, label) => `<option value="${v}"${String(ws[k]) === String(v) ? ' selected' : ''}>${label}</option>`;
   const ctl = `<span class="sec-ctl"><select data-set="group" aria-label="그룹">${opt('group', 'none', '그룹화 안 함')}${opt('group', 'type', '유형별')}${opt('group', 'cost', '에너지별')}${opt('group', 'domain', '영역별')}</select>
     <select data-set="sort" aria-label="정렬">${opt('sort', 'cost', '에너지')}${opt('sort', 'name', '이름')}${opt('sort', 'count', '장수')}${opt('sort', 'short', '부족한 카드')}</select>
@@ -3054,16 +3067,16 @@ function listView(dk, om) {
     for (const r of main) { const [gk, gl] = groupKey(r[0]); if (!groups.has(gk)) groups.set(gk, [gl, []]); groups.get(gk)[1].push(r); }
     body = [...groups].sort((a, b) => ws.group === 'none' ? 0 : ws.dir * (a[0] - b[0])).map(([, [gl, rs]]) => (gl ? `<h5>${esc(gl)} <span>${sum(rs)}장</span></h5>` : '') + tiles(rs, 'main')).join('') + addBtn('main');
   }
-  h += `<section class=\"sec\" data-drop=\"main\">${head('main', ctl)}${body}</section>`;
+  h += `<section class=\"sec a-main\" data-drop=\"main\">${head('main', ctl)}${body}</section>`;
   const bf = (dk.bf || []).map(id => [BYID.get(id), 1]).filter(r => r[0]);
-  h += `<section class=\"sec\" data-drop=\"bf\">${head('bf')}${bf.length ? tiles(bf, 'bf') : ''}${bf.length < 3 ? addBtn('bf') : ''}</section>`;
+  h += `<section class=\"sec a-bf\" data-drop=\"bf\">${head('bf')}${bf.length ? tiles(bf, 'bf') : ''}${bf.length < 3 ? addBtn('bf') : ''}</section>`;
   const sd = sortTiles(rows(dk.side), om);
-  h += `<section class=\"sec\" data-drop=\"side\">${head('side')}${sd.length ? tiles(sd, 'side') : ''}${addBtn('side')}</section>`;
+  h += `<section class=\"sec a-side\" data-drop=\"side\">${head('side')}${sd.length ? tiles(sd, 'side') : ''}${addBtn('side')}</section>`;
   const rs = rows(dk.runes);
   let runeBtns = '';
   if (lg) runeBtns = lg.d.map(d => CANON_LIST.find(c => has(c, 'rune') && (c.d || [])[0] === d)).filter(Boolean).map(c => `<button class="mini" type="button" data-act="rune" data-rid="${c.id}">+ ${esc(dName(c))}</button>`).join('');
-  h += `<section class=\"sec\" data-drop=\"runes\">${head('runes')}${rs.length ? tiles(rs, 'runes') : ''}<div class="rune-add">${runeBtns || addBtn('runes')}</div></section>`;
-  return h;
+  h += `<section class=\"sec a-runes\" data-drop=\"runes\">${head('runes')}${rs.length ? tiles(rs, 'runes') : ''}<div class="rune-add">${runeBtns || addBtn('runes')}</div></section>`;
+  return `<div class="ws-list">${h}</div>`;
 }
 function artView(dk) {
   const ch = BYID.get(dk.champion), lg = BYID.get(dk.legend);
