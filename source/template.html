@@ -433,28 +433,45 @@ table.an th{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:n
 table.an td.pc{color:var(--ink);background:linear-gradient(90deg,var(--rift-soft) var(--p),transparent var(--p));font-family:var(--f-mono);font-size:12.5px;min-width:64px}
 .sec .btn[data-act="mulligan"]{margin-top:2px}
 /* mulligan test */
-.mull{position:fixed;z-index:42;left:50%;top:50%;transform:translate(-50%,-50%);width:min(860px,calc(100% - 24px));max-height:calc(100% - 24px);overflow-y:auto;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:14px;box-shadow:0 30px 80px rgb(0 0 0 / .35)}
+.mull{position:fixed;z-index:42;left:50%;top:50%;transform:translate(-50%,-50%);width:min(960px,calc(100% - 24px));max-height:calc(100% - 24px);overflow-y:auto;overflow-x:hidden;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:14px;box-shadow:0 30px 80px rgb(0 0 0 / .35)}
 #mull-scrim{z-index:41}
 .mull header{display:flex;justify-content:space-between;align-items:start;gap:12px}
 .mull h2{margin:0;font-size:22px;letter-spacing:-.02em}
+.mull-table{display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:16px;align-items:start;padding-top:14px}
 .mull-hand{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.mull-deck{display:grid;justify-items:center;gap:8px;padding-top:8px}
+.pile{position:relative;width:72px;aspect-ratio:420/588}
+.pile i{position:absolute;inset:0;border-radius:8px;background:linear-gradient(150deg,#1B2631,#0B1118);border:1px solid #33414D;box-shadow:0 2px 0 rgb(0 0 0 / .25)}
+.pile i:nth-child(1){transform:translate(4px,6px)}
+.pile i:nth-child(2){transform:translate(2px,3px)}
+.pile i:nth-child(3){display:grid;place-items:center}
+.pile svg{width:30px;height:30px;color:#C9973F}
 .mcard{all:unset;box-sizing:border-box;cursor:pointer;position:relative;display:grid;gap:6px;min-width:0}
 .mcard:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:10px}
-.mc-art{display:block;aspect-ratio:420/588;border-radius:10px;overflow:hidden;background:var(--sunk);box-shadow:0 6px 18px rgb(0 0 0 / .18)}
+.mc-art{display:block;aspect-ratio:420/588;border-radius:10px;overflow:hidden;background:var(--sunk);box-shadow:0 6px 18px rgb(0 0 0 / .18);transform-origin:50% 80%}
 .mc-art .ti,.mc-art img{display:block;width:100%;height:100%;object-fit:contain;background-repeat:no-repeat}
 .mc-name{font-size:13px;font-weight:600;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mcard.sel .mc-art{box-shadow:0 0 0 3px var(--danger),0 14px 30px rgb(0 0 0 / .25);opacity:.7}
+.mcard.sel .mc-art{transform:translateY(-10px) rotate(-4deg);box-shadow:0 0 0 3px var(--danger),0 16px 30px rgb(0 0 0 / .25)}
 .mcard.drawn .mc-art{box-shadow:0 0 0 2px var(--rift)}
-.mc-tag{position:absolute;top:8px;left:50%;transform:translateX(-50%);background:var(--danger);color:#fff;font-size:12px;font-weight:600;padding:2px 10px;border-radius:999px;white-space:nowrap}
+.mc-tag{position:absolute;top:2px;left:50%;transform:translateX(-50%);background:var(--danger);color:#fff;font-size:12px;font-weight:600;padding:2px 10px;border-radius:999px;white-space:nowrap;z-index:2;pointer-events:none}
 .mc-tag.dr{background:var(--rift)}
 .mull .mstats{font-size:12px;color:var(--muted)}
+/* muted, readable button tones (white text keeps 4.5:1 or better) */
+.btn.tone-blue{background:#466B93;color:#fff}
+.btn.tone-red{background:#A0524C;color:#fff}
+.btn.tone-green{background:#4B7A5A;color:#fff}
+.btn.tone-blue:hover{background:#3D5F84}.btn.tone-red:hover{background:#8F4843}.btn.tone-green:hover{background:#426C50}
+.btn[disabled]{opacity:.45;cursor:default}
 @media (prefers-reduced-motion:no-preference){
-  .mcard .mc-art{transition:transform .2s ease,box-shadow .2s ease,opacity .2s ease}
-  .mcard.sel .mc-art{transform:translateY(-10px) rotate(-2deg)}
-  .mcard.fresh .mc-art{animation:mc-in .35s cubic-bezier(.2,.8,.25,1)}
-  @keyframes mc-in{from{transform:translateY(-30px) rotate(6deg) scale(.9);opacity:0}to{transform:none;opacity:1}}
+  .mcard .mc-art{transition:box-shadow .2s ease}
+  .mc-art.picking{animation:mc-pick .36s cubic-bezier(.3,.7,.3,1)}
+  .mc-art.unpicking{animation:mc-unpick .36s cubic-bezier(.3,.7,.3,1)}
+  @keyframes mc-pick{0%{transform:none}28%{transform:scale(.93)}70%{transform:translateY(-12px) rotate(-5deg) scale(1.02)}100%{transform:translateY(-10px) rotate(-4deg)}}
+  @keyframes mc-unpick{0%{transform:translateY(-10px) rotate(-4deg)}28%{transform:translateY(-7px) rotate(-4deg) scale(.93)}70%{transform:translateY(1px) rotate(.8deg)}100%{transform:none}}
+  .mc-tag{animation:tag-in .22s ease-out}
+  @keyframes tag-in{from{opacity:0;transform:translate(-50%,6px) scale(.8)}to{opacity:1;transform:translateX(-50%)}}
 }
-@media (max-width:560px){.mull-hand{grid-template-columns:repeat(2,minmax(0,1fr))}.mull{padding:16px}}
+@media (max-width:560px){.mull-hand{grid-template-columns:repeat(2,minmax(0,1fr))}.mull{padding:16px}.mull-table{grid-template-columns:minmax(0,1fr) 64px;gap:10px}.pile{width:52px}}
 /* deck list delete */
 .dk-li{position:relative}
 .dk-li .dk-item{padding-right:66px}
@@ -725,12 +742,15 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
 <div class="scrim" id="mull-scrim" hidden></div>
 <section class="mull" id="mull" hidden role="dialog" aria-modal="true" aria-labelledby="mull-title">
   <header><div><h2 id="mull-title">멀리건 테스트</h2><p class="hint" id="mull-hint" style="margin:4px 0 0"></p></div><button class="x" type="button" id="mull-close" aria-label="닫기">✕</button></header>
-  <div class="mull-hand" id="mull-hand"></div>
+  <div class="mull-table">
+    <div class="mull-hand" id="mull-hand"></div>
+    <div class="mull-deck" id="mull-deck" aria-live="polite"><span class="pile" aria-hidden="true"><i></i><i></i><i><svg aria-hidden="true"><use href="#rl-mark"/></svg></i></span><span class="hint">덱 <b id="mull-left">0</b>장</span></div>
+  </div>
   <div class="filters">
     <button class="btn" type="button" id="mull-go">다시 뽑을 카드를 고르세요</button>
-    <button class="ghost" type="button" id="mull-keep">이대로 확정</button>
-    <button class="ghost" type="button" id="mull-draw">1장 더 뽑기</button>
-    <button class="ghost" type="button" id="mull-new">새로 섞기</button>
+    <button class="btn tone-blue" type="button" id="mull-keep">이대로 확정</button>
+    <button class="btn tone-green" type="button" id="mull-draw">1장 더 뽑기</button>
+    <button class="btn tone-red" type="button" id="mull-new">새로 섞기</button>
     <span class="mstats" id="mull-stats"></span>
   </div>
   <p class="hint" style="margin:0">주 덱(선택 챔피언 제외)을 섞어 4장을 뽑습니다. 다시 뽑은 카드는 덱 맨 아래로 가고, 그 자리는 덱 위에서 새로 채웁니다.</p>
@@ -1598,7 +1618,7 @@ function analysisView(dk) {
 }
 
 /* ---------- mulligan test ---------- */
-const mull = { lib: [], hand: [], drawn: [], pick: new Set(), phase: 'choose', hands: 0, mulls: 0, back: null };
+const mull = { lib: [], hand: [], drawn: [], pick: new Set(), phase: 'choose', hands: 0, mulls: 0, back: null, busy: false };
 function shuffled(a) {
   const r = new Uint32Array(a.length); crypto.getRandomValues(r);
   for (let i = a.length - 1; i > 0; i--) { const j = r[i] % (i + 1); [a[i], a[j]] = [a[j], a[i]]; }
@@ -1608,53 +1628,95 @@ function mullDeal() {
   const dk = decks.data[edId], ids = [];
   for (const [c, n] of rows(dk.main)) for (let i = 0; i < n; i++) ids.push(c.id);
   if (ids.length < HAND) { toast(`주 덱에 카드가 ${HAND}장 이상 있어야 합니다.`); return false; }
-  const lib = shuffled(ids);
-  mull.hand = lib.splice(0, HAND).map((id, i) => ({ id, k: 'h' + i })); mull.lib = lib; mull.drawn = [];
-  mull.pick.clear(); mull.phase = 'choose'; mull.hands++;
+  const lib = shuffled(ids), deal = mull.hands + 1;
+  mull.hand = lib.splice(0, HAND).map((id, i) => ({ id, k: `h${deal}-${i}`, fresh: true })); mull.lib = lib; mull.drawn = [];
+  mull.pick.clear(); mull.phase = 'choose'; mull.hands = deal;
   return true;
 }
-function mullCard(x, i) {
-  const c = BYID.get(x.id), sel = mull.pick.has(x.k), fresh = x.fresh ? ' fresh' : '';
-  return `<button class="mcard${sel ? ' sel' : ''}${fresh}${x.drawn ? ' drawn' : ''}" type="button" data-mk="${x.k}" aria-pressed="${sel}"${mull.phase === 'choose' && !x.drawn ? '' : ' tabindex="-1"'} title="${esc(enName(c))}">
+function mullCard(x) {
+  const c = BYID.get(x.id), sel = mull.pick.has(x.k);
+  return `<button class="mcard${sel ? ' sel' : ''}${x.drawn ? ' drawn' : ''}" type="button" data-id="${x.k}" data-mk="${x.k}" aria-pressed="${sel}"${mull.phase === 'choose' && !x.drawn ? '' : ' tabindex="-1"'} title="${esc(enName(c))}">
     <span class="mc-art">${tileArt(c)}</span>${sel ? '<span class="mc-tag">다시 뽑기</span>' : ''}${x.drawn ? `<span class="mc-tag dr">드로우 ${x.drawn}</span>` : ''}
     <span class="mc-name">${esc(dName(c))}</span></button>`;
 }
-function renderMull() {
+function mullControls() {
   const choose = mull.phase === 'choose';
   $('mull-hint').textContent = choose ? `시작 손패 ${HAND}장입니다. 다시 뽑을 카드를 최대 ${MULL}장까지 누르세요. (${mull.pick.size}/${MULL})` : `확정된 손패입니다. 덱에 ${mull.lib.length}장이 남았습니다.`;
-  $('mull-hand').innerHTML = [...mull.hand, ...mull.drawn].map(mullCard).join('');
-  $('mull-hand').querySelectorAll('[data-bg]').forEach(el => { el.style.backgroundImage = `url('${el.dataset.bg}')`; BG_SEEN.add(el.dataset.bg); });
   $('mull-go').hidden = !choose; $('mull-keep').hidden = !choose; $('mull-draw').hidden = choose;
-  $('mull-go').disabled = !mull.pick.size;
+  $('mull-go').disabled = !mull.pick.size || mull.busy;
   $('mull-go').textContent = mull.pick.size ? `선택한 ${mull.pick.size}장 다시 뽑기` : '다시 뽑을 카드를 고르세요';
-  $('mull-draw').disabled = !mull.lib.length;
+  $('mull-draw').disabled = !mull.lib.length || mull.busy;
+  $('mull-keep').disabled = $('mull-new').disabled = mull.busy;
+  $('mull-left').textContent = mull.lib.length;
   $('mull-stats').textContent = `이번에 섞은 횟수 ${mull.hands}회 · 멀리건한 횟수 ${mull.mulls}회`;
-  for (const x of [...mull.hand, ...mull.drawn]) delete x.fresh;
 }
+// Fresh cards fly out of the deck pile into their slot, a little apart from each other.
+function dealIn() {
+  const fresh = [...$('mull-hand').querySelectorAll('.mcard.fresh .mc-art')];
+  for (const x of [...mull.hand, ...mull.drawn]) delete x.fresh;
+  $('mull-hand').querySelectorAll('.mcard.fresh').forEach(el => el.classList.remove('fresh'));
+  if (reduceMotion() || !fresh.length) return;
+  const d = $('mull-deck').querySelector('.pile').getBoundingClientRect();
+  fresh.forEach((el, i) => {
+    const r = el.getBoundingClientRect(), dx = d.left + d.width / 2 - (r.left + r.width / 2), dy = d.top + d.height / 2 - (r.top + r.height / 2);
+    el.animate([{ transform: `translate(${dx}px,${dy}px) rotate(10deg) scale(.3)`, opacity: 0 }, { transform: `translate(${dx * .35}px,${dy * .35 - 24}px) rotate(-3deg) scale(.85)`, opacity: 1, offset: .6 }, { transform: 'none', opacity: 1 }],
+      { duration: 460, delay: i * 80, easing: 'cubic-bezier(.2,.8,.25,1)', fill: 'backwards' });
+  });
+}
+function renderMull() {
+  morphInto($('mull-hand'), [...mull.hand, ...mull.drawn].map(x => mullCard(x).replace('class="mcard', `class="mcard${x.fresh ? ' fresh' : ''}`)).join(''));
+  $('mull-hand').querySelectorAll('[data-bg]').forEach(el => { el.style.backgroundImage = `url('${el.dataset.bg}')`; BG_SEEN.add(el.dataset.bg); });
+  mullControls(); dealIn();
+}
+function bumpDeck() { if (!reduceMotion()) $('mull-deck').querySelector('.pile').animate([{ transform: 'none' }, { transform: 'translateY(4px) scale(.96)' }, { transform: 'none' }], { duration: 260, easing: 'ease-out' }); }
 function openMull() {
   if (!mullDeal()) return;
-  mull.back = document.activeElement; hidePreview();
+  mull.back = document.activeElement; hidePreview(); mull.busy = false;
+  $('mull-hand').innerHTML = '';
   $('mull').hidden = false; $('mull-scrim').hidden = false; renderMull(); $('mull-close').focus();
 }
 function closeMull() { $('mull').hidden = true; $('mull-scrim').hidden = true; if (mull.back && document.contains(mull.back)) mull.back.focus(); }
 $('mull-hand').onclick = ev => {
-  const b = ev.target.closest('[data-mk]'); if (!b || mull.phase !== 'choose') return;
+  const b = ev.target.closest('[data-mk]'); if (!b || mull.phase !== 'choose' || mull.busy) return;
   const k = b.dataset.mk; if (!mull.hand.some(x => x.k === k)) return;
-  if (mull.pick.has(k)) mull.pick.delete(k);
-  else if (mull.pick.size >= MULL) { toast(`최대 ${MULL}장까지 다시 뽑을 수 있습니다.`); return; }
-  else mull.pick.add(k);
-  renderMull();
+  const on = !mull.pick.has(k);
+  if (on && mull.pick.size >= MULL) { toast(`최대 ${MULL}장까지 다시 뽑을 수 있습니다.`); return; }
+  if (on) mull.pick.add(k); else mull.pick.delete(k);
+  // update this card in place so the press-and-tilt animation can play
+  b.classList.toggle('sel', on); b.setAttribute('aria-pressed', on);
+  const tag = b.querySelector('.mc-tag');
+  if (on && !tag) b.querySelector('.mc-art').insertAdjacentHTML('afterend', '<span class="mc-tag">다시 뽑기</span>'); else if (!on && tag) tag.remove();
+  const art = b.querySelector('.mc-art'); art.classList.remove('picking', 'unpicking'); void art.offsetWidth; art.classList.add(on ? 'picking' : 'unpicking');
+  art.addEventListener('animationend', () => art.classList.remove('picking', 'unpicking'), { once: true });
+  mullControls();
 };
-$('mull-go').onclick = () => {
-  if (!mull.pick.size) return;
+$('mull-go').onclick = async () => {
+  if (!mull.pick.size || mull.busy) return;
+  mull.busy = true; mullControls();
+  // the chosen cards slide back into the deck pile and vanish there
+  if (!reduceMotion()) {
+    const d = $('mull-deck').querySelector('.pile').getBoundingClientRect();
+    const going = [...$('mull-hand').querySelectorAll('.mcard.sel')];
+    going.forEach(el => { const t = el.querySelector('.mc-tag'); if (t) t.remove(); });
+    await Promise.all(going.map((el, i) => {
+      const art = el.querySelector('.mc-art'), r = art.getBoundingClientRect();
+      const dx = d.left + d.width / 2 - (r.left + r.width / 2), dy = d.top + d.height / 2 - (r.top + r.height / 2);
+      el.querySelector('.mc-name').animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150, fill: 'forwards' });
+      return art.animate([{ transform: 'translateY(-10px) rotate(-4deg)', opacity: 1 },
+        { transform: `translate(${dx * .45}px,${dy * .45 - 36}px) rotate(6deg) scale(.72)`, opacity: 1, offset: .45 },
+        { transform: `translate(${dx}px,${dy}px) rotate(12deg) scale(.26)`, opacity: 0 }],
+        { duration: 540, delay: i * 110, easing: 'cubic-bezier(.45,0,.4,1)', fill: 'forwards' }).finished;
+    }));
+    bumpDeck();
+  }
   const back = mull.hand.filter(x => mull.pick.has(x.k));
-  mull.hand = mull.hand.map(x => mull.pick.has(x.k) ? { id: mull.lib.shift(), k: x.k + 'r', fresh: true } : x);
   mull.lib.push(...back.map(x => x.id));   // returned cards go to the bottom of the deck
-  mull.pick.clear(); mull.phase = 'kept'; mull.mulls++; renderMull();
+  mull.hand = mull.hand.map(x => mull.pick.has(x.k) ? { id: mull.lib.shift(), k: x.k + 'r', fresh: true } : x);
+  mull.pick.clear(); mull.phase = 'kept'; mull.mulls++; mull.busy = false; renderMull();
 };
-$('mull-keep').onclick = () => { mull.pick.clear(); mull.phase = 'kept'; renderMull(); };
-$('mull-draw').onclick = () => { if (!mull.lib.length) return; mull.drawn.push({ id: mull.lib.shift(), k: 'd' + mull.drawn.length, drawn: mull.drawn.length + 1, fresh: true }); renderMull(); };
-$('mull-new').onclick = () => { if (mullDeal()) renderMull(); };
+$('mull-keep').onclick = () => { if (mull.busy) return; mull.pick.clear(); mull.phase = 'kept'; renderMull(); };
+$('mull-draw').onclick = () => { if (!mull.lib.length || mull.busy) return; mull.drawn.push({ id: mull.lib.shift(), k: 'd' + mull.hands + '-' + mull.drawn.length, drawn: mull.drawn.length + 1, fresh: true }); renderMull(); };
+$('mull-new').onclick = () => { if (mull.busy) return; if (mullDeal()) { $('mull-hand').innerHTML = ''; renderMull(); } };
 $('mull-close').onclick = closeMull;
 $('mull-scrim').onclick = closeMull;
 document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && !$('mull').hidden) { ev.stopPropagation(); closeMull(); } }, true);
