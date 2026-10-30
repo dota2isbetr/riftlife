@@ -1579,7 +1579,7 @@ function analysisView(dk) {
   const lib = rows(dk.main), N = sum(lib), ch = BYID.get(dk.champion), lg = BYID.get(dk.legend);
   const mullBtn = `<button class="btn" type="button" data-act="mulligan"${N >= HAND ? '' : ' disabled'}>멀리건 테스트 열기</button>`;
   if (N < HAND) return `<section class="sec"><header><h4>분석</h4></header><p class="empty">주 덱에 카드를 ${HAND}장 이상 넣으면 분석이 나옵니다.</p>${mullBtn}</section>`;
-  const cols = [['시작 4장', 0, false], ['멀리건 포함', 0, true], ['+2장', 2, true], ['+4장', 4, true], ['+6장', 6, true]];
+  const cols = [['시작 4장', 0, false], ['멀리건 포함', 0, true], ['+1장', 1, true], ['+2장', 2, true], ['+3장', 3, true]];
   const head = `<tr><th></th><td>장수</td>${cols.map(([t]) => `<td>${t}</td>`).join('')}</tr>`;
   const line = (label, K, extraCell = '') => `<tr><th>${label}${extraCell}</th><td>${K}</td>${cols.map(([, x, m]) => pctCell(oddsSeen(N, K, x, m))).join('')}</tr>`;
   const tag = lg ? champTag(lg) : '';
