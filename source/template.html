@@ -431,6 +431,8 @@ h2.vh{margin:0;font-size:18px}
 .sectabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
 .sectabs button{border:1px solid var(--line);background:var(--bg);border-radius:7px;padding:6px 12px;font-weight:600;font-size:13px}
 .sectabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+#kr-sum{margin-bottom:26px}.kr-env{margin:0 0 14px}.kr-env button{padding:8px 16px;font-size:14px}
+.kr-env .beta{font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:1px 6px;margin-left:4px;border-radius:999px;background:var(--accent-soft);color:var(--accent);vertical-align:2px}
 .bt-ctl{margin-bottom:6px}
 .bt-ctl input[type="search"]{flex:1 1 200px;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 .bt-info{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
@@ -840,6 +842,7 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
 
   <section id="v-kr" hidden>
     <div class="page-head"><h1 class="page-title">한국 환경 샘플 덱</h1></div>
+    <div class="sectabs kr-env" id="kr-env" role="tablist" aria-label="한국 환경"></div>
     <div class="filters">
       <select id="k-sort" aria-label="정렬">
         <option value="name">챔피언 이름순</option>
@@ -848,7 +851,6 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
       <button class="ghost" type="button" id="k-bans">밴리스트 보기</button>
     </div>
     <div class="meta-sum" id="kr-sum"></div>
-    <div class="chips" id="kr-chips"></div>
     <div class="meta-grid" id="kr-list"></div>
   </section>
 
@@ -2279,7 +2281,10 @@ function openMetaSheet(i) {
 /* ---------- Korean environment sample decks ---------- */
 const KD = JSON.parse(document.getElementById('kr-data').textContent);
 const KU_KEY = 'rb-ledger-kr-v1';
-const ku = Object.assign({ sort: 'name', legend: '' }, lsGet(KU_KEY) || {});
+// Korean Standard environments in release order; a deck without `env` belongs to Origins
+const KR_ENVS = [{ id: 'OGN', ko: '한국 오리진', sets: '오리진·증명의 전장' }, { id: 'SFD', ko: '한국 스피릿포지', beta: true, sets: '오리진·증명의 전장·스피릿포지드' }];
+const ku = Object.assign({ sort: 'name', env: 'OGN' }, lsGet(KU_KEY) || {});
+if (!KR_ENVS.some(e => e.id === ku.env)) ku.env = 'OGN';
 if (ku.sort !== 'own') ku.sort = 'name';
 const saveKu = () => lsSet(KU_KEY, ku);
 const KR_SITE = 'https://riftlife.life/';   // deck images live at the repo root; absolute so the claude.ai copy links there too
@@ -2292,19 +2297,16 @@ const krDoms = o => (BYID.get(o.L).d || []).map(d => L.domain[d][0]).join('·');
 function renderKr() {
   const om = ownedMap();
   $('k-sort').value = ku.sort;
-  const pool = KD.decks.map((o, i) => ({ o, i, lg: BYID.get(o.L) }));
-  const tags = new Map();
-  for (const { lg } of pool) { const t = champTag(lg); if (!tags.has(t)) tags.set(t, { n: 0, lg }); tags.get(t).n++; }
-  if (ku.legend && !tags.has(ku.legend)) ku.legend = '';
-  let list = (ku.legend ? pool.filter(x => champTag(x.lg) === ku.legend) : pool).map(x => ({ ...x, own: deckOwn(krDeck(x.o), om) }));
+  const env = KR_ENVS.find(e => e.id === ku.env), envOf = o => o.env || 'OGN';
+  $('kr-env').innerHTML = KR_ENVS.map(e => `<button type="button" role="tab" data-env="${e.id}" aria-selected="${e.id === ku.env}">${esc(e.ko)}${e.beta ? ' <span class="beta">beta</span>' : ''}</button>`).join('');
+  const pool = KD.decks.map((o, i) => ({ o, i, lg: BYID.get(o.L) })).filter(x => envOf(x.o) === ku.env);
+  let list = pool.map(x => ({ ...x, own: deckOwn(krDeck(x.o), om) }));
   const byName = (a, b) => champKo(champTag(a.lg)).localeCompare(champKo(champTag(b.lg)), 'ko');
   if (ku.sort === 'own') list.sort((a, b) => b.own.pct - a.own.pct || byName(a, b));
   else list.sort(byName);
   const best = pool.map(x => ({ x, own: deckOwn(krDeck(x.o), om) })).sort((a, b) => b.own.pct - a.own.pct)[0];
-  $('kr-sum').innerHTML = `<p class="hint" style="margin:0">한국어판 스탠다드 환경 적법성에 맞춰 구성된 덱 예시입니다. (오리진·증명의 전장, 샘플 덱 ${pool.length}개)</p>
+  $('kr-sum').innerHTML = `<p class="hint" style="margin:0">한국어판 스탠다드 환경 적법성에 맞춰 구성된 덱 예시입니다. (${env.sets}, 샘플 덱 ${pool.length}개)</p>
     ${best ? `<p style="margin:0;font-size:13px">내 컬렉션으로 가장 가까운 덱: <b>${esc(best.x.o.t)}</b> · 보유 ${best.own.pct}% · 부족 ${best.own.miss}장</p>` : ''}`;
-  $('kr-chips').innerHTML = `<button class="chip" type="button" data-tag="" aria-pressed="${!ku.legend}">전체 챔피언<b>${pool.length}</b></button>` +
-    [...tags].sort((a, b) => b[1].n - a[1].n || champKo(a[0]).localeCompare(champKo(b[0]), 'ko')).map(([t, { n, lg }]) => `<button class="chip av-chip" type="button" data-tag="${esc(t)}" aria-pressed="${ku.legend === t}" title="${esc(legendLabel(lg))}"><span class="av" style="${avatarStyle(lg)}" aria-hidden="true"></span>${esc(ko() ? champKo(t) : t)}<b>${n}</b></button>`).join('');
   $('kr-list').innerHTML = list.length ? list.map(({ o, i, lg, own }) => {
     const ch = BYID.get(o.C), banned = [o.L, o.C, ...o.m.map(x => x[0]), ...o.b].filter(id => isBanned(BYID.get(id))).length;
     return `<article class="mdeck" data-ki="${i}">
@@ -2319,11 +2321,11 @@ function renderKr() {
       <div class="act"><button class="mini" type="button" data-act="view">덱 보기</button><button class="mini" type="button" data-act="take">내 덱으로 가져오기</button></div>
       </div>
     </article>`;
-  }).join('') : `<p class="empty">조건에 맞는 덱이 없습니다.</p>`;
+  }).join('') : `<p class="empty">${env.beta ? `${esc(env.ko)} 샘플 덱은 준비 중입니다. 한국어판 스피릿포지드 출시(12월)에 맞춰 추가됩니다.` : '조건에 맞는 덱이 없습니다.'}</p>`;
   wireLazy($('kr-list'));
 }
 $('k-sort').onchange = ev => { ku.sort = ev.target.value; saveKu(); renderKr(); };
-$('kr-chips').onclick = ev => { const b = ev.target.closest('[data-tag]'); if (!b) return; ku.legend = b.dataset.tag; saveKu(); renderKr(); };
+$('kr-env').onclick = ev => { const b = ev.target.closest('[data-env]'); if (!b) return; ku.env = b.dataset.env; saveKu(); renderKr(); };
 function takeKr(i) { const id = decks.create(krDeck(KD.decks[i])); closeDetail(); toast('내 덱으로 가져왔습니다.'); openEditor(id); }
 function openKrSheet(i) {
   const o = KD.decks[i], lg = BYID.get(o.L);
