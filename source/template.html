@@ -141,12 +141,22 @@ h1{margin:2px 0 0;font-size:clamp(22px,4vw,30px);font-weight:700;letter-spacing:
   padding:calc(20px + env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) calc(28px + env(safe-area-inset-bottom,0px)) 20px;display:grid;gap:16px;align-content:start}
 .sheet header{display:flex;justify-content:space-between;gap:12px;align-items:start}
 .sheet h2{margin:0;font-size:22px;line-height:1.3;text-wrap:balance}
+#sheet:not(.wide) h2{font-size:27px;font-weight:800;letter-spacing:-.02em;line-height:1.25}
+#sheet:not(.wide) h2 small{font-size:14.5px;margin-top:2px;letter-spacing:0}
 .sheet h2 small{display:block;font-size:14px;font-weight:400;color:var(--muted)}
 .x{border:1px solid var(--line);background:none;border-radius:8px;width:36px;height:36px;font-size:18px;flex:none}
 .facts{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:13px}
 .facts dt{color:var(--muted)}
 .facts dd{margin:0;min-width:0}
 .txt{background:var(--sunk);border-radius:8px;padding:12px 14px;white-space:pre-line;font-size:13.5px;line-height:1.65}
+.txt.ko{font-size:15.5px;font-weight:600;line-height:1.7;color:var(--ink);padding:14px 16px}
+.txt.ko h3{font-size:11.5px}
+.d-top{display:grid;grid-template-columns:168px minmax(0,1fr);gap:18px;align-items:start}
+.d-top.land{grid-template-columns:minmax(0,1fr)}
+.d-top.land .artwrap{max-width:230px}
+.d-side{display:grid;gap:14px;min-width:0}
+.d-side .bigstep{flex-wrap:wrap;gap:8px 14px}
+@media (max-width:420px){.d-top{grid-template-columns:120px minmax(0,1fr);gap:12px}}
 .txt h3{margin:0 0 4px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
 .kw{font-weight:600;color:var(--accent)}
 .ic{display:inline-grid;place-items:center;min-width:17px;height:17px;padding:0 3px;border-radius:4px;background:var(--ink);color:var(--bg);font-family:var(--f-mono);font-size:11px;font-weight:500;text-decoration:none;vertical-align:1px}
@@ -155,7 +165,8 @@ h1{margin:2px 0 0;font-size:clamp(22px,4vw,30px);font-weight:700;letter-spacing:
 .rune.rainbow{background:conic-gradient(var(--d-fury),var(--d-body),var(--d-order),var(--d-calm),var(--d-mind),var(--d-chaos),var(--d-fury))}
 .art{display:block;width:100%;max-width:100%;height:auto;border-radius:14px;background:var(--sunk);aspect-ratio:744/1039;object-fit:contain}
 .art.land{aspect-ratio:1039/744}
-.artwrap{display:grid;gap:6px}
+.artwrap{display:grid;gap:6px;min-width:0}
+.artwrap .art{border-radius:9px;box-shadow:0 8px 20px rgb(0 0 0 / .18)}
 .artlink{display:inline-flex;gap:6px;align-items:center;color:var(--rift);font-weight:500}
 .field{display:grid;gap:4px}
 .field label{font-size:12px;color:var(--muted)}
@@ -2588,6 +2599,9 @@ function openDetail(id) {
       <h2 id="d-title">${esc(e.nk || c.nk || c.n)}${c.sk || c.s ? ' · ' + esc(c.sk || c.s) : ''}<small>${esc(c.n)}${c.s ? ' · ' + esc(c.s) : ''}</small></h2></div>
       <span style="display:flex;gap:6px">${sheetBack ? `<button class="ghost" type="button" id="d-back">${esc(sheetBack.label || '← 덱')}</button>` : ''}<button class="x" type="button" id="d-close" aria-label="닫기">✕</button></span>
     </header>
+    <div class="d-top${c.o === 'l' || c.rot ? ' land' : ''}">
+    <div class="artwrap" id="d-art">${USE_PACK ? `<div class="art${c.o === 'l' ? ' land' : ''}"></div>` : `<img class="art${c.o === 'l' ? ' land' : ''}" src="${cdn(c, c.o === 'l' ? 1040 : 744)}" alt="${esc(c.n)} 카드 이미지">`}</div>
+    <div class="d-side">
     <div class="bigstep"><div class="step"><button type="button" id="d-dec" aria-label="1장 빼기">−</button><output id="d-q">${inv.q(id)}</output><button type="button" id="d-inc" aria-label="1장 더하기">+</button></div><span class="hint">보유 수량 · 덱에는 같은 카드 최대 3장</span></div>
     <dl class="facts">
       <dt>유형</dt><dd>${esc(types)}</dd>
@@ -2599,12 +2613,12 @@ function openDetail(id) {
       <dt>일러스트</dt><dd>${esc(c.il || '—')}</dd>
       <dt>한글명</dt><dd>${koState}</dd>
     </dl>
-    ${c.txk ? `<div class="txt"><h3>효과 · 한국어</h3>${richText(c.txk)}</div>` : ''}
+    </div></div>
+    ${c.txk ? `<div class="txt ko"><h3>효과 · 한국어</h3>${richText(c.txk)}</div>` : ''}
     ${c.tx ? `<div class="txt"><h3>Effect · English</h3>${richText(c.tx)}</div>` : ''}
     <div class="field"><label for="f-nk">내 한글 이름 ${c.nk ? '(공식/추정 이름 대신 표시)' : '(검색에도 반영)'}</label><input id="f-nk" value="${esc(e.nk || '')}" placeholder="${esc(c.nk || '예: 직접 번역한 카드명')}"></div>
     <div class="field"><label for="f-memo">메모</label><input id="f-memo" value="${esc(e.memo || '')}" placeholder="예: 포일 1장, 트레이드용"></div>
-    <div class="artwrap"><div id="d-art">${USE_PACK ? `<div class="art${c.o === 'l' ? ' land' : ''}"></div>` : `<img class="art${c.o === 'l' ? ' land' : ''}" src="${cdn(c, c.o === 'l' ? 1040 : 744)}" alt="${esc(c.n)} 카드 이미지">`}</div>
-    <a class="artlink" href="${img}" target="_blank" rel="noopener">${c.ex ? '공식 공지 이미지 ↗' : '원본 고해상도 이미지 ↗'}</a></div>`;
+    <a class="artlink" href="${img}" target="_blank" rel="noopener">${c.ex ? '공식 공지 이미지 ↗' : '원본 고해상도 이미지 ↗'}</a>`;
   if (USE_PACK) drawArt(c, $('d-art')).catch(() => { if (openId === id) $('d-art').innerHTML = '<p class="hint">이미지를 불러오지 못했습니다. 위 링크로 원본을 열 수 있습니다.</p>'; });
   $('sheet').hidden = false; $('scrim').hidden = false;
   $('d-close').onclick = closeDetail;
