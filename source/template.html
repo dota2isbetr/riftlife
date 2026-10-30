@@ -270,6 +270,33 @@ h1{margin:2px 0 0;font-size:clamp(22px,4vw,30px);font-weight:700;letter-spacing:
 .fan .c:nth-child(3){left:144px;transform:rotate(11deg);transform-origin:bottom center;z-index:2}
 @media (prefers-reduced-motion:no-preference){.fan .c{transition:transform .3s ease}.hcard:hover .fan .c:nth-child(1){transform:rotate(-16deg) translateX(-8px)}.hcard:hover .fan .c:nth-child(3){transform:rotate(16deg) translateX(8px)}}
 .hcard.dark .go{color:#7FD0D8}
+/* home deck builder card: deck boxes */
+.dbx-scene{position:absolute;left:50%;bottom:12px;width:330px;height:230px;transform:translateX(-50%);pointer-events:none}
+.dbx{position:absolute;bottom:0;width:154px;height:189px;filter:drop-shadow(0 18px 24px rgb(0 0 0 / .5))}
+.dbx-l{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.dbx-a{left:34px;bottom:30px;transform:scale(.9);transform-origin:bottom center;z-index:1}
+.dbx-b{left:150px;z-index:2}
+.dbx-back{z-index:0}.dbx-cards{position:absolute;inset:0;z-index:2;clip-path:inset(-400px -300px 0 -300px)}.dbx-body{z-index:3}.dbx-lid{z-index:4;transform-origin:2% 38%}
+.hcard:is(:hover,:focus-visible) .dbx-lid{z-index:1}
+.dbx-card{position:absolute;left:21px;bottom:8px;width:90px;aspect-ratio:420/588;border-radius:6px;overflow:hidden;background:var(--sunk);box-shadow:0 10px 22px rgb(0 0 0 / .45);transform-origin:50% 100%;transform:translateY(46px);opacity:0}
+.dbx-card .ti,.dbx-card img{display:block;width:100%;height:100%;object-fit:contain;background-repeat:no-repeat}
+.hcard:is(:hover,:focus-visible) .dbx-a{transform:translateX(-22px) scale(.82);filter:drop-shadow(0 12px 18px rgb(0 0 0 / .45)) brightness(.62)}
+.hcard:is(:hover,:focus-visible) .dbx-b{transform:translate(-58px,-6px) scale(1.06)}
+.hcard:is(:hover,:focus-visible) .dbx-lid{transform:translate(-24px,-50px) rotate(-14deg)}
+.hcard:is(:hover,:focus-visible) .dbx-card{opacity:1}
+.hcard:is(:hover,:focus-visible) .dbx-card:nth-child(1){transform:translate(-54px,-92px) rotate(-22deg)}
+.hcard:is(:hover,:focus-visible) .dbx-card:nth-child(2){transform:translate(-19px,-122px) rotate(-8deg)}
+.hcard:is(:hover,:focus-visible) .dbx-card:nth-child(3){transform:translate(19px,-122px) rotate(8deg)}
+.hcard:is(:hover,:focus-visible) .dbx-card:nth-child(4){transform:translate(54px,-92px) rotate(22deg)}
+@media (prefers-reduced-motion:no-preference){
+  .dbx{transition:transform .45s cubic-bezier(.3,.9,.3,1),filter .45s ease}
+  .dbx-lid{transition:transform .35s cubic-bezier(.3,.9,.4,1) .12s}
+  .dbx-card{transition:transform .2s ease-in,opacity .15s ease .05s}
+  .hcard:is(:hover,:focus-visible) .dbx-lid{transition-delay:.1s}
+  .hcard:is(:hover,:focus-visible) .dbx-card{transition:transform .55s cubic-bezier(.2,1.35,.45,1) calc(.3s + var(--i) * .07s),opacity .12s linear calc(.3s + var(--i) * .07s)}
+}
+@media (max-width:460px){.dbx-scene{transform:translateX(-50%) scale(.86);transform-origin:bottom center}}
+
 
 /* view tabs */
 .tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:16px;overflow-x:auto}
@@ -603,6 +630,7 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
     <symbol id="rl-mark" viewBox="0 0 32 32"><path d="M14.3 2.4a2.4 2.4 0 0 1 3.4 0l11.9 11.9a2.4 2.4 0 0 1 0 3.4L17.7 29.6a2.4 2.4 0 0 1-3.4 0L2.4 17.7a2.4 2.4 0 0 1 0-3.4Z" fill="currentColor" mask="url(#rift-cut)"/></symbol>
   </defs>
 </svg>
+<div id="dbx-defs"></div>
 <nav class="topnav" aria-label="주 메뉴">
   <a class="brand" href="#home" aria-label="RIFTLIFE 홈"><svg class="mark" aria-hidden="true"><use href="#rl-mark"/></svg><span class="wordmark">RIFTLIFE</span></a>
   <div class="navlinks">
@@ -2497,6 +2525,7 @@ for (const s of SETS) {
   SET_REP.set(s.id, [...new Set(pick)].slice(0, 3));
 }
 function renderHome() {
+  if (!$('dbx-defs').firstChild) $('dbx-defs').innerHTML = DBX_DEFS;
   const om = ownedMap();
   // promo strip: the Korean environment's meta and its latest event
   const m = MD.metas.find(x => x.id === KR_META) || MD.metas[MD.metas.length - 1], evs = MD.events.filter(e => e.meta === m.id), last = evs[evs.length - 1];
@@ -2512,8 +2541,6 @@ function renderHome() {
   for (const o of MD.decks) if (MD.events[o.e].meta === m.id && o.r != null && o.r <= 8) legCount.set(o.L, (legCount.get(o.L) || 0) + 1);
   const metaLegends = [...legCount].sort((a, b) => b[1] - a[1]).map(([ix]) => CARDS[ix]);
   const owned = CARDS.filter(c => !c._alt && inv.q(c.id)).sort((a, b) => inv.q(b.id) - inv.q(a.id) || (b.r === 'epic') - (a.r === 'epic'));
-  const lastDeck = Object.values(decks.data).sort((a, b) => (b.updated || 0) - (a.updated || 0))[0];
-  const deckCards = lastDeck ? [lastDeck.legend, lastDeck.champion, ...Object.keys(lastDeck.main || {})].map(id => BYID.get(id)).filter(Boolean) : [];
   const fill = (cs, extra) => [...new Set([...cs, ...extra])].slice(0, 3);
   const nDecks = Object.keys(decks.data).length, metaN = MD.decks.filter(o => MD.events[o.e].meta === m.id).length;
   $('home-feat').innerHTML = `
@@ -2529,7 +2556,7 @@ function renderHome() {
       <h3>덱 빌더</h3>
       <p class="sub">전설을 고르면 규칙에 맞는 카드만 추려 줍니다. 내 컬렉션과 비교해 부족한 카드를 바로 알려 줍니다.</p>
       <span class="go">덱 만들기 ›</span>
-      ${fanArt(fill(deckCards, metaLegends.slice(3)))}
+      ${deckBoxArt()}
     </button>
     <button class="hcard feat" type="button" data-go="kr">
       <span class="k">한국 환경 · 샘플 덱 ${KD.decks.length}개</span>
@@ -2558,6 +2585,30 @@ function renderHome() {
     <button class="hcard" type="button" data-go="search"><span class="k">검색</span><h3>한글·영문·초성으로 카드 찾기</h3><span class="go">컬렉션에서 검색 ›</span></button>`;
   wireLazy($('v-home'));
   updateShelfNav();
+}
+// Home "deck builder" card: two closed deck boxes; on hover the front one slides forward, its lid lifts and four cards burst out.
+const DBX_CARDS = ['ogn-247-298', 'ogn-039-298', 'ogn-248-298', 'ogn-027-298'];   // Kai'Sa legend, Kai'Sa champion, Icathian Rain, Darius
+const DBX_DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="dbx-cu" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E99A66"/><stop offset=".55" stop-color="#C06A3D"/><stop offset="1" stop-color="#8E4726"/></linearGradient>
+  <linearGradient id="dbx-cu-side" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A8562F"/><stop offset="1" stop-color="#6E3419"/></linearGradient>
+  <linearGradient id="dbx-navy" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2B3E6B"/><stop offset="1" stop-color="#1B2848"/></linearGradient></defs></svg>`;
+function deckBoxArt() {
+  // one box = 140x172 drawing units: front face 120x150, side and top faces skewed 20 up-right
+  const panel = (y0, y1) => `<rect x="2" y="${y0}" width="116" height="${y1 - y0}" rx="3" fill="url(#dbx-cu)"/><rect x="9" y="${y0 + 7}" width="102" height="${y1 - y0 - 14}" rx="2" fill="url(#dbx-navy)"/>`;
+  const back = `<svg class="dbx-l dbx-back" viewBox="0 0 140 172" aria-hidden="true"><polygon points="2,22 22,2 138,2 118,22" fill="#0A1120"/><polygon points="118,22 138,2 138,150 118,170" fill="#0A1120"/></svg>`;
+  const body = `<svg class="dbx-l dbx-body" viewBox="0 0 140 172" aria-hidden="true">
+    <polygon points="118,66 138,46 138,150 118,170" fill="url(#dbx-cu-side)"/><polygon points="122,72 134,60 134,146 122,158" fill="#1B2848"/>
+    ${panel(66, 170)}
+    <path d="M9 77h14l-14 14zM111 77H97l14 14zM9 159h14l-14-14zM111 159H97l14-14z" fill="#9B4F2B"/>
+    <path d="M40 84v62M80 84v62" stroke="#C06A3D" stroke-width="2" stroke-linecap="round" opacity=".55"/>
+    <g transform="translate(42 98) scale(1.125)"><use href="#rl-mark" width="32" height="32" style="color:#E99A66"/></g></svg>`;
+  const lid = `<svg class="dbx-l dbx-lid" viewBox="0 0 140 172" aria-hidden="true">
+    <polygon points="2,22 22,2 138,2 118,22" fill="#D88556"/><polygon points="14,18 28,6 126,6 112,18" fill="url(#dbx-navy)"/>
+    <polygon points="118,22 138,2 138,46 118,66" fill="url(#dbx-cu-side)"/>
+    ${panel(22, 66)}<path d="M44 34h32l-6 10H50z" fill="#C06A3D"/><path d="M2 65h116" stroke="#5A2A14" stroke-width="2"/></svg>`;
+  const cards = DBX_CARDS.map(id => BYID.get(id)).filter(Boolean).map((c, i) => `<span class="dbx-card" style="--i:${i}">${tileArt(c)}</span>`).join('');
+  const box = (cls, inner) => `<span class="dbx ${cls}">${back}${inner}${body}${lid}</span>`;
+  return `<span class="dbx-scene" aria-hidden="true">${box('dbx-a', '')}${box('dbx-b', `<span class="dbx-cards">${cards}</span>`)}</span>`;
 }
 function fanArt(cs) { return `<span class="fan" aria-hidden="true">${cs.map(c => `<span class="c">${tileArt(c)}</span>`).join('')}</span>`; }
 function catArt(cs) { return `<span class="cat-art" aria-hidden="true">${cs.map(c => `<span class="c">${tileArt(c)}</span>`).join('')}</span>`; }
