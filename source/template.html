@@ -102,6 +102,24 @@ h1{margin:2px 0 0;font-size:clamp(22px,4vw,30px);font-weight:700;letter-spacing:
 /* album view: binder pages of card art, uncollected cards greyed out */
 .list.album{display:grid;grid-template-columns:repeat(auto-fill,minmax(156px,1fr));gap:18px 14px;padding-top:16px}
 .list.album .empty{grid-column:1 / -1}
+.list.album.fixed-cols{grid-template-columns:repeat(var(--cols),minmax(0,1fr));gap:14px clamp(6px,1.2vw,14px)}
+.tile{container-type:inline-size}
+@container (max-width:130px){
+  .tile .step button{width:24px;height:26px;font-size:15px}
+  .tile .step output{min-width:20px;font-size:13px}
+  .tile .tname{font-size:11.5px}
+  .tile .tile-foot .code{display:none}
+  .tile .qb{top:3px;right:3px;padding:0 5px;font-size:10.5px}
+}
+@container (max-width:96px){
+  .tile .step button{width:22px;height:24px;font-size:14px}
+  .tile .step output{min-width:14px;font-size:12px}
+  .tile .tname{font-size:10.5px}
+}
+@container (max-width:66px){
+  .tile .step button{width:18px}
+  .tile .step output{min-width:10px;font-size:11px}
+}
 .tile{display:grid;gap:6px;min-width:0;align-content:start}
 .tile-img{all:unset;box-sizing:border-box;cursor:pointer;display:block;position:relative;aspect-ratio:420/588;max-width:100%;border-radius:9px;overflow:hidden;background:var(--sunk)}
 .tile-img:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -240,6 +258,17 @@ h1{margin:2px 0 0;font-size:clamp(22px,4vw,30px);font-weight:700;letter-spacing:
 .shelf.small .hcard{height:200px;flex-basis:min(300px,78vw)}
 .shelf.small .hcard h3{font-size:22px}
 .hcard .go{margin-top:auto;color:var(--rift);font-size:14px;font-weight:500}
+.hcard.feat{height:500px}
+.hcard.feat h3{font-size:40px;letter-spacing:-.04em}
+.hcard.feat .sub{max-width:30ch;margin-top:4px}
+.hcard.feat .go{margin-top:10px}
+.fan{position:absolute;left:50%;bottom:-44px;width:300px;height:250px;transform:translateX(-50%)}
+.fan .c{position:absolute;bottom:0;width:150px;aspect-ratio:420/588;border-radius:10px;overflow:hidden;background:var(--sunk);box-shadow:0 16px 40px rgb(0 0 0 / .35)}
+.fan .c .ti,.fan .c img{display:block;width:100%;height:100%;object-fit:contain;background-repeat:no-repeat}
+.fan .c:nth-child(1){left:6px;transform:rotate(-11deg);transform-origin:bottom center;z-index:1}
+.fan .c:nth-child(2){left:75px;bottom:14px;z-index:3}
+.fan .c:nth-child(3){left:144px;transform:rotate(11deg);transform-origin:bottom center;z-index:2}
+@media (prefers-reduced-motion:no-preference){.fan .c{transition:transform .3s ease}.hcard:hover .fan .c:nth-child(1){transform:rotate(-16deg) translateX(-8px)}.hcard:hover .fan .c:nth-child(3){transform:rotate(16deg) translateX(8px)}}
 .hcard.dark .go{color:#7FD0D8}
 
 /* view tabs */
@@ -483,8 +512,8 @@ table.st tr+tr th,table.st tr+tr td{border-top:1px solid var(--line)}
   </div>
   <div class="cat-row" id="home-sets" aria-label="세트별 바로가기"></div>
 
-  <h2 class="shelf-title"><b>최신 메타.</b> 지금 가장 강한 덱.</h2>
-  <div class="shelf-wrap"><div class="shelf" id="home-meta"></div><button class="shelf-nav prev" type="button" data-shelf="home-meta" data-dir="-1" aria-label="이전">‹</button><button class="shelf-nav next" type="button" data-shelf="home-meta" data-dir="1" aria-label="다음">›</button></div>
+  <h2 class="shelf-title"><b>기능.</b> 카드부터 덱, 메타까지.</h2>
+  <div class="shelf-wrap"><div class="shelf" id="home-feat"></div><button class="shelf-nav prev" type="button" data-shelf="home-feat" data-dir="-1" aria-label="이전">‹</button><button class="shelf-nav next" type="button" data-shelf="home-feat" data-dir="1" aria-label="다음">›</button></div>
 
   <h2 class="shelf-title"><b>내 컬렉션.</b> 한눈에 보는 수집 현황.</h2>
   <div class="shelf-wrap"><div class="shelf" id="home-coll"></div><button class="shelf-nav prev" type="button" data-shelf="home-coll" data-dir="-1" aria-label="이전">‹</button><button class="shelf-nav next" type="button" data-shelf="home-coll" data-dir="1" aria-label="다음">›</button></div>
@@ -532,6 +561,11 @@ table.st tr+tr th,table.st tr+tr td{border-top:1px solid var(--line)}
         <button id="view-list" type="button" aria-pressed="true">목록</button>
         <button id="view-album" type="button" aria-pressed="false">앨범</button>
       </div>
+      <select id="f-cols" aria-label="앨범 한 줄에 보일 카드 수">
+        <option value="auto">한 줄: 자동</option>
+        <option value="2">한 줄에 2장</option><option value="3">한 줄에 3장</option><option value="4">한 줄에 4장</option><option value="5">한 줄에 5장</option>
+        <option value="6">한 줄에 6장</option><option value="7">한 줄에 7장</option><option value="8">한 줄에 8장</option><option value="9">한 줄에 9장</option><option value="10">한 줄에 10장</option>
+      </select>
       <div class="seg" role="group" aria-label="표시 언어">
         <button id="lang-ko" type="button" aria-pressed="true">한글</button>
         <button id="lang-en" type="button" aria-pressed="false">EN</button>
@@ -759,7 +793,8 @@ function offerMigrate(dbEmpty) {
 function afterLoad() { CARDS.forEach(indexCard); renderActive(); if (openId) openDetail(openId); }
 
 /* ---------- UI state ---------- */
-const ui = Object.assign({ q:'', text:false, set:'', domain:'', type:'', rarity:'', own:'', sort:'set', lang:'ko', view:'list', base:false, limit:150 }, lsGet(UI_KEY) || {});
+const ui = Object.assign({ q:'', text:false, set:'', domain:'', type:'', rarity:'', own:'', sort:'set', lang:'ko', view:'album', cols:'auto', base:false, limit:150 }, lsGet(UI_KEY) || {});
+if (ui.uiv !== 2) { ui.view = 'album'; ui.uiv = 2; }   // album became the default view; switch earlier list users over once
 ui.limit = 150;
 const $ = id => document.getElementById(id);
 const saveUi = () => lsSet(UI_KEY, { ...ui, q: '' });
@@ -1476,6 +1511,7 @@ function fillSelects() {
   $('f-own').value = ui.own; $('f-sort').value = ui.sort; $('q-text').checked = ui.text;
   $('lang-ko').setAttribute('aria-pressed', ko()); $('lang-en').setAttribute('aria-pressed', !ko());
   $('hide-alt').setAttribute('aria-pressed', !!ui.base);
+  $('f-cols').value = String(ui.cols || 'auto'); $('f-cols').hidden = ui.view !== 'album';
   $('view-list').setAttribute('aria-pressed', ui.view !== 'album'); $('view-album').setAttribute('aria-pressed', ui.view === 'album');
 }
 
@@ -1579,6 +1615,8 @@ function render() {
   const shown = current.slice(0, ui.limit);
   if (lazyBg) lazyBg.disconnect();
   $('list').classList.toggle('album', ui.view === 'album');
+  $('list').classList.toggle('fixed-cols', ui.view === 'album' && ui.cols !== 'auto');
+  $('list').style.setProperty('--cols', ui.cols === 'auto' ? 6 : ui.cols);
   $('list').innerHTML = shown.length ? shown.map(itemHTML).join('') : `<li class="empty">조건에 맞는 카드가 없습니다. 검색어를 줄이거나 필터를 초기화해 보세요.</li>`;
   $('result').textContent = `${current.length.toLocaleString()}종 표시`;
   const rest = current.length - shown.length;
@@ -1754,28 +1792,37 @@ function renderHome() {
   for (const c of CARDS) { const q = inv.q(c.id); if (q) { kinds++; copies += q; } }
   $('home-sets').innerHTML = `<button class="cat" type="button" data-set="">${catArt([CARDS.find(c => has(c, 'legend') && c.set === 'SFD'), CARDS.find(c => has(c, 'legend') && c.set === 'UNL'), CARDS.find(c => has(c, 'legend') && c.set === 'VEN')].filter(Boolean))}<span>전체 카드<small>${base.toLocaleString()}종</small></span></button>` +
     SETS.map(s => `<button class="cat" type="button" data-set="${s.id}">${catArt(SET_REP.get(s.id))}<span>${esc(s.ko)}<small>${per[s.id].own}/${per[s.id].n}</small></span></button>`).join('');
-  // meta shelf: summary card + newest meta top 4
-  const top = MD.decks.map((o, i) => ({ o, i })).filter(({ o }) => MD.events[o.e].meta === m.id && o.r != null && o.r <= 4)
-    .sort((a, b) => MD.events[b.o.e].date.localeCompare(MD.events[a.o.e].date) || a.o.r - b.o.r);
-  const tags = new Map();
-  for (const { o } of MD.decks.map(o => ({ o })).filter(({ o }) => MD.events[o.e].meta === m.id && o.r != null && o.r <= 8)) { const t = champTag(CARDS[o.L]); tags.set(t, (tags.get(t) || 0) + 1); }
-  const best = top.map(x => ({ ...x, own: deckOwn(metaDeck(x.o), om) })).sort((a, b) => b.own.pct - a.own.pct)[0];
-  $('home-meta').innerHTML = `<button class="hcard dark" type="button" data-go="meta">
-      <span class="k">${esc(m.ko)} 메타 · 대회 ${evs.length}개</span>
-      <h3>Top 8에 가장 많이 오른 챔피언</h3>
-      <div class="chips">${[...tags].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([t, n]) => `<span class="chip">${esc(champKo(t))}<b>${n}</b></span>`).join('')}</div>
-      ${best ? `<p class="sub" style="margin-top:14px">내 컬렉션으로 가장 가까운 Top 4 덱</p><p>${esc(legendLabel(CARDS[best.o.L]))} · 보유 ${best.own.pct}%</p>` : ''}
-      <span class="go">메타 덱 전체 보기 ›</span>
-    </button>` + top.map(({ o, i }) => {
-    const lg = CARDS[o.L], ev = MD.events[o.e], own = deckOwn(metaDeck(o), om);
-    return `<button class="hcard dark" type="button" data-mi="${i}">
-      <span class="k">${esc(ev.ko)} RQ · ${o.r}위 · ${ev.date}</span>
-      <h3>${esc(legendLabel(lg))}</h3>
-      <p class="sub">${o.C != null ? esc(dName(CARDS[o.C])) + ' · ' : ''}${esc(o.p)}</p>
-      <span class="own"><span class="ownbar" aria-hidden="true"><i style="width:${own.pct}%"></i></span>내 보유 ${own.pct}%</span>
-      <span class="art" aria-hidden="true">${tileArt(lg)}</span>
+  // feature shelf: one large card per part of the site, each with a fan of relevant card art
+  const legCount = new Map();
+  for (const o of MD.decks) if (MD.events[o.e].meta === m.id && o.r != null && o.r <= 8) legCount.set(o.L, (legCount.get(o.L) || 0) + 1);
+  const metaLegends = [...legCount].sort((a, b) => b[1] - a[1]).map(([ix]) => CARDS[ix]);
+  const owned = CARDS.filter(c => !c._alt && inv.q(c.id)).sort((a, b) => inv.q(b.id) - inv.q(a.id) || (b.r === 'epic') - (a.r === 'epic'));
+  const lastDeck = Object.values(decks.data).sort((a, b) => (b.updated || 0) - (a.updated || 0))[0];
+  const deckCards = lastDeck ? [lastDeck.legend, lastDeck.champion, ...Object.keys(lastDeck.main || {})].map(id => BYID.get(id)).filter(Boolean) : [];
+  const fill = (cs, extra) => [...new Set([...cs, ...extra])].slice(0, 3);
+  const nDecks = Object.keys(decks.data).length, metaN = MD.decks.filter(o => MD.events[o.e].meta === m.id).length;
+  $('home-feat').innerHTML = `
+    <button class="hcard feat" type="button" data-go="collection">
+      <span class="k">컬렉션 · 기본 카드 ${(baseOwn / base * 100).toFixed(1)}% 수집</span>
+      <h3>컬렉션</h3>
+      <p class="sub">카드 ${CARDS.length.toLocaleString()}종의 보유 수량을 앨범처럼 넘겨 보며 관리합니다. 한글·영문·초성으로 바로 찾습니다.</p>
+      <span class="go">컬렉션 열기 ›</span>
+      ${fanArt(fill(owned, SET_REP.get(SETS[SETS.length - 1].id)))}
+    </button>
+    <button class="hcard feat dark" type="button" data-go="decks">
+      <span class="k">덱 빌더 · 내 덱 ${nDecks}개</span>
+      <h3>덱 빌더</h3>
+      <p class="sub">전설을 고르면 규칙에 맞는 카드만 추려 줍니다. 내 컬렉션과 비교해 부족한 카드를 바로 알려 줍니다.</p>
+      <span class="go">덱 만들기 ›</span>
+      ${fanArt(fill(deckCards, metaLegends.slice(3)))}
+    </button>
+    <button class="hcard feat dark" type="button" data-go="meta">
+      <span class="k">메타 덱 · ${esc(m.ko)} 메타 ${metaN}개</span>
+      <h3>메타 덱</h3>
+      <p class="sub">공식 지역 예선 상위 덱을 메타별로 모았습니다. 내 보유율이 높은 덱부터 볼 수 있습니다.</p>
+      <span class="go">메타 덱 보기 ›</span>
+      ${fanArt(fill(metaLegends, []))}
     </button>`;
-  }).join('');
   // collection shelf
   const setBars = SETS.map(s => `<div><span>${esc(s.ko)}</span><span class="hint">${per[s.id].own}/${per[s.id].n}</span><span class="ownbar"><i style="width:${(per[s.id].own / per[s.id].n * 100).toFixed(1)}%"></i></span></div>`).join('');
   $('home-coll').innerHTML = `
@@ -1790,6 +1837,7 @@ function renderHome() {
   wireLazy($('v-home'));
   updateShelfNav();
 }
+function fanArt(cs) { return `<span class="fan" aria-hidden="true">${cs.map(c => `<span class="c">${tileArt(c)}</span>`).join('')}</span>`; }
 function catArt(cs) { return `<span class="cat-art" aria-hidden="true">${cs.map(c => `<span class="c">${tileArt(c)}</span>`).join('')}</span>`; }
 function updateShelfNav() {
   for (const b of document.querySelectorAll('.shelf-nav')) {
@@ -1797,7 +1845,7 @@ function updateShelfNav() {
     b.disabled = d < 0 ? s.scrollLeft <= 4 : s.scrollLeft + s.clientWidth >= s.scrollWidth - 4;
   }
 }
-for (const id of ['home-meta', 'home-coll']) $(id).addEventListener('scroll', () => requestAnimationFrame(updateShelfNav), { passive: true });
+for (const id of ['home-feat', 'home-coll']) $(id).addEventListener('scroll', () => requestAnimationFrame(updateShelfNav), { passive: true });
 addEventListener('resize', () => { if (view === 'home') updateShelfNav(); });
 $('v-home').onclick = ev => {
   const nav = ev.target.closest('.shelf-nav');
@@ -1834,6 +1882,7 @@ $('q').addEventListener('input', ev => { clearTimeout(qT); qT = setTimeout(() =>
 $('q-text').onchange = ev => { ui.text = ev.target.checked; saveUi(); render(); };
 for (const [id, key] of [['f-set','set'],['f-domain','domain'],['f-type','type'],['f-rarity','rarity'],['f-own','own'],['f-sort','sort']])
   $(id).onchange = ev => { ui[key] = ev.target.value; ui.limit = 150; saveUi(); render(); };
+$('f-cols').onchange = ev => { ui.cols = ev.target.value; saveUi(); render(); };
 for (const v of ['list', 'album']) $('view-' + v).onclick = () => { ui.view = v; saveUi(); fillSelects(); render(); };
 $('lang-ko').onclick = () => { ui.lang = 'ko'; saveUi(); fillSelects(); render(); };
 $('lang-en').onclick = () => { ui.lang = 'en'; saveUi(); fillSelects(); render(); };
