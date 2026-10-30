@@ -1,0 +1,29 @@
+{
+  "note": "공식 카드 갤러리에 없는 프로모·지역 한정 카드. base 카드의 게임 데이터를 복사하고 아래 값만 덮어씀. 이미지는 source/extras/<id>.webp (744x1039).",
+  "cards": [
+    {
+      "id": "ogn-303a-298", "base": "ogn-303-298", "code": "OGN-303a/298 KR", "r": "showcase", "il": "Allen Song",
+      "x": "KR", "xs": "한국어판 오리진 부스터 한정 오버넘버 (한복 아리 오마주)",
+      "src": "https://playriftbound.com/ko-kr/news/announcements/koreas-rift-opens-on-september-18/",
+      "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/5460eec92189cb7e00c1c4a740c1146c8ad85c40-1848x1063.jpg"
+    },
+    {
+      "id": "ogn-030-kr-298", "base": "ogn-030-298", "code": "OGN-030/298 P KR", "r": "promo", "il": "Kudos Productions",
+      "x": "KR", "xs": "한국 출시 이벤트 프로모 (출시 특별판 스탬프)",
+      "src": "https://playriftbound.com/ko-kr/news/announcements/koreas-rift-opens-on-september-18/",
+      "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/dda8706e0b7bb4ab59807650f8e02fc8eb0e49eb-1848x1063.jpg"
+    },
+    {
+      "id": "ogn-076b-298", "base": "ogn-076-298", "code": "OGN-076b/298 P KR", "r": "promo", "il": "Kim Star",
+      "x": "KR", "xs": "한국 오리진 출시 이벤트 프로모",
+      "src": "https://playriftbound.com/ko-kr/news/announcements/koreas-rift-opens-on-september-18/",
+      "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/9ddf848f09b3f13047ab473aa4f09cc6ebf16906-1848x1063.jpg"
+    },
+    {
+      "id": "ogn-197b-298", "base": "ogn-197-298", "code": "OGN-197b/298 P KR", "r": "promo", "il": "Alsie Lau",
+      "x": "KR", "xs": "한국 넥서스 나이트 프로모 (GG EZ)",
+      "src": "https://playriftbound.com/ko-kr/news/announcements/koreas-rift-opens-on-september-18/",
+      "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/e9e879f0711473ce756b10e737980ac601f0ee77-1848x1063.jpg"
+    }
+  ]
+}

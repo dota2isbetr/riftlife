@@ -37,6 +37,18 @@ https://riftlife.life 에 게시된 앱(`/index.html`, `/img/`)을 만드는 원
 
 주의: `ix`(이미지 시트 위치)는 카드 순서로 정해집니다. 카드 목록이 바뀌면 이미지 시트를 반드시 다시 만들고 `/img/` 전체를 교체해야 합니다. meta.json도 `ix`를 쓰므로 함께 다시 만듭니다.
 
+## 프로모·지역 한정 카드 (공식 갤러리에 없는 카드)
+
+공식 카드 갤러리에는 프로모·지역 한정 카드가 올라오지 않습니다. 이런 카드는 `data/extras.json`에 직접 적습니다.
+
+1. `extras.json`의 `cards`에 항목 추가: `id`, 게임 데이터를 복사해 올 `base` 카드 id, `code`, `r`(promo/showcase), `il`, `x`(지역, 예: KR), `xs`(설명), `src`(출처 공지), `img`(공식 공지 속 카드 이미지 URL)
+2. 저장소 루트에서 `python3 -I source/scripts/add_extras.py --fetch`
+   - 공지 이미지에서 카드 부분을 잘라 `source/extras/<id>.webp`로 저장하고, cards.json 끝에 붙이고, `/img/`의 마지막 시트에 이어 붙임
+   - 갤러리 카드의 `ix`와 meta.json은 바뀌지 않음. 화면에서는 `after`로 지정된 같은 번호 카드 바로 뒤에 정렬됨
+3. `build_page.py` 실행 후 `/index.html`, `/img/`, `source/` 커밋
+
+새 카드 세트로 갤러리를 다시 받아 `pack.py`를 돌린 경우에는 마지막에 `add_extras.py`(이미지가 있으니 `--fetch` 없이)를 다시 실행합니다.
+
 ## 새 대회 덱이 공개됐을 때
 
 1. `rd/` 폴더에 뉴스 목록 페이지를 받아 두고 `python3 -I ../crawl.py`로 기사를 `rd/arts/`에 수집
@@ -50,6 +62,6 @@ https://riftlife.life 에 게시된 앱(`/index.html`, `/img/`)을 만드는 원
 
 ## 출처
 
-- 카드 데이터·이미지: playriftbound.com 공식 카드 갤러리 (영문·한국어). 카드 이미지 © Riot Games, 비영리 목적으로 허가를 받아 사용.
+- 카드 데이터·이미지: playriftbound.com 공식 카드 갤러리 (영문·한국어). 한국 한정 카드 4종은 공식 공지 「9월 18일, 대한민국에 협곡이 열립니다」의 이미지. 카드 이미지 © Riot Games, 비영리 목적으로 허가를 받아 사용.
 - 대회 덱: playriftbound.com Organized Play 지역 예선(RQ) Top Decks 기사
 - 덱 규칙: 공식 Deckbuilding Primer, 대회 규정 (2026년 7월 24일부터 사이드보드 10장 이하)

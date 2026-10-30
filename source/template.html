@@ -9,7 +9,7 @@
   --bg:#EDF1F2; --surface:#FFFFFF; --sunk:#E3E9EB; --ink:#15202A; --muted:#5A6A75; --line:#D3DCE0;
   --accent:#94661C; --accent-soft:#F3E7D0; --rift:#1D6C75; --rift-soft:#D7ECEE; --danger:#B23A30;
   --d-fury:#D2483C; --d-calm:#3E9F62; --d-mind:#3B7DD8; --d-body:#E08A2E; --d-chaos:#8A55C9; --d-order:#C29A1A; --d-colorless:#8C969E;
-  --r-common:#8C969E; --r-uncommon:#2FA3A8; --r-rare:#3B7DD8; --r-epic:#8A55C9; --r-showcase:#C29A1A;
+  --r-common:#8C969E; --r-uncommon:#2FA3A8; --r-rare:#3B7DD8; --r-epic:#8A55C9; --r-showcase:#C29A1A; --r-promo:#C2577A;
   --f-display:"Sora","IBM Plex Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;
   --nav:rgb(246 248 249 / .8);
   --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
@@ -769,7 +769,8 @@ const IMG = 'https://cmsassets.rgpub.io/sanity/images/dsfx7636/game_data_live/';
 const IN_VIEWER = !!(window.claude && window.claude.use);
 const G = RAW.img, USE_PACK = G && location.protocol !== 'file:';   // served pages (claude.ai or your own site) ship the sprite sheets in img/; a file opened from disk loads Riot's CDN
 const pad3 = n => String(n).padStart(3, '0');
-const cdn = (c, w) => IMG + c.img + `?accountingTag=RB&w=${w}&fm=webp&q=80`;
+const imgUrl = c => /^https?:/.test(c.img) ? c.img : IMG + c.img;      // promo / regional extras point at their official news image
+const cdn = (c, w) => imgUrl(c) + `?accountingTag=RB&w=${w}&fm=webp&q=80`;
 function thumbStyle(c, w = 40) {
   if (!USE_PACK) return `background-image:url('${cdn(c, 80)}')`;
   const per = G.tn * G.tn, k = c.ix % per, sx = w / G.tw;
@@ -800,12 +801,16 @@ async function drawArt(c, box) {
 
 const L = {
   type: {unit:['유닛','Unit'],spell:['주문','Spell'],gear:['도구','Gear'],battlefield:['전장','Battlefield'],rune:['룬','Rune'],legend:['전설','Legend'],champion:['챔피언','Champion'],signature:['시그니처','Signature'],token:['토큰','Token'],basic:['기본','Basic']},
-  rarity: {common:['일반','Common'],uncommon:['특별','Uncommon'],rare:['희귀','Rare'],epic:['서사','Epic'],showcase:['쇼케이스','Showcase']},
+  rarity: {common:['일반','Common'],uncommon:['특별','Uncommon'],rare:['희귀','Rare'],epic:['서사','Epic'],showcase:['쇼케이스','Showcase'],promo:['프로모','Promo']},
   domain: {fury:['분노','Fury'],calm:['평온','Calm'],mind:['정신','Mind'],body:['신체','Body'],chaos:['혼돈','Chaos'],order:['질서','Order'],colorless:['무색','Colorless']},
 };
 const SETMAP = new Map(SETS.map(s => [s.id, s]));
 // Alternate-art printings: showcase rarity, numbered past the set size (overnumbered), "*" signed versions, or "a" variants.
-for (const c of CARDS) c._alt = c.r === 'showcase' || c.no > SETMAP.get(c.set).max || /-star-/.test(c.id) || /-\d+[a-z]-/.test(c.id);
+for (const c of CARDS) c._alt = c.r === 'showcase' || c.r === 'promo' || !!c.x || c.no > SETMAP.get(c.set).max || /-star-/.test(c.id) || /-\d+[a-z]-/.test(c.id);
+// Set order: gallery cards keep their array position; extras (appended for stable ix) slot in after the printing named in `after`.
+{ const pos = new Map(); CARDS.forEach((c, i) => { if (!c.x) pos.set(c.id, c._o = i); });
+  CARDS.forEach((c, i) => { if (c.x) c._o = (pos.get(c.after) ?? CARDS.length) + 0.5 + i / 1e6; }); }
+const HAS_EXTRAS = CARDS.some(c => c.x);
 const DOM_ORDER = Object.keys(L.domain), RAR_ORDER = Object.keys(L.rarity);
 
 /* ---------- search index ---------- */
@@ -817,7 +822,7 @@ function indexCard(c) {
   const e = inv.get(c.id);
   const ko = [c.nk, c.sk, e.nk, ...(c.tk||[])].filter(Boolean);
   c._name = '|' + [c.n, c.s, ...ko, ...(c.tg||[]), c.code, c.code.replace(/\/.*/, ''), c.set + c.no,
-    ...typeWords(c), ...(c.d||[]).flatMap(d => L.domain[d]||[]), ...(L.rarity[c.r]||[]), c.il].map(norm).join('|') + '|';
+    ...typeWords(c), ...(c.d||[]).flatMap(d => L.domain[d]||[]), ...(L.rarity[c.r]||[]), c.il, ...(c.x ? [c.x, c.xs, '한정', '한국 한정', '지역 한정'] : [])].map(norm).join('|') + '|';
   c._cho = ko.map(k => cho(k)).join('|');
   c._text = norm((c.tx||'') + '|' + (c.txk||''));
 }
@@ -927,7 +932,7 @@ const setName = id => { const s = SETMAP.get(id); return ko() ? s.ko : s.en; };
 /* ---------- deck helpers ---------- */
 const MD = JSON.parse(document.getElementById('meta-data').textContent);
 const SET_ORDER = ['OGN','OGS','SFD','UNL','VEN','RAD'];
-const isAlt = c => /-star-/.test(c.id) || /-\d+[a-z]-/.test(c.id);
+const isAlt = c => !!c.x || /-star-/.test(c.id) || /-\d+[a-z]-/.test(c.id);
 const isSig = c => (c.st || []).includes('signature');
 const has = (c, t) => (c.t || []).includes(t) || (c.st || []).includes(t);
 const nameKey = c => c.n + '|' + (c.s || '');          // every printing of one card shares this key
@@ -2117,6 +2122,7 @@ function filtered() {
   if (ui.sort === 'name') { const col = new Intl.Collator(ko() ? 'ko' : 'en'); out.sort((a, b) => col.compare(nm(a), nm(b))); }
   else if (ui.sort === 'qty') out.sort((a, b) => inv.q(b.id) - inv.q(a.id));
   else if (ui.sort === 'cost') out.sort((a, b) => (a.e ?? 99) - (b.e ?? 99));
+  else if (HAS_EXTRAS) out.sort((a, b) => a._o - b._o);
   return out;
 }
 
@@ -2225,7 +2231,7 @@ function openDetail(id) {
   if (!openId) lastFocus = document.activeElement;
   openId = id;
   const e = inv.get(id), s = SETMAP.get(c.set);
-  const img = IMG + c.img;
+  const img = imgUrl(c);
   const types = [...(c.st||[]), ...(c.t||[])].map(t => `${L.type[t]?.[0] || t} (${L.type[t]?.[1] || t})`).join(', ');
   const doms = (c.d||[]).map(d => `<span class="rune" style="--c:var(--d-${d})"></span> ${L.domain[d][1]}`).join(' &nbsp;') || '—';
   const stats = [c.e != null && `에너지 ${c.e}`, c.p != null && `파워 ${c.p}`, c.m != null && `힘(Might) ${c.m}`].filter(Boolean).join(' · ') || '—';
@@ -2243,6 +2249,7 @@ function openDetail(id) {
       <dt>유형</dt><dd>${esc(types)}</dd>
       <dt>영역</dt><dd>${doms}</dd>
       <dt>희귀도</dt><dd><span class="gem" style="--c:var(--r-${c.r})">${esc(L.rarity[c.r][0])} (${esc(L.rarity[c.r][1])})</span></dd>
+      ${c.xs ? `<dt>구분</dt><dd><span class="gem" style="--c:var(--r-promo)">${esc(c.x)} 한정</span> ${esc(c.xs)}</dd>` : ''}
       <dt>수치</dt><dd>${stats}</dd>
       ${tags ? `<dt>태그</dt><dd>${tags}${tagsKo ? ` <span class="hint">(${esc(tagsKo)})</span>` : ''}</dd>` : ''}
       <dt>일러스트</dt><dd>${esc(c.il || '—')}</dd>
