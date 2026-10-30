@@ -425,6 +425,20 @@ table.st td{text-align:right;padding:4px 0 4px 8px;color:var(--muted);white-spac
 table.st thead td{font-size:11px}
 table.st tr+tr th,table.st tr+tr td{border-top:1px solid var(--line)}
 
+/* deck card hover preview */
+.hover-card{position:fixed;left:0;top:0;z-index:45;width:300px;pointer-events:none;display:grid;gap:8px;filter:drop-shadow(0 18px 36px rgb(0 0 0 / .32))}
+.hp-card{position:relative;width:300px;aspect-ratio:420/588;border-radius:14px;overflow:hidden;background:var(--sunk)}
+.hp-card.land{aspect-ratio:588/420}
+.hp-in{position:absolute;inset:0}
+.hp-in .ti,.hp-in img{display:block;width:100%;height:100%;object-fit:contain;background-repeat:no-repeat}
+.hp-card.land.pack .hp-in{inset:auto;left:50%;top:50%;width:214px;height:300px;transform:translate(-50%,-50%) rotate(90deg)}
+.hp-text{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:13.5px;line-height:1.6;display:grid;gap:4px;max-height:40vh;overflow:hidden}
+.hp-text b{font-size:15px}
+.hp-text p{margin:4px 0 0;white-space:pre-line}
+.hp-text .en{color:var(--muted);font-size:12.5px;line-height:1.55}
+#ws-body .dt-art{cursor:zoom-in}
+@media (prefers-reduced-motion:no-preference){.hover-card:not([hidden]){animation:hp-in .14s ease-out}@keyframes hp-in{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}}
+
 /* drag and drop */
 #bt-grid .bt-img,#ws-body .dt{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 #bt-grid .bt-img img,#ws-body .dt img{-webkit-user-drag:none}
@@ -668,6 +682,7 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
 <div class="scrim" id="scrim" hidden></div>
 <aside class="sheet" id="sheet" hidden aria-modal="true" role="dialog" aria-labelledby="d-title"></aside>
 <div class="toast" id="toast" hidden role="status"></div>
+<div class="hover-card" id="hover-card" hidden aria-hidden="true"></div>
 <div class="copybox" id="copybox" hidden role="dialog" aria-label="복사할 텍스트"><p>자동 복사가 막혀 있습니다. 아래 텍스트를 선택해서 복사하세요.</p><textarea id="copybox-text" readonly></textarea><div><button class="ghost" id="copybox-close" type="button">닫기</button></div></div>
 
 <script id="card-data" type="application/json">__DATA__</script>
@@ -1198,6 +1213,8 @@ function renderEditor() {
     $('deck-edit').onclick = onEditorClick;
     $('deck-edit').addEventListener('pointerdown', onDragDown);
     $('deck-edit').addEventListener('dragstart', ev => ev.preventDefault());
+    $('deck-edit').addEventListener('mouseover', onHoverPreview);
+    $('deck-edit').addEventListener('mouseleave', hidePreview);
     $('deck-edit').onchange = ev => {
       const s = ev.target.dataset.set; if (!s) return;
       ws[s] = s === 'dir' ? +ev.target.value : ev.target.value; renderWorkspace();
@@ -1495,6 +1512,7 @@ function onDragMove(ev) {
   updateDropZone(st);
 }
 function beginDrag(st) {
+  hidePreview();
   st.active = true; clearTimeout(st.timer);
   const c = BYID.get(st.id), r = st.el.getBoundingClientRect();
   const g = document.createElement('div');
@@ -1644,6 +1662,44 @@ document.addEventListener('keydown', ev => {
   const st = DRAG.st; if (ev.key !== 'Escape' || !st || !st.active) return;
   endDragListeners(); finishDragUI(st); flyGhost(st.ghost, document.contains(st.el) ? st.el.getBoundingClientRect() : null, { cls: 'back', ms: 300 });
 }, true);
+
+/* ---------- deck editor: hover preview of a deck card ---------- */
+const canHover = matchMedia('(hover: hover) and (pointer: fine)');
+let hpTimer = null, hpFor = null;
+function hidePreview() { clearTimeout(hpTimer); hpFor = null; $('hover-card').hidden = true; }
+function previewHTML(c) {
+  const land = c.o === 'l';
+  const types = [...(c.st || []), ...(c.t || [])].map(t => lbl('type', t)).join(' · ');
+  const stats = [c.e != null && `에너지 ${c.e}`, c.p != null && `파워 ${c.p}`, c.m != null && `힘 ${c.m}`].filter(Boolean).join(' · ');
+  const main = c.txk || c.tx;
+  return `<div class="hp-card${land ? ' land' : ''}${USE_PACK ? ' pack' : ''}"><div class="hp-in">${tileArt(c)}</div></div>
+    <div class="hp-text"><b>${esc(dName(c))}</b><span class="hint">${esc(types)}${stats ? ' · ' + stats : ''}</span>
+      ${main ? `<p>${richText(main)}</p>` : ''}${c.txk && c.tx ? `<p class="en">${richText(c.tx)}</p>` : ''}
+      ${isBanned(c) ? '<span><span class="pill bad">현재 금지 카드</span></span>' : ''}</div>`;
+}
+function showPreview(art) {
+  const tile = art.closest('.dt'), c = tile && BYID.get(tile.dataset.id); if (!c) return;
+  const h = $('hover-card');
+  h.innerHTML = previewHTML(c);
+  h.querySelectorAll('[data-bg]').forEach(el => { el.style.backgroundImage = `url('${el.dataset.bg}')`; BG_SEEN.add(el.dataset.bg); });
+  h.hidden = false;
+  // beside the thumbnail: left of it when there is room (over the card pool), otherwise right; kept inside the viewport
+  const r = art.getBoundingClientRect(), w = h.offsetWidth, hh = h.offsetHeight, gap = 14, pad = 8;
+  let left = r.left - w - gap;
+  if (left < pad) left = r.right + gap;
+  left = Math.max(pad, Math.min(left, innerWidth - w - pad));
+  const top = Math.max(pad + 48, Math.min(r.top - 40, innerHeight - hh - pad));
+  h.style.left = left + 'px'; h.style.top = top + 'px';
+}
+function onHoverPreview(ev) {
+  if (!canHover.matches || (DRAG.st && DRAG.st.active)) return;
+  const art = ev.target.closest('#ws-body .dt-art');
+  if (!art) { if (hpFor) hidePreview(); return; }
+  if (hpFor === art) return;
+  hidePreview(); hpFor = art;
+  hpTimer = setTimeout(() => { if (hpFor === art && document.contains(art)) showPreview(art); }, 140);
+}
+addEventListener('scroll', () => { if (hpFor) hidePreview(); }, { passive: true, capture: true });
 
 /* read-only deck list used by the meta-deck sheet */
 function lineHTML(c, n, sec, om, need, editable) {
