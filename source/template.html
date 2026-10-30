@@ -2,7 +2,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
 <style>
 /* Layout: a collector's ledger. Sticky search rail, set progress tiles, then a dense card register with a quantity stepper on every line. */
 :root{
@@ -10,17 +10,18 @@
   --accent:#94661C; --accent-soft:#F3E7D0; --rift:#1D6C75; --rift-soft:#D7ECEE; --danger:#B23A30;
   --d-fury:#D2483C; --d-calm:#3E9F62; --d-mind:#3B7DD8; --d-body:#E08A2E; --d-chaos:#8A55C9; --d-order:#C29A1A; --d-colorless:#8C969E;
   --r-common:#8C969E; --r-uncommon:#2FA3A8; --r-rare:#3B7DD8; --r-epic:#8A55C9; --r-showcase:#C29A1A;
-  --f-display:"Cinzel","Times New Roman",serif;
+  --f-display:"Sora","IBM Plex Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;
+  --nav:rgb(246 248 249 / .8);
   --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
   --radius:10px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0D141B; --surface:#151F28; --sunk:#101920; --ink:#E4EBEE; --muted:#8E9FAB; --line:#25323D;
-  --accent:#D8A84F; --accent-soft:#3A2F1C; --rift:#56B8C1; --rift-soft:#17343A; --danger:#E26A5E; color-scheme:dark}}
+  --accent:#D8A84F; --accent-soft:#3A2F1C; --rift:#56B8C1; --rift-soft:#17343A; --danger:#E26A5E; --nav:rgb(13 20 27 / .78); color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0D141B; --surface:#151F28; --sunk:#101920; --ink:#E4EBEE; --muted:#8E9FAB; --line:#25323D;
-  --accent:#D8A84F; --accent-soft:#3A2F1C; --rift:#56B8C1; --rift-soft:#17343A; --danger:#E26A5E; color-scheme:dark}
+  --accent:#D8A84F; --accent-soft:#3A2F1C; --rift:#56B8C1; --rift-soft:#17343A; --danger:#E26A5E; --nav:rgb(13 20 27 / .78); color-scheme:dark}
 
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -33,8 +34,6 @@ button{cursor:pointer}
 .wrap{max-width:1180px;margin:0 auto}
 
 /* masthead */
-.mast{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;padding-block:28px 18px}
-.eyebrow{font-family:var(--f-display);font-weight:700;letter-spacing:.22em;font-size:12px;color:var(--accent);text-transform:uppercase}
 h1{margin:2px 0 0;font-size:clamp(22px,4vw,30px);font-weight:700;letter-spacing:-.01em;text-wrap:balance}
 .totals{display:flex;gap:22px;flex-wrap:wrap}
 .total b{display:block;font-family:var(--f-mono);font-size:22px;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.2}
@@ -56,7 +55,7 @@ h1{margin:2px 0 0;font-size:clamp(22px,4vw,30px);font-weight:700;letter-spacing:
 .bar>i{display:block;height:100%;background:var(--rift);width:0}
 
 /* controls */
-.rail{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px;border-bottom:1px solid var(--line);display:grid;gap:8px}
+.rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 48px);z-index:5;background:var(--bg);padding-block:10px;border-bottom:1px solid var(--line);display:grid;gap:8px}
 .search{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .search input{flex:1 1 240px;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:11px 14px;font-size:15px}
 .search input::placeholder{color:var(--muted)}
@@ -159,6 +158,85 @@ h1{margin:2px 0 0;font-size:clamp(22px,4vw,30px);font-weight:700;letter-spacing:
 .foot{margin-top:28px;font-size:12px;color:var(--muted);max-width:70ch}
 
 
+/* top navigation: thin translucent bar, full bleed */
+.topnav{position:sticky;top:env(safe-area-inset-top,0px);z-index:8;display:flex;align-items:center;gap:6px;height:48px;background:var(--nav);backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);box-shadow:0 0 0 100vmax var(--nav);clip-path:inset(0 -100vmax);border-bottom:1px solid var(--line);margin-bottom:0}
+.brand{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink);margin-right:14px}
+.brand .mark{width:22px;height:22px;color:var(--accent)}
+.wordmark{font-family:var(--f-display);font-weight:800;font-size:15px;letter-spacing:.14em}
+.navlinks{display:flex;gap:2px}
+.navlinks a{padding:6px 12px;border-radius:999px;text-decoration:none;color:var(--muted);font-size:13.5px;font-weight:500;white-space:nowrap}
+.navlinks a:hover{color:var(--ink)}
+.navlinks a[aria-current="page"]{color:var(--ink);background:var(--sunk)}
+.navlinks .short{display:none}
+.nav-search{margin-left:auto;color:var(--muted);display:grid;place-items:center;width:34px;height:34px;border-radius:50%}
+.nav-search:hover{color:var(--ink);background:var(--sunk)}
+.topnav .storage{max-width:220px}
+.topnav .storage span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.promo{text-align:center;font-size:13px;padding-block:12px;color:var(--ink);background:var(--surface);box-shadow:0 0 0 100vmax var(--surface);clip-path:inset(0 -100vmax)}
+.promo a{color:var(--rift);text-decoration:none;font-weight:500;margin-left:6px}
+.promo a:hover{text-decoration:underline}
+
+/* page titles shared by every view */
+.page-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:18px 32px;padding-block:44px 22px}
+.page-title{margin:0;font-family:var(--f-display);font-size:clamp(40px,6.4vw,72px);font-weight:700;letter-spacing:-.035em;line-height:1}
+
+/* home */
+.hero{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:28px 40px;padding-block:clamp(40px,7vw,84px) clamp(28px,5vw,56px)}
+.hero-title{margin:0;display:flex;align-items:center;gap:.16em;font-family:var(--f-display);font-weight:800;font-size:clamp(56px,11vw,132px);letter-spacing:-.045em;line-height:.9}
+.hero-mark{width:.78em;height:.78em;color:var(--accent);flex:none}
+.hero-side{display:grid;justify-items:end;gap:10px;text-align:right;max-width:100%}
+.hero-tag{margin:0 0 10px;font-size:clamp(20px,2.6vw,28px);font-weight:700;letter-spacing:-.025em;line-height:1.3;text-wrap:balance}
+.hero-link{color:var(--rift);text-decoration:none;font-size:15px}
+.hero-link:hover{text-decoration:underline}
+.cat-row{display:flex;gap:clamp(10px,2vw,28px);overflow-x:auto;padding-block:8px 34px;scrollbar-width:none}
+.cat-row::-webkit-scrollbar{display:none}
+.cat{all:unset;box-sizing:border-box;cursor:pointer;display:grid;justify-items:center;gap:12px;min-width:104px;flex:1 0 auto;text-align:center;font-size:14px;font-weight:500}
+.cat:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:8px}
+.cat-art{position:relative;width:96px;height:96px}
+.cat-art .c{position:absolute;top:4px;width:62px;aspect-ratio:420/588;border-radius:5px;overflow:hidden;background:var(--sunk);box-shadow:0 6px 14px rgb(0 0 0 / .18)}
+.cat-art .c .ti,.cat-art .c img{display:block;width:100%;height:100%;object-fit:contain;background-repeat:no-repeat}
+.cat-art .c:nth-child(1){left:2px;transform:rotate(-9deg);z-index:1}
+.cat-art .c:nth-child(2){left:17px;z-index:3;top:0}
+.cat-art .c:nth-child(3){left:32px;transform:rotate(9deg);z-index:2}
+@media (prefers-reduced-motion:no-preference){.cat-art .c{transition:transform .25s ease}.cat:hover .c:nth-child(1){transform:rotate(-14deg) translateX(-4px)}.cat:hover .c:nth-child(3){transform:rotate(14deg) translateX(4px)}}
+.cat small{display:block;color:var(--muted);font-size:12px;font-weight:400;font-variant-numeric:tabular-nums}
+.shelf-title{margin:12px 0 18px;font-size:clamp(22px,2.6vw,28px);font-weight:700;letter-spacing:-.025em;color:var(--muted)}
+.shelf-title b{color:var(--ink)}
+.hero-tag,.shelf-title,.hcard h3,.hcard p,.page-title{word-break:keep-all;overflow-wrap:anywhere}
+.shelf-wrap{position:relative}
+.shelf{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;padding-block:4px 30px;scrollbar-width:none;overscroll-behavior-x:contain}
+.shelf::-webkit-scrollbar{display:none}
+.shelf-nav{position:absolute;top:calc(50% - 36px);width:44px;height:44px;border-radius:50%;border:0;background:var(--surface);color:var(--ink);font-size:24px;line-height:1;box-shadow:0 2px 10px rgb(0 0 0 / .15);opacity:.92}
+.shelf-nav.prev{left:-12px}.shelf-nav.next{right:-12px}
+.shelf-nav:hover{opacity:1}
+.shelf-nav[disabled]{opacity:0;pointer-events:none}
+.hcard{all:unset;box-sizing:border-box;cursor:pointer;scroll-snap-align:start;flex:0 0 min(380px,82vw);height:460px;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:6px;position:relative;overflow:hidden;background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgb(0 0 0 / .06)}
+.hcard:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+@media (prefers-reduced-motion:no-preference){.hcard{transition:transform .25s ease,box-shadow .25s ease}.hcard:hover{transform:scale(1.012);box-shadow:0 10px 30px rgb(0 0 0 / .12)}}
+.hcard.dark{background:#0B0F14;color:#F2F4F5;box-shadow:0 0 0 1px var(--line)}
+.hcard .k{font-size:12px;font-weight:600;color:var(--accent);letter-spacing:.01em}
+.hcard.dark .k{color:#E0A84A}
+.hcard h3{margin:2px 0 0;font-size:28px;font-weight:700;letter-spacing:-.03em;line-height:1.15;text-wrap:balance}
+.hcard p{margin:0;font-size:14.5px;font-weight:500;line-height:1.45}
+.hcard .sub{color:var(--muted);font-weight:400}
+.hcard.dark .sub{color:#9AA7B1}
+.hcard .art{position:absolute;left:50%;bottom:-70px;transform:translateX(-50%);width:228px;aspect-ratio:420/588;border-radius:14px;overflow:hidden;box-shadow:0 20px 50px rgb(0 0 0 / .45)}
+.hcard .art .ti,.hcard .art img{display:block;width:100%;height:100%;object-fit:cover;background-repeat:no-repeat}
+.hcard .own{margin-top:6px;display:flex;align-items:center;gap:10px;font-size:13px}
+.hcard .own .ownbar{flex:0 0 120px}
+.hcard.dark .ownbar{background:#27313A}
+.hcard .big{font-family:var(--f-display);font-size:64px;font-weight:700;letter-spacing:-.04em;line-height:1;margin-top:auto;font-variant-numeric:tabular-nums}
+.hcard .big small{font-size:22px;letter-spacing:0;margin-left:4px;color:var(--muted)}
+.hcard .bars{display:grid;gap:9px;margin-top:auto}
+.hcard .bars div{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 10px;font-size:13px}
+.hcard .bars .ownbar{grid-column:1 / -1}
+.hcard .chips{margin:10px 0 0}
+.hcard.dark .chip{background:#1A2129;border-color:#2B3640;color:#E6ECEF}
+.shelf.small .hcard{height:200px;flex-basis:min(300px,78vw)}
+.shelf.small .hcard h3{font-size:22px}
+.hcard .go{margin-top:auto;color:var(--rift);font-size:14px;font-weight:500}
+.hcard.dark .go{color:#7FD0D8}
+
 /* view tabs */
 .tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:16px;overflow-x:auto}
 .tabs a{padding:10px 16px;text-decoration:none;color:var(--muted);font-weight:600;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
@@ -233,7 +311,7 @@ h2.vh{margin:0;font-size:18px}
 .ed-switch button:first-child{border-radius:8px 0 0 8px}.ed-switch button:last-child{border-radius:0 8px 8px 0;border-left:0}
 .ed-switch button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .ed-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:16px;align-items:start}
-.browser,.ws{position:sticky;top:calc(env(safe-area-inset-top,0px) + 8px);max-height:calc(100vh - 24px);overflow-y:auto}
+.browser,.ws{position:sticky;top:calc(env(safe-area-inset-top,0px) + 58px);max-height:calc(100vh - 72px);overflow-y:auto}
 .sectabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
 .sectabs button{border:1px solid var(--line);background:var(--bg);border-radius:7px;padding:6px 12px;font-weight:600;font-size:13px}
 .sectabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -334,12 +412,21 @@ table.st tr+tr th,table.st tr+tr td{border-top:1px solid var(--line)}
 .copybox p{margin:0;font-size:13px}
 
 @media (max-width:860px){
+  .topnav .storage span{display:none}
+  .hero-side{justify-items:start;text-align:left}
+  .shelf-nav{display:none}
   .ed-switch{display:flex}
   .ed-grid{grid-template-columns:minmax(0,1fr)}
   .browser,.ws{position:static;max-height:none;overflow:visible}
   .ed-grid[data-pane="browse"] .ws,.ed-grid[data-pane="deck"] .browser{display:none}
 }
 @media (max-width:560px){
+  .navlinks .long{display:none}
+  .navlinks .short{display:inline}
+  .navlinks a{padding:6px 9px}
+  .brand{margin-right:4px}
+  .nav-search{display:none}
+  .topnav .storage{margin-left:auto}
   .pk-row{grid-template-columns:32px minmax(0,1fr)}
   .pk-row .th{grid-row:1 / span 2}
   .pk-btns{grid-column:2;justify-content:flex-start}
@@ -355,28 +442,60 @@ table.st tr+tr th,table.st tr+tr td{border-top:1px solid var(--line)}
 </style>
 
 <div class="wrap">
-  <header class="mast">
-    <div>
-      <div class="eyebrow">Riftbound · Collection &amp; Decks</div>
-      <h1>RIFTLIFE</h1>
-      <div class="storage" id="storage" data-mode="loading"><i></i><span id="storage-text">보관함 불러오는 중…</span></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <mask id="rift-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="32" height="32">
+      <rect width="32" height="32" fill="#fff"/>
+      <path d="M18.6 4.5 12.4 15.2h6.1L13.2 27.5" fill="none" stroke="#000" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </mask>
+    <symbol id="rl-mark" viewBox="0 0 32 32"><path d="M14.3 2.4a2.4 2.4 0 0 1 3.4 0l11.9 11.9a2.4 2.4 0 0 1 0 3.4L17.7 29.6a2.4 2.4 0 0 1-3.4 0L2.4 17.7a2.4 2.4 0 0 1 0-3.4Z" fill="currentColor" mask="url(#rift-cut)"/></symbol>
+  </defs>
+</svg>
+<nav class="topnav" aria-label="주 메뉴">
+  <a class="brand" href="#home" aria-label="RIFTLIFE 홈"><svg class="mark" aria-hidden="true"><use href="#rl-mark"/></svg><span class="wordmark">RIFTLIFE</span></a>
+  <div class="navlinks">
+    <a id="tab-home" href="#home">홈</a>
+    <a id="tab-collection" href="#collection">컬렉션</a>
+    <a id="tab-decks" href="#decks"><span class="long">덱 빌더</span><span class="short">덱</span></a>
+    <a id="tab-meta" href="#meta"><span class="long">메타 덱</span><span class="short">메타</span></a>
+  </div>
+  <a class="nav-search" href="#collection" id="nav-search" aria-label="카드 검색"><svg viewBox="0 0 20 20" width="17" height="17" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m13 13 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></a>
+  <div class="storage" id="storage" data-mode="loading" title="저장 위치"><i></i><span id="storage-text">보관함 불러오는 중…</span></div>
+</nav>
+<div class="promo" id="promo"></div>
+<div id="banner"></div>
+
+<section id="v-home" hidden>
+  <div class="hero">
+    <h1 class="hero-title"><svg class="hero-mark" aria-hidden="true"><use href="#rl-mark"/></svg>RIFTLIFE</h1>
+    <div class="hero-side">
+      <p class="hero-tag">내 카드, 내 덱, 지금의 메타.<br>리프트바운드를 가장 가볍게 정리하는 곳.</p>
+      <a class="hero-link" href="#collection">내 컬렉션 열기 ↗</a>
+      <a class="hero-link" href="#decks" id="hero-new-deck">새 덱 만들기 ↗</a>
     </div>
+  </div>
+  <div class="cat-row" id="home-sets" aria-label="세트별 바로가기"></div>
+
+  <h2 class="shelf-title"><b>최신 메타.</b> 지금 가장 강한 덱.</h2>
+  <div class="shelf-wrap"><div class="shelf" id="home-meta"></div><button class="shelf-nav prev" type="button" data-shelf="home-meta" data-dir="-1" aria-label="이전">‹</button><button class="shelf-nav next" type="button" data-shelf="home-meta" data-dir="1" aria-label="다음">›</button></div>
+
+  <h2 class="shelf-title"><b>내 컬렉션.</b> 한눈에 보는 수집 현황.</h2>
+  <div class="shelf-wrap"><div class="shelf" id="home-coll"></div><button class="shelf-nav prev" type="button" data-shelf="home-coll" data-dir="-1" aria-label="이전">‹</button><button class="shelf-nav next" type="button" data-shelf="home-coll" data-dir="1" aria-label="다음">›</button></div>
+
+  <h2 class="shelf-title"><b>도구.</b> 더 빠르게 만들고 정리하기.</h2>
+  <div class="shelf small" id="home-tools"></div>
+</section>
+
+
+  <section id="v-collection">
+  <div class="page-head"><h1 class="page-title">컬렉션</h1>
     <div class="totals">
       <div class="total"><b id="t-kinds">0</b><span>보유 종류 / <span id="t-all">0</span></span></div>
       <div class="total"><b id="t-copies">0</b><span>총 보유 장수</span></div>
       <div class="total"><b id="t-pct">0%</b><span>수집률</span></div>
       <div class="total" title="쇼케이스·오버넘버·대체 일러스트 판본을 뺀 기본 카드 기준"><b id="t-pct-base">0%</b><span>기본 카드 수집률 <span id="t-base"></span></span></div>
     </div>
-  </header>
-
-  <nav class="tabs" aria-label="화면">
-    <a id="tab-collection" href="#collection">컬렉션</a>
-    <a id="tab-decks" href="#decks">덱 빌더</a>
-    <a id="tab-meta" href="#meta">메타 덱</a>
-  </nav>
-  <div id="banner"></div>
-
-  <section id="v-collection">
+  </div>
   <section class="sets" id="sets" aria-label="세트별 수집 현황"></section>
 
   <div class="rail">
@@ -433,6 +552,7 @@ table.st tr+tr th,table.st tr+tr td{border-top:1px solid var(--line)}
 
   <section id="v-decks" hidden>
     <div id="deck-home">
+      <div class="page-head"><h1 class="page-title">덱 빌더</h1></div>
       <div class="dk-head">
         <h2 class="vh">내 덱</h2>
         <button class="ghost" id="dk-paste-btn" type="button">덱리스트 붙여넣기</button>
@@ -449,7 +569,7 @@ table.st tr+tr th,table.st tr+tr td{border-top:1px solid var(--line)}
   </section>
 
   <section id="v-meta" hidden>
-    <div class="dk-head"><h2 class="vh">메타 덱</h2></div>
+    <div class="page-head"><h1 class="page-title">메타 덱</h1></div>
     <div class="filters" id="meta-ctl">
       <select id="m-meta" aria-label="메타 (확장팩 환경)"></select>
       <select id="m-rank" aria-label="순위">
@@ -577,8 +697,8 @@ const inv = {
 };
 
 function setStorage(mode, text) {
-  const el = document.getElementById('storage'); el.dataset.mode = mode;
-  document.getElementById('storage-text').textContent = text;
+  const el = document.getElementById('storage'); el.dataset.mode = mode; el.title = text;
+  document.getElementById('storage-text').textContent = text.split(' · ')[0];
 }
 
 async function initStore() {
@@ -816,16 +936,17 @@ const decks = {
 };
 
 /* ---------- views ---------- */
-const VIEWS = ['collection', 'decks', 'meta'];
+const VIEWS = ['home', 'collection', 'decks', 'meta'];
 let view = 'collection';
 function route() {
   const h = location.hash.slice(1);
-  view = VIEWS.includes(h) ? h : 'collection';
+  view = VIEWS.includes(h) ? h : 'home';
   for (const v of VIEWS) { $('v-' + v).hidden = v !== view; $('tab-' + v).setAttribute('aria-current', v === view ? 'page' : 'false'); }
   renderActive();
 }
 function renderActive() {
   if (view === 'collection') { render(); return; }
+  if (view === 'home') { renderSummary(); renderHome(); return; }
   renderSummary();
   if (view === 'decks') { if (edId && decks.data[edId]) renderEditor(); else { if (edId) closeEditor(); renderDeckHome(); } }
   else renderMeta();
@@ -1607,6 +1728,87 @@ function confirmBox(msg, goLabel, danger, fn) {
 
 let toastT;
 function toast(msg) { const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 3200); }
+
+/* ---------- home ---------- */
+const SET_REP = new Map();   // set -> three representative cards for the category row
+for (const s of SETS) {
+  const pool = CARDS.filter(c => c.set === s.id && !c._alt);
+  const pick = [...pool.filter(c => has(c, 'legend')), ...pool.filter(c => has(c, 'champion') && c.r === 'epic'), ...pool.filter(c => c.r === 'epic'), ...pool];
+  SET_REP.set(s.id, [...new Set(pick)].slice(0, 3));
+}
+function renderHome() {
+  const om = ownedMap();
+  // promo strip: the newest meta's latest event
+  const m = MD.metas[MD.metas.length - 1], evs = MD.events.filter(e => e.meta === m.id), last = evs[evs.length - 1];
+  $('promo').innerHTML = `${esc(m.ko)} 메타 공식 대회 덱 ${MD.decks.filter(o => MD.events[o.e].meta === m.id).length}개 반영 · 최근 대회: ${esc(last.ko)} RQ (${last.date}).<a href="#meta">메타 덱 보기 ›</a>`;
+  const per = Object.fromEntries(SETS.map(s => [s.id, { n: 0, own: 0 }]));
+  let kinds = 0, base = 0, baseOwn = 0, copies = 0;
+  for (const c of CARDS) { const q = inv.q(c.id), p = per[c.set]; if (c._alt) continue; p.n++; base++; if (q) { p.own++; baseOwn++; } }
+  for (const c of CARDS) { const q = inv.q(c.id); if (q) { kinds++; copies += q; } }
+  $('home-sets').innerHTML = `<button class="cat" type="button" data-set="">${catArt([CARDS.find(c => has(c, 'legend') && c.set === 'SFD'), CARDS.find(c => has(c, 'legend') && c.set === 'UNL'), CARDS.find(c => has(c, 'legend') && c.set === 'VEN')].filter(Boolean))}<span>전체 카드<small>${base.toLocaleString()}종</small></span></button>` +
+    SETS.map(s => `<button class="cat" type="button" data-set="${s.id}">${catArt(SET_REP.get(s.id))}<span>${esc(s.ko)}<small>${per[s.id].own}/${per[s.id].n}</small></span></button>`).join('');
+  // meta shelf: summary card + newest meta top 4
+  const top = MD.decks.map((o, i) => ({ o, i })).filter(({ o }) => MD.events[o.e].meta === m.id && o.r != null && o.r <= 4)
+    .sort((a, b) => MD.events[b.o.e].date.localeCompare(MD.events[a.o.e].date) || a.o.r - b.o.r);
+  const tags = new Map();
+  for (const { o } of MD.decks.map(o => ({ o })).filter(({ o }) => MD.events[o.e].meta === m.id && o.r != null && o.r <= 8)) { const t = champTag(CARDS[o.L]); tags.set(t, (tags.get(t) || 0) + 1); }
+  const best = top.map(x => ({ ...x, own: deckOwn(metaDeck(x.o), om) })).sort((a, b) => b.own.pct - a.own.pct)[0];
+  $('home-meta').innerHTML = `<button class="hcard dark" type="button" data-go="meta">
+      <span class="k">${esc(m.ko)} 메타 · 대회 ${evs.length}개</span>
+      <h3>Top 8에 가장 많이 오른 챔피언</h3>
+      <div class="chips">${[...tags].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([t, n]) => `<span class="chip">${esc(champKo(t))}<b>${n}</b></span>`).join('')}</div>
+      ${best ? `<p class="sub" style="margin-top:14px">내 컬렉션으로 가장 가까운 Top 4 덱</p><p>${esc(legendLabel(CARDS[best.o.L]))} · 보유 ${best.own.pct}%</p>` : ''}
+      <span class="go">메타 덱 전체 보기 ›</span>
+    </button>` + top.map(({ o, i }) => {
+    const lg = CARDS[o.L], ev = MD.events[o.e], own = deckOwn(metaDeck(o), om);
+    return `<button class="hcard dark" type="button" data-mi="${i}">
+      <span class="k">${esc(ev.ko)} RQ · ${o.r}위 · ${ev.date}</span>
+      <h3>${esc(legendLabel(lg))}</h3>
+      <p class="sub">${o.C != null ? esc(dName(CARDS[o.C])) + ' · ' : ''}${esc(o.p)}</p>
+      <span class="own"><span class="ownbar" aria-hidden="true"><i style="width:${own.pct}%"></i></span>내 보유 ${own.pct}%</span>
+      <span class="art" aria-hidden="true">${tileArt(lg)}</span>
+    </button>`;
+  }).join('');
+  // collection shelf
+  const setBars = SETS.map(s => `<div><span>${esc(s.ko)}</span><span class="hint">${per[s.id].own}/${per[s.id].n}</span><span class="ownbar"><i style="width:${(per[s.id].own / per[s.id].n * 100).toFixed(1)}%"></i></span></div>`).join('');
+  $('home-coll').innerHTML = `
+    <button class="hcard" type="button" data-go="collection"><span class="k">쇼케이스·오버넘버 제외 ${base.toLocaleString()}종 기준</span><h3>기본 카드 수집률</h3><span class="big">${(baseOwn / base * 100).toFixed(1)}<small>%</small></span><p class="sub">${baseOwn.toLocaleString()}종 보유 · 전체 판본 기준 ${kinds.toLocaleString()}종, ${copies.toLocaleString()}장</p></button>
+    <button class="hcard" type="button" data-go="collection"><span class="k">세트별 진행</span><h3>어느 세트가 비었을까</h3><div class="bars">${setBars}</div></button>
+    <button class="hcard" type="button" data-go="decks"><span class="k">내 덱 ${Object.keys(decks.data).length}개</span><h3>${Object.keys(decks.data).length ? '만들어 둔 덱 이어서 편집하기' : '첫 덱을 만들어 보세요'}</h3><p class="sub">전설을 고르면 영역에 맞는 카드만 추려 주고, 내 보유 수량과 비교해 부족한 카드를 알려 줍니다.</p><span class="go">덱 빌더 열기 ›</span></button>`;
+  $('home-tools').innerHTML = `
+    <button class="hcard" type="button" data-go="new-deck"><span class="k">덱 빌더</span><h3>새 덱 만들기</h3><span class="go">시작하기 ›</span></button>
+    <button class="hcard" type="button" data-go="paste"><span class="k">가져오기</span><h3>덱리스트 붙여넣기</h3><span class="go">텍스트로 덱 만들기 ›</span></button>
+    <button class="hcard" type="button" data-go="backup"><span class="k">백업</span><h3>JSON으로 내 데이터 저장</h3><span class="go">백업 파일 받기 ›</span></button>
+    <button class="hcard" type="button" data-go="search"><span class="k">검색</span><h3>한글·영문·초성으로 카드 찾기</h3><span class="go">컬렉션에서 검색 ›</span></button>`;
+  wireLazy($('v-home'));
+  updateShelfNav();
+}
+function catArt(cs) { return `<span class="cat-art" aria-hidden="true">${cs.map(c => `<span class="c">${tileArt(c)}</span>`).join('')}</span>`; }
+function updateShelfNav() {
+  for (const b of document.querySelectorAll('.shelf-nav')) {
+    const s = $(b.dataset.shelf), d = +b.dataset.dir;
+    b.disabled = d < 0 ? s.scrollLeft <= 4 : s.scrollLeft + s.clientWidth >= s.scrollWidth - 4;
+  }
+}
+for (const id of ['home-meta', 'home-coll']) $(id).addEventListener('scroll', () => requestAnimationFrame(updateShelfNav), { passive: true });
+addEventListener('resize', () => { if (view === 'home') updateShelfNav(); });
+$('v-home').onclick = ev => {
+  const nav = ev.target.closest('.shelf-nav');
+  if (nav) { const s = $(nav.dataset.shelf); s.scrollBy({ left: +nav.dataset.dir * s.clientWidth * 0.85, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); return; }
+  const cat = ev.target.closest('.cat');
+  if (cat) { ui.set = cat.dataset.set; ui.limit = 150; saveUi(); fillSelects(); location.hash = 'collection'; return; }
+  const mi = ev.target.closest('[data-mi]');
+  if (mi) { openMetaSheet(+mi.dataset.mi); return; }
+  const go = ev.target.closest('[data-go]'); if (!go) return;
+  const g = go.dataset.go;
+  if (g === 'new-deck') { openEditor(decks.create(newDeck())); return; }
+  if (g === 'paste') { location.hash = 'decks'; closeEditor(); renderDeckHome(); $('dk-paste').hidden = false; $('dk-paste-text').focus(); return; }
+  if (g === 'backup') { $('ex-json').click(); return; }
+  if (g === 'search') { location.hash = 'collection'; setTimeout(() => $('q').focus(), 50); return; }
+  location.hash = g;
+};
+$('hero-new-deck').onclick = ev => { ev.preventDefault(); openEditor(decks.create(newDeck())); };
+$('nav-search').onclick = () => setTimeout(() => $('q').focus(), 50);
 
 /* ---------- events ---------- */
 let qT;
