@@ -598,8 +598,8 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
     <a id="tab-home" href="#home">홈</a>
     <a id="tab-collection" href="#collection">컬렉션</a>
     <a id="tab-decks" href="#decks"><span class="long">덱 빌더</span><span class="short">덱</span></a>
-    <a id="tab-meta" href="#meta"><span class="long">메타 덱</span><span class="short">메타</span></a>
     <a id="tab-kr" href="#kr"><span class="long">한국 환경 샘플 덱</span><span class="short">샘플</span></a>
+    <a id="tab-meta" href="#meta"><span class="long">메타 덱</span><span class="short">메타</span></a>
   </div>
   <a class="nav-search" href="#collection" id="nav-search" aria-label="카드 검색"><svg viewBox="0 0 20 20" width="17" height="17" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m13 13 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></a>
   <div class="storage" id="storage" data-mode="loading" title="저장 위치"><i></i><span id="storage-text">보관함 불러오는 중…</span></div>
@@ -2479,19 +2479,19 @@ function renderHome() {
       <span class="go">덱 만들기 ›</span>
       ${fanArt(fill(deckCards, metaLegends.slice(3)))}
     </button>
-    <button class="hcard feat dark" type="button" data-go="meta">
-      <span class="k">메타 덱 · ${esc(m.ko)} 메타 ${metaN}개</span>
-      <h3>메타 덱</h3>
-      <p class="sub">공식 지역 예선 상위 덱을 메타별로 모았습니다. 내 보유율이 높은 덱부터 볼 수 있습니다.</p>
-      <span class="go">메타 덱 보기 ›</span>
-      ${fanArt(fill(metaLegends, []))}
-    </button>
     <button class="hcard feat" type="button" data-go="kr">
       <span class="k">한국 환경 · 샘플 덱 ${KD.decks.length}개</span>
       <h3>한국 환경 샘플 덱</h3>
       <p class="sub">한국어판 스탠다드 포맷으로 짠 덱을 모았습니다. 챔피언별 1위 덱과 사이드보드까지 확인하고 내 덱으로 가져옵니다.</p>
       <span class="go">샘플 덱 보기 ›</span>
       ${fanArt(fill(KD.decks.filter(o => o.top).map(o => BYID.get(o.L)), []))}
+    </button>
+    <button class="hcard feat dark" type="button" data-go="meta">
+      <span class="k">메타 덱 · ${esc(m.ko)} 메타 ${metaN}개</span>
+      <h3>메타 덱</h3>
+      <p class="sub">공식 지역 예선 상위 덱을 메타별로 모았습니다. 내 보유율이 높은 덱부터 볼 수 있습니다.</p>
+      <span class="go">메타 덱 보기 ›</span>
+      ${fanArt(fill(metaLegends, []))}
     </button>`;
   // collection shelf
   const setBars = SETS.map(s => `<div><span>${esc(s.ko)}</span><span class="hint">${per[s.id].own}/${per[s.id].n}</span><span class="ownbar"><i style="width:${(per[s.id].own / per[s.id].n * 100).toFixed(1)}%"></i></span></div>`).join('');
