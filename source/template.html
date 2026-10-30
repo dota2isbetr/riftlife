@@ -1,0 +1,1369 @@
+<title>리프트바운드 컬렉션 장부</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a collector's ledger. Sticky search rail, set progress tiles, then a dense card register with a quantity stepper on every line. */
+:root{
+  --bg:#EDF1F2; --surface:#FFFFFF; --sunk:#E3E9EB; --ink:#15202A; --muted:#5A6A75; --line:#D3DCE0;
+  --accent:#94661C; --accent-soft:#F3E7D0; --rift:#1D6C75; --rift-soft:#D7ECEE; --danger:#B23A30;
+  --d-fury:#D2483C; --d-calm:#3E9F62; --d-mind:#3B7DD8; --d-body:#E08A2E; --d-chaos:#8A55C9; --d-order:#C29A1A; --d-colorless:#8C969E;
+  --r-common:#8C969E; --r-uncommon:#2FA3A8; --r-rare:#3B7DD8; --r-epic:#8A55C9; --r-showcase:#C29A1A;
+  --f-display:"Cinzel","Times New Roman",serif;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --radius:10px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0D141B; --surface:#151F28; --sunk:#101920; --ink:#E4EBEE; --muted:#8E9FAB; --line:#25323D;
+  --accent:#D8A84F; --accent-soft:#3A2F1C; --rift:#56B8C1; --rift-soft:#17343A; --danger:#E26A5E; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D141B; --surface:#151F28; --sunk:#101920; --ink:#E4EBEE; --muted:#8E9FAB; --line:#25323D;
+  --accent:#D8A84F; --accent-soft:#3A2F1C; --rift:#56B8C1; --rift-soft:#17343A; --danger:#E26A5E; color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--f-body);font-size:14px;line-height:1.5;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto}
+
+/* masthead */
+.mast{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;padding-block:28px 18px}
+.eyebrow{font-family:var(--f-display);font-weight:700;letter-spacing:.22em;font-size:12px;color:var(--accent);text-transform:uppercase}
+h1{margin:2px 0 0;font-size:clamp(22px,4vw,30px);font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+.totals{display:flex;gap:22px;flex-wrap:wrap}
+.total b{display:block;font-family:var(--f-mono);font-size:22px;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.2}
+.total span{font-size:12px;color:var(--muted)}
+.storage{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.storage i{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block}
+.storage[data-mode="db"] i{background:var(--d-calm)}
+.storage[data-mode="local"] i{background:var(--d-order)}
+
+/* set tiles */
+.sets{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin-bottom:16px}
+.set{all:unset;box-sizing:border-box;cursor:pointer;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px;display:grid;gap:4px;min-width:0}
+.set[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.set .nm{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.set .nm b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.set .nm code{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.set .ct{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{height:4px;background:var(--sunk);border-radius:2px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--rift);width:0}
+
+/* controls */
+.rail{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px;border-bottom:1px solid var(--line);display:grid;gap:8px}
+.search{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.search input{flex:1 1 240px;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:11px 14px;font-size:15px}
+.search input::placeholder{color:var(--muted)}
+.chk{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);white-space:nowrap}
+.filters{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.filters select{flex:1 1 120px;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-size:13px;max-width:100%}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:6px 10px;font-size:13px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.spacer{flex:1}
+.ghost{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:13px}
+.ghost:hover{border-color:var(--muted)}
+.ghost[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.result{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* register */
+.list{list-style:none;margin:0;padding:0}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding:8px 0}
+.row-main{all:unset;cursor:pointer;display:grid;grid-template-columns:40px 118px minmax(0,1fr) 260px;gap:12px;align-items:center;min-width:0;padding:2px 4px;border-radius:6px}
+.row-main:hover{background:var(--surface)}
+.row-main:focus-visible{outline:2px solid var(--accent)}
+.th{width:40px;height:56px;border-radius:3px;background:var(--sunk) no-repeat center/cover}
+.code{font-family:var(--f-mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.names{min-width:0}
+.names .pri{font-weight:600;font-size:15px}
+.names .sub{color:var(--muted);font-weight:400}
+.names .alt{display:block;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge{display:inline-block;font-size:10px;font-weight:600;letter-spacing:.04em;padding:1px 5px;border-radius:4px;vertical-align:2px;margin-left:4px;border:1px solid var(--line);color:var(--muted)}
+.badge.mine{border-color:var(--rift);color:var(--rift)}
+.meta{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);min-width:0;flex-wrap:wrap}
+.dom{display:inline-flex;gap:3px}
+.dom i{width:10px;height:10px;border-radius:50%;background:var(--c);display:inline-block}
+.gem{display:inline-flex;align-items:center;gap:4px}
+.gem::before{content:"";width:8px;height:8px;transform:rotate(45deg);background:var(--c);display:inline-block}
+.cost{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.step{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;background:var(--surface);overflow:hidden}
+.step button{border:0;background:none;width:34px;height:34px;font-size:18px;line-height:1;color:var(--muted)}
+.step button:hover{background:var(--sunk);color:var(--ink)}
+.step output{min-width:30px;text-align:center;font-family:var(--f-mono);font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--muted)}
+.has > .step{border-color:var(--rift)}
+.has > .step output{color:var(--rift)}
+.full > .step{background:var(--rift-soft)}
+
+/* album view: binder pages of card art, uncollected cards greyed out */
+.list.album{display:grid;grid-template-columns:repeat(auto-fill,minmax(156px,1fr));gap:18px 14px;padding-top:16px}
+.list.album .empty{grid-column:1 / -1}
+.tile{display:grid;gap:6px;min-width:0;align-content:start}
+.tile-img{all:unset;box-sizing:border-box;cursor:pointer;display:block;position:relative;aspect-ratio:420/588;max-width:100%;border-radius:9px;overflow:hidden;background:var(--sunk)}
+.tile-img:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tile-img .ti,.tile-img img{display:block;width:100%;height:100%;object-fit:contain;background-repeat:no-repeat}
+.tile:not(.has) .ti,.tile:not(.has) .tile-img img{filter:grayscale(1);opacity:.42}
+@media (prefers-reduced-motion:no-preference){.tile-img .ti,.tile-img img{transition:filter .2s,opacity .2s}.tile-img:hover .ti,.tile-img:hover img{opacity:1;filter:none}}
+.qb{position:absolute;top:6px;right:6px;background:var(--rift);color:var(--surface);font-family:var(--f-mono);font-size:12px;font-weight:500;padding:1px 8px;border-radius:999px;font-variant-numeric:tabular-nums}
+.tile-foot{display:grid;min-width:0;line-height:1.35}
+.tname{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile-foot .code{font-size:11px}
+.tile > .step{display:flex;justify-content:space-between}
+.more{display:flex;justify-content:center;padding:18px 0}
+.more button{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:9px 18px}
+.empty{padding:40px 8px;text-align:center;color:var(--muted)}
+
+/* detail sheet */
+.scrim{position:fixed;inset:0;background:rgb(8 12 16 / .45);z-index:20}
+.sheet{position:fixed;z-index:21;top:0;right:0;bottom:0;width:min(520px,100%);background:var(--surface);border-left:1px solid var(--line);overflow-y:auto;
+  padding:calc(20px + env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) calc(28px + env(safe-area-inset-bottom,0px)) 20px;display:grid;gap:16px;align-content:start}
+.sheet header{display:flex;justify-content:space-between;gap:12px;align-items:start}
+.sheet h2{margin:0;font-size:22px;line-height:1.3;text-wrap:balance}
+.sheet h2 small{display:block;font-size:14px;font-weight:400;color:var(--muted)}
+.x{border:1px solid var(--line);background:none;border-radius:8px;width:36px;height:36px;font-size:18px;flex:none}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:13px}
+.facts dt{color:var(--muted)}
+.facts dd{margin:0;min-width:0}
+.txt{background:var(--sunk);border-radius:8px;padding:12px 14px;white-space:pre-line;font-size:13.5px;line-height:1.65}
+.txt h3{margin:0 0 4px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.kw{font-weight:600;color:var(--accent)}
+.ic{display:inline-grid;place-items:center;min-width:17px;height:17px;padding:0 3px;border-radius:4px;background:var(--ink);color:var(--bg);font-family:var(--f-mono);font-size:11px;font-weight:500;text-decoration:none;vertical-align:1px}
+.ic.en{border-radius:50%;background:var(--accent);color:var(--surface)}
+.rune{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--c);vertical-align:-1px}
+.rune.rainbow{background:conic-gradient(var(--d-fury),var(--d-body),var(--d-order),var(--d-calm),var(--d-mind),var(--d-chaos),var(--d-fury))}
+.art{display:block;width:100%;max-width:100%;height:auto;border-radius:14px;background:var(--sunk);aspect-ratio:744/1039;object-fit:contain}
+.art.land{aspect-ratio:1039/744}
+.artwrap{display:grid;gap:6px}
+.artlink{display:inline-flex;gap:6px;align-items:center;color:var(--rift);font-weight:500}
+.field{display:grid;gap:4px}
+.field label{font-size:12px;color:var(--muted)}
+.field input{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 11px}
+.bigstep{display:flex;align-items:center;gap:14px}
+.bigstep .step button{width:46px;height:46px;font-size:22px}
+.bigstep .step output{min-width:46px;font-size:20px}
+.hint{font-size:12px;color:var(--muted)}
+
+/* tools / toasts */
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding-block:22px 0;border-top:1px solid var(--line);margin-top:20px}
+.tools h2{font-size:13px;font-weight:600;margin:0 8px 0 0;color:var(--muted)}
+.confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--accent-soft);border-radius:8px;padding:10px 12px;margin-top:10px;font-size:13px}
+.confirm .go{background:var(--ink);color:var(--bg);border:0;border-radius:6px;padding:6px 12px}
+.confirm .go.danger{background:var(--danger);color:#fff}
+.banner{background:var(--accent-soft);border-radius:var(--radius);padding:10px 14px;margin-bottom:12px;font-size:13px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:13px;z-index:30;max-width:calc(100% - 32px)}
+.foot{margin-top:28px;font-size:12px;color:var(--muted);max-width:70ch}
+
+
+/* view tabs */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:16px;overflow-x:auto}
+.tabs a{padding:10px 16px;text-decoration:none;color:var(--muted);font-weight:600;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tabs a:hover{color:var(--ink)}
+.tabs a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--accent)}
+.btn{background:var(--ink);color:var(--bg);border:0;border-radius:8px;padding:8px 14px;font-weight:600}
+.mini{border:1px solid var(--line);background:var(--bg);border-radius:6px;padding:4px 9px;font-size:12.5px;white-space:nowrap}
+.mini:hover{border-color:var(--muted)}
+.mini.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.th.sm{width:32px;height:44.8px}
+.pill{display:inline-block;font-size:11px;font-weight:600;padding:1px 7px;border-radius:999px;white-space:nowrap}
+.pill.ok{background:var(--rift-soft);color:var(--rift)}
+.pill.bad{background:var(--accent-soft);color:var(--danger)}
+.pill.warn{background:var(--accent-soft);color:var(--accent)}
+.ownbar{display:block;height:4px;background:var(--sunk);border-radius:2px;overflow:hidden}
+.cardbody{display:flex;flex-direction:column;gap:4px;min-width:0}
+.ownbar>i{display:block;height:100%;background:var(--rift)}
+textarea{width:100%;min-height:170px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px;font-family:var(--f-mono);font-size:12.5px;color:var(--ink)}
+h2.vh{margin:0;font-size:18px}
+
+/* deck builder */
+.dk-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.dk-head h2{margin-right:auto}
+.paste{display:grid;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px;margin-bottom:14px}
+.dk-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:10px}
+.dk-item{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:40px minmax(0,1fr);gap:12px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px;width:100%}
+.dk-item:hover{border-color:var(--muted)}
+.dk-item:focus-visible{outline:2px solid var(--accent)}
+.dk-item b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dk-item .pills{display:flex;gap:6px;flex-wrap:wrap}
+.ed-top{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.ed-top input{flex:1 1 220px;min-width:0;font-size:17px;font-weight:600;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 12px}
+.ed-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;min-width:0}
+.deckpane{position:sticky;top:calc(env(safe-area-inset-top,0px) + 8px);max-height:calc(100vh - 24px);overflow-y:auto}
+.panel h3{margin:0 0 8px;font-size:14px}
+.pk-ctl{margin-bottom:8px}
+.pk-ctl input[type="search"]{flex:1 1 180px;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.pk-list{list-style:none;margin:0;padding:0}
+.pk-row{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.pk-row .hint{display:block}
+.pk-btns{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.nm{all:unset;cursor:pointer;min-width:0;font-weight:500}
+.nm:hover{text-decoration:underline}
+.nm:focus-visible{outline:2px solid var(--accent)}
+.slot{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:10px;align-items:center;padding:4px 0}
+.slot select{max-width:100%;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px 6px}
+.stats{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;margin:10px 0;font-variant-numeric:tabular-nums}
+.stats b{font-family:var(--f-mono);font-weight:500}
+.checks{list-style:none;margin:8px 0 4px;padding:0;display:grid;gap:3px;font-size:13px}
+.checks li{padding-left:16px;position:relative}
+.checks li::before{content:"";position:absolute;left:2px;top:.55em;width:7px;height:7px;border-radius:50%;background:currentColor}
+.checks .e{color:var(--danger)} .checks .w{color:var(--accent)} .checks .ok{color:var(--rift)}
+.curve{display:flex;gap:4px;flex-wrap:wrap;font-size:12px;margin:4px 0 6px}
+.curve span{background:var(--sunk);border-radius:5px;padding:2px 7px;font-family:var(--f-mono)}
+.dl h4{margin:14px 0 4px;font-size:12px;letter-spacing:.05em;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.dl ul{list-style:none;margin:0;padding:0}
+.dl-line{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;padding:3px 0;font-size:13.5px}
+.dl-line .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dl-line .cnt{font-family:var(--f-mono);min-width:18px;text-align:right}
+.own-ok{color:var(--muted);font-size:12px;white-space:nowrap}
+.own-short{color:var(--danger);font-weight:600;font-size:12px;white-space:nowrap}
+.sstep{display:inline-flex;align-items:center;gap:2px}
+.sstep button{border:1px solid var(--line);background:var(--bg);width:24px;height:24px;border-radius:5px;line-height:1;padding:0;color:var(--muted)}
+.sstep button:hover{color:var(--ink);border-color:var(--muted)}
+.sstep b{min-width:20px;text-align:center;font-family:var(--f-mono);font-weight:500}
+.acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+
+/* meta decks */
+.meta-sum{display:grid;gap:4px;margin:4px 0 6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 14px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;font-size:12.5px}
+.chip{display:inline-flex;align-items:center;gap:7px}
+.chip b{font-family:var(--f-mono);font-weight:500}
+.chip.av-chip{padding:3px 12px 3px 3px;font-size:13px}
+.av{width:34px;height:34px;border-radius:50%;flex:none;background-color:var(--sunk);background-repeat:no-repeat;box-shadow:0 0 0 1px var(--line)}
+.chip[aria-pressed="true"] .av{box-shadow:0 0 0 2px var(--accent)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.meta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.mdeck{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px;display:grid;grid-template-columns:40px minmax(0,1fr);gap:12px;align-items:start;min-width:0}
+.mdeck .top{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.rankb{font-family:var(--f-mono);font-weight:600;color:var(--accent);font-size:13px}
+.mdeck b{font-size:15px}
+.mdeck .act{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.mdeck .badges{display:flex;gap:6px;flex-wrap:wrap}
+.copybox{position:fixed;z-index:40;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,calc(100% - 32px));background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:10px;box-shadow:0 20px 50px rgb(0 0 0 / .25)}
+.copybox p{margin:0;font-size:13px}
+
+@media (max-width:860px){
+  .ed-grid{grid-template-columns:minmax(0,1fr)}
+  .deckpane{position:static;max-height:none}
+  .pk-list{max-height:62vh;overflow-y:auto}
+}
+@media (max-width:560px){
+  .pk-row{grid-template-columns:32px minmax(0,1fr)}
+  .pk-row .th{grid-row:1 / span 2}
+  .pk-btns{grid-column:2;justify-content:flex-start}
+  .row-main{grid-template-columns:40px minmax(0,1fr);gap:2px 12px}
+  .row-main .th{grid-row:1 / span 3}
+  .row-main .names,.row-main .code,.row-main .meta{grid-column:2}
+  .row-main .code{order:2}
+  .row-main .meta{order:3}
+  .rail{position:static}
+  .filters .spacer{display:none}
+}
+@media (prefers-reduced-motion:no-preference){.bar>i{transition:width .3s ease}}
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <div class="eyebrow">Riftbound · Collection &amp; Decks</div>
+      <h1>리프트바운드 컬렉션 장부</h1>
+      <div class="storage" id="storage" data-mode="loading"><i></i><span id="storage-text">보관함 불러오는 중…</span></div>
+    </div>
+    <div class="totals">
+      <div class="total"><b id="t-kinds">0</b><span>보유 종류 / <span id="t-all">0</span></span></div>
+      <div class="total"><b id="t-copies">0</b><span>총 보유 장수</span></div>
+      <div class="total"><b id="t-pct">0%</b><span>수집률</span></div>
+      <div class="total" title="쇼케이스·오버넘버·대체 일러스트 판본을 뺀 기본 카드 기준"><b id="t-pct-base">0%</b><span>기본 카드 수집률 <span id="t-base"></span></span></div>
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="화면">
+    <a id="tab-collection" href="#collection">컬렉션</a>
+    <a id="tab-decks" href="#decks">덱 빌더</a>
+    <a id="tab-meta" href="#meta">메타 덱</a>
+  </nav>
+  <div id="banner"></div>
+
+  <section id="v-collection">
+  <section class="sets" id="sets" aria-label="세트별 수집 현황"></section>
+
+  <div class="rail">
+    <div class="search">
+      <input id="q" type="search" autocomplete="off" placeholder="한글·영문 카드명, 코드, 챔피언, 초성 검색 (예: 아리, Ahri, OGN-066, ㅋㅈㅅ)" aria-label="카드 검색">
+      <label class="chk"><input id="q-text" type="checkbox"> 효과 텍스트 포함</label>
+    </div>
+    <div class="filters">
+      <select id="f-set" aria-label="세트"></select>
+      <select id="f-domain" aria-label="영역"></select>
+      <select id="f-type" aria-label="유형"></select>
+      <select id="f-rarity" aria-label="희귀도"></select>
+      <select id="f-own" aria-label="보유 상태">
+        <option value="">보유 상태: 전체</option>
+        <option value="own">보유 중</option>
+        <option value="missing">미보유</option>
+        <option value="under3">3장 미만</option>
+        <option value="extra">4장 이상 (여분)</option>
+      </select>
+      <select id="f-sort" aria-label="정렬">
+        <option value="set">세트·번호순</option>
+        <option value="name">이름순</option>
+        <option value="qty">보유 많은 순</option>
+        <option value="cost">에너지 비용순</option>
+      </select>
+      <div class="seg" role="group" aria-label="보기 방식">
+        <button id="view-list" type="button" aria-pressed="true">목록</button>
+        <button id="view-album" type="button" aria-pressed="false">앨범</button>
+      </div>
+      <div class="seg" role="group" aria-label="표시 언어">
+        <button id="lang-ko" type="button" aria-pressed="true">한글</button>
+        <button id="lang-en" type="button" aria-pressed="false">EN</button>
+      </div>
+      <button class="ghost" id="hide-alt" type="button" aria-pressed="false" title="쇼케이스·오버넘버·대체 일러스트 판본을 숨기고 기본 일러스트 카드만 봅니다">쇼케이스·오버넘버 숨기기</button>
+      <button class="ghost" id="reset-f" type="button">필터 초기화</button>
+      <span class="spacer"></span>
+      <span class="result" id="result"></span>
+    </div>
+  </div>
+
+  <ul class="list" id="list"></ul>
+  <div class="more" id="more" hidden><button type="button" id="more-btn"></button></div>
+
+  <section class="tools" aria-label="데이터 관리">
+    <h2>내 데이터</h2>
+    <button class="ghost" id="ex-csv" type="button">CSV 내보내기</button>
+    <button class="ghost" id="ex-json" type="button">JSON 백업</button>
+    <button class="ghost" id="im-btn" type="button">가져오기 (CSV·JSON)</button>
+    <input id="im-file" type="file" accept=".json,.csv,application/json,text/csv" hidden>
+    <button class="ghost" id="wipe" type="button">모든 수량 초기화</button>
+  </section>
+  <div id="confirm-area"></div>
+  </section>
+
+  <section id="v-decks" hidden>
+    <div id="deck-home">
+      <div class="dk-head">
+        <h2 class="vh">내 덱</h2>
+        <button class="ghost" id="dk-paste-btn" type="button">덱리스트 붙여넣기</button>
+        <button class="btn" id="dk-new" type="button">새 덱 만들기</button>
+      </div>
+      <div class="paste" id="dk-paste" hidden>
+        <label for="dk-paste-text" class="hint">공식 기사나 덱 사이트에서 복사한 덱리스트를 붙여넣으세요. "3 Hidden Blade"처럼 한 줄에 한 카드씩이고, Legend·Champion·Main Deck·Battlefields·Rune Pool·Sideboard 제목을 인식합니다. 한글 카드명도 읽습니다.</label>
+        <textarea id="dk-paste-text" placeholder="Legend:&#10;1 Renata Glasc, Chem-Baroness&#10;Champion:&#10;1 Renata Glasc, Mastermind&#10;Main Deck:&#10;3 Hidden Blade&#10;..."></textarea>
+        <div class="filters"><button class="btn" id="dk-paste-go" type="button">덱으로 만들기</button><button class="ghost" id="dk-paste-cancel" type="button">취소</button><span class="hint" id="dk-paste-msg"></span></div>
+      </div>
+      <ul class="dk-list" id="dk-list"></ul>
+    </div>
+    <div id="deck-edit" hidden></div>
+  </section>
+
+  <section id="v-meta" hidden>
+    <div class="dk-head"><h2 class="vh">메타 덱</h2></div>
+    <div class="filters" id="meta-ctl">
+      <select id="m-meta" aria-label="메타 (확장팩 환경)"></select>
+      <select id="m-rank" aria-label="순위">
+        <option value="top4">Top 4 (1~4위)</option>
+        <option value="top8">Top 8 (1~8위)</option>
+        <option value="all">공개된 덱 전체 (전설별 최고 성적 포함)</option>
+      </select>
+      <select id="m-sort" aria-label="정렬">
+        <option value="rank">최신 대회·순위순</option>
+        <option value="own">내 보유율 높은 순</option>
+      </select>
+    </div>
+    <div class="meta-sum" id="meta-sum"></div>
+    <div class="chips" id="meta-chips"></div>
+    <div class="meta-grid" id="meta-list"></div>
+  </section>
+
+  <p class="foot">카드 데이터: playriftbound.com 공식 카드 갤러리 (영문·한국어, <span id="fetched"></span> 기준, <span id="n-cards"></span>종). 한국어 이름은 공식 한국어판이 있는 오리진 세트만 <b>공식</b>이며, 이후 세트의 챔피언 이름은 리그 오브 레전드 한국어 표기를 따른 <b>추정</b>입니다. 한글명이 없는 카드는 상세 화면에서 내 번역을 직접 넣을 수 있고, 검색에도 반영됩니다. 카드 이미지 © Riot Games, 비영리 목적으로 허가를 받아 사용합니다. 메타 덱: playriftbound.com 공식 Organized Play 기사의 지역 예선(RQ) 덱리스트이며, 메타는 각 대회에서 사용된 가장 최신 확장팩 기준으로 나눴습니다. 금지 카드는 공식 금지 목록(Standard)을 기준으로 표시합니다.</p>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="sheet" id="sheet" hidden aria-modal="true" role="dialog" aria-labelledby="d-title"></aside>
+<div class="toast" id="toast" hidden role="status"></div>
+<div class="copybox" id="copybox" hidden role="dialog" aria-label="복사할 텍스트"><p>자동 복사가 막혀 있습니다. 아래 텍스트를 선택해서 복사하세요.</p><textarea id="copybox-text" readonly></textarea><div><button class="ghost" id="copybox-close" type="button">닫기</button></div></div>
+
+<script id="card-data" type="application/json">__DATA__</script>
+<script id="meta-data" type="application/json">__META__</script>
+<script>
+(() => {
+const RAW = JSON.parse(document.getElementById('card-data').textContent);
+const CARDS = RAW.cards, SETS = RAW.sets;
+const BYID = new Map(CARDS.map(c => [c.id, c]));
+const BYCODE = new Map(CARDS.map(c => [c.code.toUpperCase(), c]));
+const IMG = 'https://cmsassets.rgpub.io/sanity/images/dsfx7636/game_data_live/';
+const IN_VIEWER = !!(window.claude && window.claude.use);
+const G = RAW.img, USE_PACK = G && location.protocol !== 'file:';   // served pages (claude.ai or your own site) ship the sprite sheets in img/; a file opened from disk loads Riot's CDN
+const pad3 = n => String(n).padStart(3, '0');
+const cdn = (c, w) => IMG + c.img + `?accountingTag=RB&w=${w}&fm=webp&q=80`;
+function thumbStyle(c, w = 40) {
+  if (!USE_PACK) return `background-image:url('${cdn(c, 80)}')`;
+  const per = G.tn * G.tn, k = c.ix % per, sx = w / G.tw;
+  return `background-image:url('img/t${pad3(Math.floor(c.ix / per))}.webp');background-size:${G.tn * w}px ${G.tn * G.th * sx}px;background-position:-${(k % G.tn) * w}px -${Math.floor(k / G.tn) * G.th * sx}px`;
+}
+// Round crop of a card's illustration (faces sit near 57% across, 25% down on legend cards).
+function avatarStyle(c, size = 34) {
+  const W = size / 0.46, cx = 0.57, cy = 0.25, f = n => n.toFixed(1);
+  if (!USE_PACK) { const H = W * 1039 / 744; return `background-image:url('${cdn(c, 160)}');background-size:${f(W)}px ${f(H)}px;background-position:${f(size / 2 - cx * W)}px ${f(size / 2 - cy * H)}px`; }
+  const per = G.tn * G.tn, k = c.ix % per, H = G.th * W / G.tw;
+  return `background-image:url('img/t${pad3(Math.floor(c.ix / per))}.webp');background-size:${f(G.tn * W)}px ${f(G.tn * H)}px;background-position:${f(size / 2 - ((k % G.tn) + cx) * W)}px ${f(size / 2 - (Math.floor(k / G.tn) * H + cy * H))}px`;
+}
+const sheets = new Map();
+function loadSheet(n) {
+  if (!sheets.has(n)) sheets.set(n, new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => { sheets.delete(n); rej(); }; im.src = `img/d${pad3(n)}.webp`; }));
+  return sheets.get(n);
+}
+async function drawArt(c, box) {
+  const per = G.dn * G.dn, k = c.ix % per, [w, h] = c.wh, sw = c.rot ? h : w, sh = c.rot ? w : h;
+  const im = await loadSheet(Math.floor(c.ix / per));
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+  cv.className = 'art' + (c.rot ? ' land' : ''); cv.setAttribute('role', 'img'); cv.setAttribute('aria-label', c.n + ' 카드 이미지');
+  const g = cv.getContext('2d');
+  if (c.rot) { g.translate(w, 0); g.rotate(Math.PI / 2); }   // stored rotated counter-clockwise; turn it back
+  g.drawImage(im, (k % G.dn) * G.cw, Math.floor(k / G.dn) * G.ch, sw, sh, 0, 0, sw, sh);
+  box.replaceChildren(cv);
+}
+
+const L = {
+  type: {unit:['유닛','Unit'],spell:['주문','Spell'],gear:['도구','Gear'],battlefield:['전장','Battlefield'],rune:['룬','Rune'],legend:['전설','Legend'],champion:['챔피언','Champion'],signature:['시그니처','Signature'],token:['토큰','Token'],basic:['기본','Basic']},
+  rarity: {common:['일반','Common'],uncommon:['특별','Uncommon'],rare:['희귀','Rare'],epic:['서사','Epic'],showcase:['쇼케이스','Showcase']},
+  domain: {fury:['분노','Fury'],calm:['평온','Calm'],mind:['정신','Mind'],body:['신체','Body'],chaos:['혼돈','Chaos'],order:['질서','Order'],colorless:['무색','Colorless']},
+};
+const SETMAP = new Map(SETS.map(s => [s.id, s]));
+// Alternate-art printings: showcase rarity, numbered past the set size (overnumbered), "*" signed versions, or "a" variants.
+for (const c of CARDS) c._alt = c.r === 'showcase' || c.no > SETMAP.get(c.set).max || /-star-/.test(c.id) || /-\d+[a-z]-/.test(c.id);
+const DOM_ORDER = Object.keys(L.domain), RAR_ORDER = Object.keys(L.rarity);
+
+/* ---------- search index ---------- */
+const CHO = 'ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ';
+const cho = s => Array.from(s || '').map(ch => { const k = ch.charCodeAt(0) - 0xAC00; return k >= 0 && k < 11172 ? CHO[Math.floor(k / 588)] : (/[ㄱ-ㅎ]/.test(ch) ? ch : ''); }).join('');
+const norm = s => (s || '').toLowerCase().normalize('NFC').replace(/[\s'’`"\-_.·:,!?()/*]/g, '');
+const typeWords = c => [...(c.t||[]), ...(c.st||[])].flatMap(t => L.type[t] || [t]);
+function indexCard(c) {
+  const e = inv.get(c.id);
+  const ko = [c.nk, c.sk, e.nk, ...(c.tk||[])].filter(Boolean);
+  c._name = '|' + [c.n, c.s, ...ko, ...(c.tg||[]), c.code, c.code.replace(/\/.*/, ''), c.set + c.no,
+    ...typeWords(c), ...(c.d||[]).flatMap(d => L.domain[d]||[]), ...(L.rarity[c.r]||[]), c.il].map(norm).join('|') + '|';
+  c._cho = ko.map(k => cho(k)).join('|');
+  c._text = norm((c.tx||'') + '|' + (c.txk||''));
+}
+
+/* ---------- inventory store ---------- */
+const LS_KEY = 'rb-ledger-inv-v1', UI_KEY = 'rb-ledger-ui-v1';
+const lsGet = k => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch { return null; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } };
+
+const inv = {
+  mode: 'loading', data: {}, col: null, dirty: new Set(), busy: new Map(), timers: new Map(), first: true,
+  get(id) { const c = BYID.get(id); return (this.data[c.set] || {})[id] || {}; },
+  q(id) { return this.get(id).q || 0; },
+  patch(id, p) {
+    const c = BYID.get(id), s = (this.data[c.set] ||= {});
+    const e = { ...(s[id] || {}), ...p };
+    if (!e.q) delete e.q; if (!e.nk) delete e.nk; if (!e.memo) delete e.memo;
+    if (Object.keys(e).length) s[id] = e; else delete s[id];
+    this.schedule(c.set);
+  },
+  schedule(setId) {
+    this.dirty.add(setId);
+    clearTimeout(this.timers.get(setId));
+    this.timers.set(setId, setTimeout(() => this.flush(setId), 700));
+  },
+  async flush(setId) {
+    if (this.mode !== 'db') { this.dirty.delete(setId); lsSet(LS_KEY, this.data); return; }
+    if (this.busy.get(setId)) { this.schedule(setId); return; }
+    this.dirty.delete(setId); this.busy.set(setId, true);
+    try { await this.col.doc('set-' + setId).set({ items: this.data[setId] || {} }); }
+    catch (err) {
+      if (err && err.code === 'invalid_argument') { this.toLocal('이 링크에서는 계정 저장 권한이 없어, 이 브라우저에만 저장합니다.'); lsSet(LS_KEY, this.data); }
+      else if (err && err.code === 'quota_exceeded') toast('저장 공간이 가득 찼습니다. JSON 백업 후 정리해 주세요.');
+      else { toast('저장이 잠시 실패했습니다. 곧 다시 시도합니다.'); this.dirty.add(setId); setTimeout(() => this.flush(setId), 1500 + Math.random() * 1500); }
+    } finally { this.busy.set(setId, false); }
+  },
+  toLocal(msg) { this.mode = 'local'; setStorage('local', msg || '이 브라우저에 저장됨'); },
+  pendingFor(setId) { return this.dirty.has(setId) || this.busy.get(setId); },
+};
+
+function setStorage(mode, text) {
+  const el = document.getElementById('storage'); el.dataset.mode = mode;
+  document.getElementById('storage-text').textContent = text;
+}
+
+async function initStore() {
+  if (!IN_VIEWER) {
+    inv.data = lsGet(LS_KEY) || {}; decks.data = lsGet(DK_KEY) || {}; inv.mode = 'local';
+    setStorage('local', '이 브라우저에 저장됨 · 정기적으로 JSON 백업을 권장합니다');
+    afterLoad(); return;
+  }
+  renderActive();
+  let db = null, user = null, uid = null;
+  try { [db, user] = await Promise.all([claude.use('db'), claude.use('user')]); uid = user ? await user.id() : null; } catch {}
+  if (!db || !uid) {
+    inv.data = lsGet(LS_KEY) || {}; decks.data = lsGet(DK_KEY) || {}; inv.toLocal('로그인 정보가 없어 이 브라우저에만 저장합니다');
+    afterLoad(); return;
+  }
+  inv.mode = 'db'; inv.col = db.collection('data/users/' + uid);
+  inv.col.onSnapshot(snap => {
+    const seenDecks = new Set();
+    for (const d of snap.docs) {
+      if (d.id.startsWith('deck-')) {
+        seenDecks.add(d.id);
+        if (!decks.pending(d.id)) decks.data[d.id] = JSON.parse(JSON.stringify(d.data() || {}));
+        continue;
+      }
+      const setId = d.id.replace(/^set-/, '');
+      if (!SETMAP.has(setId) || inv.pendingFor(setId)) continue;
+      inv.data[setId] = JSON.parse(JSON.stringify((d.data() || {}).items || {}));
+    }
+    for (const id of Object.keys(decks.data)) if (!seenDecks.has(id) && !decks.pending(id)) delete decks.data[id];
+    if (inv.first) { inv.first = false; setStorage('db', '내 계정 보관함에 저장됨 (나만 볼 수 있음)'); offerMigrate(snap.empty); }
+    afterLoad();
+  }, err => {
+    inv.toLocal('계정 보관함에 연결할 수 없어 이 브라우저에만 저장합니다');
+    inv.data = lsGet(LS_KEY) || inv.data; decks.data = lsGet(DK_KEY) || decks.data; afterLoad();
+  });
+}
+
+function offerMigrate(dbEmpty) {
+  const local = lsGet(LS_KEY) || {}, localDecks = lsGet(DK_KEY) || {};
+  const n = Object.values(local).reduce((a, s) => a + Object.keys(s).length, 0) + Object.keys(localDecks).length;
+  if (!dbEmpty || !n) return;
+  const b = document.getElementById('banner');
+  b.innerHTML = `<div class="banner"><span>이 브라우저에 저장된 카드 기록 ${n}건이 있습니다. 계정 보관함으로 옮길까요?</span><button class="ghost" id="mig" type="button">옮기기</button></div>`;
+  document.getElementById('mig').onclick = () => {
+    inv.data = local; Object.keys(local).forEach(s => inv.schedule(s));
+    decks.data = localDecks; Object.keys(localDecks).forEach(id => decks.schedule(id));
+    b.innerHTML = ''; afterLoad(); toast(`${n}건을 계정 보관함으로 옮겼습니다.`);
+  };
+}
+
+function afterLoad() { CARDS.forEach(indexCard); renderActive(); if (openId) openDetail(openId); }
+
+/* ---------- UI state ---------- */
+const ui = Object.assign({ q:'', text:false, set:'', domain:'', type:'', rarity:'', own:'', sort:'set', lang:'ko', view:'list', base:false, limit:150 }, lsGet(UI_KEY) || {});
+ui.limit = 150;
+const $ = id => document.getElementById(id);
+const saveUi = () => lsSet(UI_KEY, { ...ui, q: '' });
+const ko = () => ui.lang === 'ko';
+const lbl = (group, k) => (L[group][k] || [k, k])[ko() ? 0 : 1];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]);
+const setName = id => { const s = SETMAP.get(id); return ko() ? s.ko : s.en; };
+
+/* ---------- deck helpers ---------- */
+const MD = JSON.parse(document.getElementById('meta-data').textContent);
+const SET_ORDER = ['OGN','OGS','SFD','UNL','VEN','RAD'];
+const isAlt = c => /-star-/.test(c.id) || /-\d+[a-z]-/.test(c.id);
+const isSig = c => (c.st || []).includes('signature');
+const has = (c, t) => (c.t || []).includes(t) || (c.st || []).includes(t);
+const nameKey = c => c.n + '|' + (c.s || '');          // every printing of one card shares this key
+const PRINTS = new Map();
+for (const c of CARDS) { const k = nameKey(c); if (!PRINTS.has(k)) PRINTS.set(k, []); PRINTS.get(k).push(c); }
+const CANON = new Map();
+for (const [k, cs] of PRINTS) CANON.set(k, [...cs].sort((a, b) => SET_ORDER.indexOf(a.set) - SET_ORDER.indexOf(b.set) || isAlt(a) - isAlt(b) || a.no - b.no)[0]);
+const canon = c => CANON.get(nameKey(c));
+const CANON_LIST = [...CANON.values()].filter(c => !has(c, 'token'));
+const CHAMP_NAMES = new Set(), CHAMP_KO = new Map();
+for (const c of CARDS) if (has(c, 'champion')) { CHAMP_NAMES.add(c.n); if (c.nk && !CHAMP_KO.has(c.n)) CHAMP_KO.set(c.n, c.nk); }
+const champTag = lg => (lg.tg || []).find(t => CHAMP_NAMES.has(t)) || (lg.tg || [])[0] || '';
+const champKo = t => CHAMP_KO.get(t) || t;
+
+function enName(c) {
+  if (has(c, 'legend')) return `${champTag(c)}, ${c.n}`;
+  return c.n + (c.s && !isSig(c) ? ', ' + c.s : '');
+}
+function koName(c) {
+  const mine = inv.get(c.id).nk || inv.get(canon(c).id).nk;
+  if (has(c, 'legend')) return `${champKo(champTag(c))}, ${mine || c.nk || c.n}`;
+  const base = mine || c.nk;
+  if (!base) return enName(c);
+  return base + (c.sk ? ', ' + c.sk : (c.s && !isSig(c) ? ', ' + c.s : ''));
+}
+const dName = c => ko() ? koName(c) : enName(c);
+const legendLabel = lg => ko() ? `${champKo(champTag(lg))} · ${lg.nk || lg.n}` : `${champTag(lg)} · ${lg.n}`;
+
+function ownedMap() {
+  const m = new Map();
+  for (const c of CARDS) { const q = inv.q(c.id); if (q) { const k = nameKey(c); m.set(k, (m.get(k) || 0) + q); } }
+  return m;
+}
+
+const normName = s => String(s || '').toLowerCase().replace(/[’`]/g, "'").replace(/\bthe\b/g, '').replace(/[^a-z0-9가-힣]/g, '');
+const TODAY = new Date().toISOString().slice(0, 10);
+const BANNED = new Map();
+for (const b of MD.bans) if (b.fmt === 'std' && b.date <= TODAY) for (const n of b.names) BANNED.set(normName(n), b.date);
+const isBanned = c => BANNED.has(normName(enName(c))) || BANNED.has(normName(c.n));
+
+/* A deck is {name, legend, champion, main:{id:n}, bf:[id], runes:{id:n}, side:{id:n}} with card ids. */
+const rows = obj => Object.entries(obj || {}).map(([id, n]) => [BYID.get(id), n]).filter(r => r[0] && r[1] > 0);
+function deckNeeds(dk) {
+  const need = new Map(), add = (c, n) => { if (c) { const k = nameKey(c); need.set(k, (need.get(k) || 0) + n); } };
+  add(BYID.get(dk.legend), 1); add(BYID.get(dk.champion), 1);
+  rows(dk.main).forEach(([c, n]) => add(c, n));
+  (dk.bf || []).forEach(id => add(BYID.get(id), 1));
+  rows(dk.runes).forEach(([c, n]) => add(c, n));
+  return need;
+}
+function deckOwn(dk, om) {
+  let total = 0, miss = 0;
+  for (const [k, n] of deckNeeds(dk)) { total += n; miss += Math.max(0, n - (om.get(k) || 0)); }
+  return { total, have: total - miss, miss, pct: total ? Math.round((total - miss) / total * 100) : 0 };
+}
+const sum = rs => rs.reduce((a, [, n]) => a + n, 0);
+
+function validate(dk) {
+  const E = [], W = [];
+  const lg = BYID.get(dk.legend), ch = BYID.get(dk.champion), tag = lg ? champTag(lg) : '';
+  const main = rows(dk.main), side = rows(dk.side), runes = rows(dk.runes);
+  const bf = (dk.bf || []).map(id => BYID.get(id)).filter(Boolean);
+  const mainN = sum(main) + (ch ? 1 : 0), runeN = sum(runes), sideN = sum(side);
+  if (!lg) E.push('전설을 1장 골라야 합니다.');
+  if (!ch) E.push('선택 챔피언을 지정해야 합니다.');
+  else if (lg && ch.n !== tag) E.push(`선택 챔피언은 전설과 같은 챔피언(${champKo(tag)})이어야 합니다.`);
+  if (mainN < 40) E.push(`메인 덱이 ${40 - mainN}장 부족합니다 (선택 챔피언 포함 40장 이상).`);
+  const per = new Map(), bump = (c, n) => { const k = nameKey(c), p = per.get(k); per.set(k, [(p ? p[0] : 0) + n, c]); };
+  main.forEach(([c, n]) => bump(c, n)); side.forEach(([c, n]) => bump(c, n)); if (ch) bump(ch, 1);
+  for (const [n, c] of per.values()) if (n > 3) E.push(`${dName(c)}: ${n}장. 같은 카드는 메인·사이드·선택 챔피언을 합쳐 3장까지입니다.`);
+  const misplaced = main.filter(([c]) => has(c, 'legend') || has(c, 'battlefield') || has(c, 'rune') || has(c, 'token'));
+  if (misplaced.length) E.push(`메인 덱에 넣을 수 없는 카드: ${misplaced.map(([c]) => dName(c)).join(', ')}`);
+  if (lg) {
+    const ok = new Set([...lg.d, 'colorless']);
+    const off = [...main, ...side].filter(([c]) => (c.d || []).some(d => !ok.has(d))).map(([c]) => dName(c));
+    if (off.length) E.push(`전설 영역(${lg.d.map(d => L.domain[d][0]).join('·')}) 밖의 카드: ${off.slice(0, 4).join(', ')}${off.length > 4 ? ` 외 ${off.length - 4}종` : ''}`);
+    const sig = [...main, ...side].filter(([c]) => isSig(c));
+    const wrong = sig.filter(([c]) => c.s !== tag && !(c.tg || []).includes(tag));
+    if (wrong.length) E.push(`다른 챔피언의 시그니처 카드: ${wrong.map(([c]) => dName(c)).join(', ')}`);
+    const sigN = sum(main.filter(([c]) => isSig(c)));
+    if (sigN > 3) E.push(`시그니처 카드는 메인 덱에 합계 3장까지입니다 (현재 ${sigN}장).`);
+    const badRune = runes.filter(([c]) => (c.d || []).some(d => !lg.d.includes(d)));
+    if (badRune.length) E.push(`전설 영역이 아닌 룬: ${badRune.map(([c]) => dName(c)).join(', ')}`);
+  }
+  if (bf.length !== 3) E.push(`전장은 3장이어야 합니다 (현재 ${bf.length}장).`);
+  else if (new Set(bf.map(nameKey)).size < 3) E.push('전장 3장은 서로 다른 카드여야 합니다.');
+  if (runeN !== 12) E.push(`룬 덱은 12장이어야 합니다 (현재 ${runeN}장).`);
+  if (sideN > 10) E.push(`사이드보드는 10장 이하여야 합니다 (현재 ${sideN}장, 2026년 7월 24일 대회 규정).`);
+  const banned = [lg, ch, ...main.map(r => r[0]), ...bf, ...side.map(r => r[0])].filter(c => c && isBanned(c));
+  if (banned.length) E.push(`현재 금지 카드 포함: ${[...new Set(banned.map(dName))].join(', ')}`);
+  return { E, W, mainN, runeN, sideN, bfN: bf.length };
+}
+
+function deckText(dk, lang) {
+  const nm = c => lang === 'ko' ? koName(c) : enName(c);
+  const H = lang === 'ko' ? ['전설', '챔피언', '메인 덱', '전장', '룬', '사이드보드'] : ['Legend', 'Champion', 'Main Deck', 'Battlefields', 'Rune Pool', 'Sideboard'];
+  const out = [], sec = (h, rs) => { if (rs.length) out.push(h + ':', ...rs.map(([c, n]) => `${n} ${nm(c)}`), ''); };
+  const lg = BYID.get(dk.legend), ch = BYID.get(dk.champion);
+  sec(H[0], lg ? [[lg, 1]] : []); sec(H[1], ch ? [[ch, 1]] : []);
+  sec(H[2], sortRows(rows(dk.main))); sec(H[3], (dk.bf || []).map(id => [BYID.get(id), 1]).filter(r => r[0]));
+  sec(H[4], rows(dk.runes)); sec(H[5], sortRows(rows(dk.side)));
+  return out.join('\n').trim();
+}
+const TYPE_RANK = c => has(c, 'champion') ? 0 : has(c, 'unit') ? 1 : has(c, 'spell') ? 2 : has(c, 'gear') ? 3 : 4;
+const sortRows = rs => rs.sort((a, b) => TYPE_RANK(a[0]) - TYPE_RANK(b[0]) || (a[0].e ?? 99) - (b[0].e ?? 99) || enName(a[0]).localeCompare(enName(b[0])));
+
+/* deck text import: English or Korean names, official article layout or plain "N name" lines */
+const LOOK = new Map();
+{
+  const put = (k, c) => { k = normName(k); if (k && !LOOK.has(k)) LOOK.set(k, c); };
+  const cs = [...CANON.values()];
+  for (const c of cs) {
+    if (has(c, 'legend')) { put(champTag(c) + ', ' + c.n, c); if (c.nk) put(champKo(champTag(c)) + ', ' + c.nk, c); }
+    if (c.s && !isSig(c)) { put(c.n + ', ' + c.s, c); if (c.nk) put(c.nk + ', ' + (c.sk || c.s), c); }
+  }
+  for (const c of cs) { put(c.n, c); if (c.nk) put(c.nk, c); }
+}
+const HEAD = /^(legend|전설|chosen champion|champion|선택 챔피언|챔피언|main deck|main|메인 덱|메인|battlefields?|전장|rune pool|rune deck|runes|룬 덱|룬|sideboard|side ?board|사이드보드|사이드)\s*(?:[:：]\s*(.*))?$/i;
+const secOf = h => { h = h.toLowerCase(); return /legend|전설/.test(h) ? 'legend' : /champion|챔피언/.test(h) ? 'champion' : /battle|전장/.test(h) ? 'bf' : /rune|룬/.test(h) ? 'runes' : /side|사이드/.test(h) ? 'side' : 'main'; };
+const newDeck = name => ({ name: name || '새 덱', legend: null, champion: null, main: {}, bf: [], runes: {}, side: {}, created: Date.now(), updated: Date.now() });
+function addTo(dk, c, sec, n = 1) {
+  if (has(c, 'legend')) { dk.legend = c.id; return; }
+  if (sec === 'champion') { dk.champion = c.id; return; }
+  if (sec !== 'side' && has(c, 'rune')) { dk.runes[c.id] = (dk.runes[c.id] || 0) + n; return; }
+  if (sec !== 'side' && has(c, 'battlefield')) { if (!dk.bf.includes(c.id)) dk.bf.push(c.id); return; }
+  const s = sec === 'side' ? dk.side : dk.main; s[c.id] = (s[c.id] || 0) + n;
+}
+function parseDeckText(text) {
+  const dk = newDeck(), unknown = []; let sec = 'main';
+  for (let line of text.split(/\r?\n/)) {
+    line = line.replace(/ /g, ' ').trim(); if (!line) continue;
+    const h = line.match(HEAD);
+    if (h) { sec = secOf(h[1]); line = (h[2] || '').trim(); if (!line) continue; }
+    const m = line.match(/^(\d+)\s*[xX×]?\s+(.+)$/), n = m ? +m[1] : 1;
+    const name = (m ? m[2] : line).replace(/\s*\([^)]*\)\s*$/, '').trim();
+    const c = LOOK.get(normName(name));
+    if (!c) { unknown.push(line); continue; }
+    addTo(dk, c, sec, n);
+  }
+  const lg = BYID.get(dk.legend);
+  if (lg && !dk.champion) {   // no Champion line: use one copy of the legend's champion from the main deck
+    const hit = rows(dk.main).find(([c]) => has(c, 'champion') && c.n === champTag(lg));
+    if (hit) { dk.champion = hit[0].id; if (!--dk.main[hit[0].id]) delete dk.main[hit[0].id]; }
+  }
+  if (lg) dk.name = legendLabel(lg);
+  return { dk, unknown };
+}
+
+/* ---------- deck store (same private collection as the inventory) ---------- */
+const DK_KEY = 'rb-ledger-decks-v1';
+const decks = {
+  data: {}, dirty: new Set(), busy: new Map(), timers: new Map(),
+  save(id) { if (this.data[id]) this.data[id].updated = Date.now(); this.schedule(id); },
+  remove(id) { delete this.data[id]; this.schedule(id); },
+  schedule(id) { this.dirty.add(id); clearTimeout(this.timers.get(id)); this.timers.set(id, setTimeout(() => this.flush(id), 700)); },
+  async flush(id) {
+    if (inv.mode !== 'db') { this.dirty.delete(id); lsSet(DK_KEY, this.data); return; }
+    if (this.busy.get(id)) { this.schedule(id); return; }
+    this.dirty.delete(id); this.busy.set(id, true);
+    try { const d = this.data[id]; if (d) await inv.col.doc(id).set(d); else await inv.col.doc(id).delete(); }
+    catch (err) {
+      if (err && err.code === 'invalid_argument') { inv.toLocal('이 링크에서는 계정 저장 권한이 없어, 이 브라우저에만 저장합니다.'); lsSet(DK_KEY, this.data); lsSet(LS_KEY, inv.data); }
+      else if (err && err.code === 'quota_exceeded') toast('저장 공간이 가득 찼습니다. 쓰지 않는 덱을 지워 주세요.');
+      else { toast('덱 저장이 잠시 실패했습니다. 곧 다시 시도합니다.'); this.dirty.add(id); setTimeout(() => this.flush(id), 1500 + Math.random() * 1500); }
+    } finally { this.busy.set(id, false); }
+  },
+  pending(id) { return this.dirty.has(id) || this.busy.get(id); },
+  create(dk) { const id = 'deck-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); this.data[id] = dk; this.save(id); return id; },
+};
+
+/* ---------- views ---------- */
+const VIEWS = ['collection', 'decks', 'meta'];
+let view = 'collection';
+function route() {
+  const h = location.hash.slice(1);
+  view = VIEWS.includes(h) ? h : 'collection';
+  for (const v of VIEWS) { $('v-' + v).hidden = v !== view; $('tab-' + v).setAttribute('aria-current', v === view ? 'page' : 'false'); }
+  renderActive();
+}
+function renderActive() {
+  if (view === 'collection') { render(); return; }
+  renderSummary();
+  if (view === 'decks') { if (edId && decks.data[edId]) renderEditor(); else { if (edId) closeEditor(); renderDeckHome(); } }
+  else renderMeta();
+}
+addEventListener('hashchange', route);
+
+/* ---------- deck builder: list ---------- */
+function deckSummary(dk, om) {
+  const v = validate(dk), own = deckOwn(dk, om);
+  const legal = !v.E.length;
+  return { v, own, pills: `<span class="pill ${legal ? 'ok' : 'bad'}">${legal ? '덱 규칙 충족' : `규칙 오류 ${v.E.length}건`}</span><span class="pill ${own.miss ? 'warn' : 'ok'}">${own.miss ? `부족 ${own.miss}장` : '모두 보유'}</span>` };
+}
+function renderDeckHome() {
+  const om = ownedMap();
+  const arr = Object.entries(decks.data).sort((a, b) => (b[1].updated || 0) - (a[1].updated || 0));
+  $('dk-list').innerHTML = arr.length ? arr.map(([id, dk]) => {
+    const lg = BYID.get(dk.legend), s = deckSummary(dk, om);
+    return `<li><button class="dk-item" type="button" data-deck="${id}">
+      <span class="th" style="${lg ? thumbStyle(lg) : ''}" aria-hidden="true"></span>
+      <span class="cardbody">
+      <b>${esc(dk.name || '이름 없는 덱')}</b>
+      <span class="hint">${lg ? esc(legendLabel(lg)) : '전설 미선택'} · 메인 ${s.v.mainN}/40 · 보유 ${s.own.have}/${s.own.total}장</span>
+      <span class="pills">${s.pills}</span>
+      ${dk.src ? `<span class="hint">출처: ${esc(MD.events[dk.src.e]?.ko || '')} #${dk.src.r ?? '-'} · ${esc(dk.src.p || '')}</span>` : ''}
+      </span>
+    </button></li>`;
+  }).join('') : `<li class="empty">아직 만든 덱이 없습니다. "새 덱 만들기"로 시작하거나, 메타 덱 탭에서 대회 상위 덱을 가져와 보세요.</li>`;
+}
+$('dk-list').onclick = ev => { const b = ev.target.closest('[data-deck]'); if (b) openEditor(b.dataset.deck); };
+$('dk-new').onclick = () => openEditor(decks.create(newDeck()));
+$('dk-paste-btn').onclick = () => { $('dk-paste').hidden = false; $('dk-paste-msg').textContent = ''; $('dk-paste-text').focus(); };
+$('dk-paste-cancel').onclick = () => { $('dk-paste').hidden = true; };
+$('dk-paste-go').onclick = () => {
+  const { dk, unknown } = parseDeckText($('dk-paste-text').value);
+  const n = sum(rows(dk.main)) + sum(rows(dk.runes)) + dk.bf.length + (dk.legend ? 1 : 0);
+  if (!n) { $('dk-paste-msg').textContent = '인식한 카드가 없습니다. "3 Hidden Blade"처럼 수량과 카드명을 한 줄씩 적어 주세요.'; return; }
+  const id = decks.create(dk);
+  $('dk-paste-text').value = ''; $('dk-paste').hidden = true;
+  toast(unknown.length ? `덱을 만들었습니다. 인식하지 못한 줄 ${unknown.length}개: ${unknown.slice(0, 3).join(' / ')}` : '덱을 만들었습니다.');
+  openEditor(id);
+};
+
+/* ---------- deck builder: editor ---------- */
+let edId = null, edBuilt = null;
+const pk = { q: '', type: '', owned: false, limit: 80 };
+function openEditor(id) { edId = id; edBuilt = null; pk.limit = 80; if (location.hash !== '#decks') location.hash = 'decks'; else renderActive(); scrollTo(0, 0); }
+function closeEditor() { edId = null; edBuilt = null; $('deck-edit').hidden = true; $('deck-home').hidden = false; }
+function renderEditor() {
+  const dk = decks.data[edId];
+  $('deck-home').hidden = true; $('deck-edit').hidden = false;
+  if (edBuilt !== edId) {
+    edBuilt = edId;
+    $('deck-edit').innerHTML = `
+      <div class="ed-top"><button class="ghost" type="button" id="ed-back">← 내 덱 목록</button><input id="ed-name" aria-label="덱 이름" value="${esc(dk.name || '')}"></div>
+      <div class="ed-grid">
+        <section class="panel" aria-label="카드 고르기">
+          <h3 id="pk-title"></h3>
+          <div class="filters pk-ctl">
+            <input id="pk-q" type="search" autocomplete="off" placeholder="카드 검색 (한글·영문·초성)" value="${esc(pk.q)}" aria-label="카드 검색">
+            <select id="pk-type" aria-label="유형"><option value="">유형: 전체</option>${['champion','unit','spell','gear','battlefield','rune'].map(t => `<option value="${t}"${pk.type === t ? ' selected' : ''}>${L.type[t][0]}</option>`).join('')}</select>
+            <label class="chk"><input id="pk-owned" type="checkbox"${pk.owned ? ' checked' : ''}> 보유 카드만</label>
+          </div>
+          <p class="hint" id="pk-hint"></p>
+          <ul class="pk-list" id="pk-list"></ul>
+          <div class="more" id="pk-more" hidden><button type="button" id="pk-more-btn">더 보기</button></div>
+        </section>
+        <section class="panel deckpane" id="deckpane" aria-label="덱 구성"></section>
+      </div>`;
+    $('ed-back').onclick = () => { closeEditor(); renderDeckHome(); };
+    $('ed-name').oninput = ev => { const d = decks.data[edId]; if (d) { d.name = ev.target.value; decks.save(edId); } };
+    let t; $('pk-q').oninput = ev => { clearTimeout(t); t = setTimeout(() => { pk.q = ev.target.value; pk.limit = 80; renderPicker(); }, 120); };
+    $('pk-type').onchange = ev => { pk.type = ev.target.value; pk.limit = 80; renderPicker(); };
+    $('pk-owned').onchange = ev => { pk.owned = ev.target.checked; renderPicker(); };
+    $('pk-more-btn').onclick = () => { pk.limit += 120; renderPicker(); };
+    $('deck-edit').onclick = onEditorClick;
+    $('deck-edit').onchange = ev => { if (ev.target.id === 'ed-champ') { decks.data[edId].champion = ev.target.value || null; edited(); } };
+  }
+  renderPicker(); renderPane();
+}
+function edited() { decks.save(edId); renderPane(); renderPicker(); }
+
+function pickerList(dk, om) {
+  const lg = BYID.get(dk.legend), terms = pk.q.trim().split(/\s+/).filter(Boolean);
+  let list;
+  if (!lg) list = CANON_LIST.filter(c => has(c, 'legend'));
+  else {
+    const ok = new Set([...lg.d, 'colorless']), tag = champTag(lg);
+    list = CANON_LIST.filter(c => !has(c, 'legend') && (c.d || []).every(d => ok.has(d)) && (!isSig(c) || c.s === tag || (c.tg || []).includes(tag)));
+    if (pk.type) list = list.filter(c => has(c, pk.type));
+  }
+  if (pk.owned) list = list.filter(c => (om.get(nameKey(c)) || 0) > 0);
+  if (terms.length) list = list.filter(c => matches(c, terms));
+  const tag = lg ? champTag(lg) : '';
+  return list.sort((a, b) => ((b.n === tag && has(b, 'champion')) - (a.n === tag && has(a, 'champion'))) || TYPE_RANK(a) - TYPE_RANK(b) || (a.e ?? 99) - (b.e ?? 99) || dName(a).localeCompare(dName(b), ko() ? 'ko' : 'en'));
+}
+function inDeck(dk, c) {
+  const k = nameKey(c); let n = 0;
+  for (const [x, m] of [...rows(dk.main), ...rows(dk.side), ...rows(dk.runes)]) if (nameKey(x) === k) n += m;
+  if (dk.champion && nameKey(BYID.get(dk.champion)) === k) n++;
+  if ((dk.bf || []).some(id => nameKey(BYID.get(id)) === k)) n++;
+  return n;
+}
+function renderPicker() {
+  const dk = decks.data[edId], om = ownedMap(), lg = BYID.get(dk.legend);
+  $('pk-title').textContent = lg ? '카드 추가' : '1단계: 전설 고르기';
+  $('pk-hint').textContent = lg ? `${lg.d.map(d => `${L.domain[d][0]}(${L.domain[d][1]})`).join('·')} 영역과 무색 카드, ${champKo(champTag(lg))} 시그니처만 보여 줍니다.` : '전설이 덱의 영역(색)과 선택 챔피언을 정합니다.';
+  $('pk-type').hidden = !lg;
+  const list = pickerList(dk, om), shown = list.slice(0, pk.limit), tag = lg ? champTag(lg) : '';
+  $('pk-list').innerHTML = shown.length ? shown.map(c => {
+    const own = om.get(nameKey(c)) || 0, inn = inDeck(dk, c);
+    const types = [...(c.st || []), ...(c.t || [])].map(t => lbl('type', t)).join(' ');
+    let btns;
+    if (has(c, 'legend')) btns = `<button class="mini${dk.legend === c.id ? ' on' : ''}" type="button" data-act="legend">${dk.legend === c.id ? '선택됨' : '선택'}</button>`;
+    else if (has(c, 'battlefield')) btns = `<button class="mini" type="button" data-act="add">+ 전장</button><button class="mini" type="button" data-act="side">+ 사이드</button>`;
+    else if (has(c, 'rune')) btns = `<button class="mini" type="button" data-act="add">+ 룬</button>`;
+    else btns = (has(c, 'champion') && c.n === tag ? `<button class="mini${dk.champion && nameKey(BYID.get(dk.champion)) === nameKey(c) ? ' on' : ''}" type="button" data-act="champ">챔피언 지정</button>` : '') + `<button class="mini" type="button" data-act="add">+ 메인</button><button class="mini" type="button" data-act="side">+ 사이드</button>`;
+    return `<li class="pk-row" data-id="${c.id}">
+      <span class="th sm" style="${thumbStyle(c, 32)}" aria-hidden="true"></span>
+      <span style="min-width:0"><button class="nm" type="button" data-act="card">${esc(dName(c))}</button>${isBanned(c) ? ' <span class="pill bad">금지</span>' : ''}
+        <span class="hint"><span class="dom">${(c.d || []).map(d => `<i style="--c:var(--d-${d})"></i>`).join('')}</span> ${esc(types)}${c.e != null ? ` · ⬡${c.e}` : ''} · 보유 ${own}${inn ? ` · 덱 ${inn}` : ''}</span></span>
+      <span class="pk-btns">${btns}</span></li>`;
+  }).join('') : `<li class="empty">조건에 맞는 카드가 없습니다.</li>`;
+  $('pk-more').hidden = list.length <= pk.limit;
+}
+
+function lineHTML(c, n, sec, om, need, editable) {
+  const have = om.get(nameKey(c)) || 0, req = need.get(nameKey(c)) || n, short = sec !== 'side' && have < req;
+  const ctl = !editable ? `<b class="cnt">${n}</b>` : sec === 'bf'
+    ? `<span class="sstep"><button type="button" data-act="dec" aria-label="빼기">×</button></span>`
+    : `<span class="sstep"><button type="button" data-act="dec" aria-label="1장 빼기">−</button><b>${n}</b><button type="button" data-act="inc" aria-label="1장 더하기">+</button></span>`;
+  return `<li class="dl-line" data-id="${c.id}" data-sec="${sec}">${ctl}
+    <button class="nm" type="button" data-act="card" title="${esc(enName(c))}">${esc(dName(c))}${isBanned(c) ? ' <span class="pill bad">금지</span>' : ''}</button>
+    <span class="${short ? 'own-short' : 'own-ok'}">${c.e != null ? `⬡${c.e} · ` : ''}${short ? `보유 ${have}/${req}` : `보유 ${have}`}</span></li>`;
+}
+function deckListHTML(dk, om, editable) {
+  const need = deckNeeds(dk), lg = BYID.get(dk.legend), ch = BYID.get(dk.champion);
+  const main = sortRows(rows(dk.main)), groups = [['챔피언 유닛', 0], ['유닛', 1], ['주문', 2], ['도구', 3], ['기타', 4]];
+  const sec = (title, count, body) => `<h4><span>${title}</span><span>${count}</span></h4><ul>${body}</ul>`;
+  let h = '';
+  for (const [title, r] of groups) { const g = main.filter(([c]) => TYPE_RANK(c) === r); if (g.length) h += sec(title, sum(g) + '장', g.map(([c, n]) => lineHTML(c, n, 'main', om, need, editable)).join('')); }
+  const bf = (dk.bf || []).map(id => BYID.get(id)).filter(Boolean);
+  h += sec('전장', `${bf.length}/3`, bf.map(c => lineHTML(c, 1, 'bf', om, need, editable)).join('') || '<li class="hint">아직 없음</li>');
+  const rs = rows(dk.runes);
+  let runeBtns = '';
+  if (editable && lg) runeBtns = lg.d.map(d => CANON_LIST.find(c => has(c, 'rune') && (c.d || [])[0] === d)).filter(Boolean).map(c => `<button class="mini" type="button" data-act="rune" data-rid="${c.id}">+ ${esc(dName(c))}</button>`).join(' ');
+  h += sec('룬 덱', `${sum(rs)}/12`, rs.map(([c, n]) => lineHTML(c, n, 'runes', om, need, editable)).join('') + (runeBtns ? `<li class="pk-btns" style="justify-content:flex-start;padding-top:4px">${runeBtns}</li>` : ''));
+  const sd = sortRows(rows(dk.side));
+  if (sd.length || editable) h += sec('사이드보드', sum(sd) + '장', sd.map(([c, n]) => lineHTML(c, n, 'side', om, need, editable)).join('') || '<li class="hint">비어 있음</li>');
+  return `<div class="dl">${h}</div>`;
+}
+function curveHTML(dk) {
+  const b = new Map(); const ch = BYID.get(dk.champion);
+  for (const [c, n] of [...rows(dk.main), ...(ch ? [[ch, 1]] : [])]) if (c.e != null) { const k = Math.min(c.e, 7); b.set(k, (b.get(k) || 0) + n); }
+  return `<div class="curve" aria-label="에너지 분포">${[0,1,2,3,4,5,6,7].map(e => `<span>⬡${e === 7 ? '7+' : e} ${b.get(e) || 0}</span>`).join('')}</div>`;
+}
+function renderPane() {
+  const dk = decks.data[edId], om = ownedMap(), v = validate(dk), own = deckOwn(dk, om);
+  const lg = BYID.get(dk.legend), ch = BYID.get(dk.champion), tag = lg ? champTag(lg) : '';
+  const champs = lg ? CANON_LIST.filter(c => has(c, 'champion') && c.n === tag) : [];
+  const chCanon = ch ? canon(ch).id : '';
+  $('deckpane').innerHTML = `
+    <div class="slot"><span class="th sm" style="${lg ? thumbStyle(lg, 32) : ''}" aria-hidden="true"></span>
+      <span style="min-width:0"><span class="hint">전설</span><br>${lg ? `<button class="nm" type="button" data-act="card" data-cid="${lg.id}">${esc(legendLabel(lg))}</button>` : '<span class="hint">왼쪽에서 전설을 고르세요</span>'}</span>
+      ${lg ? '<button class="mini" type="button" data-act="clear-legend">변경</button>' : ''}</div>
+    <div class="slot"><span class="th sm" style="${ch ? thumbStyle(ch, 32) : ''}" aria-hidden="true"></span>
+      <span style="min-width:0"><label class="hint" for="ed-champ">선택 챔피언</label><br>
+      <select id="ed-champ"${lg ? '' : ' disabled'}><option value="">${lg ? '선택하세요' : '전설을 먼저 고르세요'}</option>${champs.map(c => `<option value="${c.id}"${c.id === chCanon || c.id === dk.champion ? ' selected' : ''}>${esc(dName(c))}</option>`).join('')}</select></span>
+      ${ch ? `<span class="${(om.get(nameKey(ch)) || 0) < (deckNeeds(dk).get(nameKey(ch)) || 1) ? 'own-short' : 'own-ok'}">보유 ${om.get(nameKey(ch)) || 0}</span>` : ''}</div>
+    <div class="stats"><span>메인 <b>${v.mainN}</b>/40</span><span>룬 <b>${v.runeN}</b>/12</span><span>전장 <b>${v.bfN}</b>/3</span><span>사이드 <b>${v.sideN}</b></span><span>보유로 채운 카드 <b>${own.have}</b>/${own.total}장</span></div>
+    <div class="ownbar" aria-hidden="true"><i style="width:${own.pct}%"></i></div>
+    <ul class="checks">${v.E.map(e => `<li class="e">${esc(e)}</li>`).join('')}${v.W.map(w => `<li class="w">${esc(w)}</li>`).join('')}${!v.E.length ? '<li class="ok">덱 규칙을 모두 충족합니다.</li>' : ''}${own.miss ? `<li class="w">컬렉션에서 ${own.miss}장이 부족합니다.</li>` : own.total ? '<li class="ok">필요한 카드를 모두 보유하고 있습니다.</li>' : ''}</ul>
+    ${curveHTML(dk)}
+    ${deckListHTML(dk, om, true)}
+    <div class="acts">
+      <button class="mini" type="button" data-act="copy-en">영문 덱리스트 복사</button>
+      <button class="mini" type="button" data-act="copy-ko">한글 덱리스트 복사</button>
+      <button class="mini" type="button" data-act="copy-miss"${own.miss ? '' : ' disabled'}>부족 카드 목록 복사</button>
+      <button class="mini" type="button" data-act="dup">덱 복제</button>
+      <button class="mini" type="button" data-act="del">덱 삭제</button>
+    </div>
+    <div id="ed-confirm"></div>`;
+}
+function missingText(dk) {
+  const om = ownedMap(), out = [];
+  for (const [k, n] of deckNeeds(dk)) { const m = n - (om.get(k) || 0); if (m > 0) out.push(`${m} ${dName(CANON.get(k))}`); }
+  return out.join('\n');
+}
+function copyText(text, label) {
+  const fallback = () => { $('copybox-text').value = text; $('copybox').hidden = false; $('copybox-text').select(); };
+  try { navigator.clipboard.writeText(text).then(() => toast(`${label}을(를) 복사했습니다.`), fallback); } catch { fallback(); }
+}
+$('copybox-close').onclick = () => { $('copybox').hidden = true; };
+
+function onEditorClick(ev) {
+  const b = ev.target.closest('[data-act]'); if (!b) return;
+  const dk = decks.data[edId], li = b.closest('[data-id]'), act = b.dataset.act;
+  const c = li ? BYID.get(li.dataset.id) : null;
+  if (act === 'card') { openDetail(b.dataset.cid || li.dataset.id); return; }
+  if (act === 'legend') {
+    dk.legend = c.id;
+    const tag = champTag(c);
+    if (dk.champion && BYID.get(dk.champion).n !== tag) dk.champion = null;
+    if (!dk.champion) { const opts = CANON_LIST.filter(x => has(x, 'champion') && x.n === tag); const om = ownedMap(); dk.champion = (opts.find(x => om.get(nameKey(x))) || opts[0] || {}).id || null; }
+    if (!dk.name || dk.name === '새 덱') { dk.name = legendLabel(c); $('ed-name').value = dk.name; }
+    pk.q = ''; $('pk-q').value = ''; edited(); toast(`${legendLabel(c)} 전설을 골랐습니다. 이제 카드를 추가하세요.`); return;
+  }
+  if (act === 'champ') { dk.champion = c.id; edited(); return; }
+  if (act === 'add' || act === 'side') {
+    addTo(dk, c, act === 'side' ? 'side' : 'main'); edited();
+    const v = validate(dk); toast(`${dName(c)} 추가 · 메인 ${v.mainN}/40 · 룬 ${v.runeN}/12 · 전장 ${v.bfN}/3`); return;
+  }
+  if (act === 'rune') { const r = b.dataset.rid; dk.runes[r] = (dk.runes[r] || 0) + 1; edited(); return; }
+  if (act === 'inc' || act === 'dec') {
+    const sec = li.dataset.sec, id = li.dataset.id;
+    if (sec === 'bf') dk.bf = dk.bf.filter(x => x !== id);
+    else { const s = dk[sec]; s[id] = (s[id] || 0) + (act === 'inc' ? 1 : -1); if (s[id] <= 0) delete s[id]; }
+    edited(); return;
+  }
+  if (act === 'clear-legend') { dk.legend = null; edited(); $('pk-q').focus(); return; }
+  if (act === 'copy-en') return copyText(deckText(dk, 'en'), '영문 덱리스트');
+  if (act === 'copy-ko') return copyText(deckText(dk, 'ko'), '한글 덱리스트');
+  if (act === 'copy-miss') return copyText(missingText(dk), '부족 카드 목록');
+  if (act === 'dup') { const id = decks.create({ ...JSON.parse(JSON.stringify(dk)), name: (dk.name || '덱') + ' (복사본)', created: Date.now() }); toast('덱을 복제했습니다.'); openEditor(id); return; }
+  if (act === 'del') {
+    $('ed-confirm').innerHTML = `<div class="confirm"><span>"${esc(dk.name || '이 덱')}"을(를) 삭제합니다. 되돌릴 수 없습니다.</span><button class="go danger" type="button" id="ed-del-go">삭제</button><button class="ghost" type="button" id="ed-del-no">취소</button></div>`;
+    $('ed-del-go').onclick = () => { decks.remove(edId); closeEditor(); renderDeckHome(); toast('덱을 삭제했습니다.'); };
+    $('ed-del-no').onclick = () => { $('ed-confirm').innerHTML = ''; };
+    return;
+  }
+}
+
+/* ---------- meta decks ---------- */
+const MU_KEY = 'rb-ledger-meta-v1';
+const mu = Object.assign({ meta: MD.metas[MD.metas.length - 1].id, rank: 'top4', sort: 'rank', legend: '' }, lsGet(MU_KEY) || {});
+if (!MD.metas.some(m => m.id === mu.meta)) mu.meta = MD.metas[MD.metas.length - 1].id;
+const saveMu = () => lsSet(MU_KEY, mu);
+const metaDeck = o => ({
+  name: `${legendLabel(CARDS[o.L])} (${MD.events[o.e].ko} #${o.r ?? '-'})`, legend: CARDS[o.L].id, champion: o.C != null ? CARDS[o.C].id : null,
+  main: Object.fromEntries(o.m.map(([i, n]) => [CARDS[i].id, n])), bf: o.b.map(i => CARDS[i].id),
+  runes: Object.fromEntries(o.u.map(([i, n]) => [CARDS[i].id, n])), side: Object.fromEntries(o.s.map(([i, n]) => [CARDS[i].id, n])),
+  src: { e: o.e, p: o.p, r: o.r }, created: Date.now(), updated: Date.now(),
+});
+const inRank = o => mu.rank === 'all' || (o.r != null && o.r <= (mu.rank === 'top4' ? 4 : 8));
+function renderMeta() {
+  $('m-meta').innerHTML = MD.metas.map(m => {
+    const evs = MD.events.filter(e => e.meta === m.id);
+    return `<option value="${m.id}"${m.id === mu.meta ? ' selected' : ''}>${m.ko} (${m.en}) 메타 · 대회 ${evs.length}개 · ${evs[0].date.slice(0, 7)}~${evs[evs.length - 1].date.slice(0, 7)}</option>`;
+  }).join('');
+  $('m-rank').value = mu.rank; $('m-sort').value = mu.sort;
+  const om = ownedMap(), m = MD.metas.find(x => x.id === mu.meta);
+  const pool = MD.decks.map((o, i) => ({ o, i })).filter(({ o }) => MD.events[o.e].meta === mu.meta && inRank(o));
+  const tags = new Map(), rep = new Map();   // champion -> deck count, and its most-played legend for the chip art
+  for (const { o } of pool) {
+    const t = champTag(CARDS[o.L]); tags.set(t, (tags.get(t) || 0) + 1);
+    const r = rep.get(t) || new Map(); r.set(o.L, (r.get(o.L) || 0) + 1); rep.set(t, r);
+  }
+  const repLegend = t => CARDS[[...rep.get(t)].sort((a, b) => b[1] - a[1])[0][0]];
+  if (mu.legend && !tags.has(mu.legend)) mu.legend = '';
+  let list = mu.legend ? pool.filter(({ o }) => champTag(CARDS[o.L]) === mu.legend) : pool;
+  list = list.map(x => ({ ...x, dk: metaDeck(x.o) })).map(x => ({ ...x, own: deckOwn(x.dk, om) }));
+  if (mu.sort === 'own') list.sort((a, b) => b.own.pct - a.own.pct || (a.o.r ?? 999) - (b.o.r ?? 999));
+  else list.sort((a, b) => MD.events[b.o.e].date.localeCompare(MD.events[a.o.e].date) || (a.o.r ?? 999) - (b.o.r ?? 999));
+  const evs = MD.events.filter(e => e.meta === mu.meta);
+  const best = pool.map(x => ({ x, own: deckOwn(metaDeck(x.o), om) })).sort((a, b) => b.own.pct - a.own.pct)[0];
+  const radNote = MD.metas.some(x => x.id === 'RAD') ? '' : ' 레디언스(2026년 10월 16일 이후) 환경의 공식 대회 덱리스트는 아직 공개되지 않았습니다.';
+  $('meta-sum').innerHTML = `<p class="hint" style="margin:0">${m.ko} 메타 대회: ${evs.map(e => `<a href="${e.url}" target="_blank" rel="noopener">${e.ko}</a>`).join(', ')}. ${mu.rank === 'all' ? '공개된' : mu.rank === 'top4' ? 'Top 4' : 'Top 8'} 덱 ${pool.length}개.${radNote}</p>
+    ${best ? `<p style="margin:0;font-size:13px">내 컬렉션으로 가장 가까운 덱: <b>${esc(legendLabel(CARDS[best.x.o.L]))}</b> (${esc(MD.events[best.x.o.e].ko)} #${best.x.o.r}) · 보유 ${best.own.pct}% · 부족 ${best.own.miss}장</p>` : ''}`;
+  $('meta-chips').innerHTML = `<button class="chip" type="button" data-tag="" aria-pressed="${!mu.legend}">전체 챔피언<b>${pool.length}</b></button>` +
+    [...tags].sort((a, b) => b[1] - a[1]).map(([t, n]) => `<button class="chip av-chip" type="button" data-tag="${esc(t)}" aria-pressed="${mu.legend === t}" title="${esc(legendLabel(repLegend(t)))}"><span class="av" style="${avatarStyle(repLegend(t))}" aria-hidden="true"></span>${esc(ko() ? champKo(t) : t)}<b>${n}</b></button>`).join('');
+  $('meta-list').innerHTML = list.length ? list.map(({ o, i, own }) => {
+    const lg = CARDS[o.L], ch = o.C != null ? CARDS[o.C] : null, ev = MD.events[o.e];
+    const banned = [o.L, o.C, ...o.m.map(x => x[0]), ...o.b].filter(x => x != null && isBanned(CARDS[x])).length;
+    return `<article class="mdeck" data-mi="${i}">
+      <span class="th" style="${thumbStyle(lg)}" aria-hidden="true"></span>
+      <div class="cardbody">
+      <span class="top"><span class="rankb">${o.r != null ? '#' + o.r : '-'}</span> · ${esc(ev.ko)} RQ · ${ev.date}${ev.players ? ` · ${ev.players.toLocaleString()}명` : ''}</span>
+      <b>${esc(legendLabel(lg))}</b>
+      <span class="hint">${ch ? esc(dName(ch)) + ' · ' : ''}${esc(o.p)}${o.lr ? ` · 전설 내 ${o.lr[0]}위/${o.lr[1]}명` : ''}</span>
+      <span class="ownbar" aria-hidden="true"><i style="width:${own.pct}%"></i></span>
+      <span class="hint">보유 ${own.have}/${own.total}장 (${own.pct}%) · 부족 ${own.miss}장</span>
+      ${banned || o.note ? `<span class="badges">${banned ? `<span class="pill bad">현재 금지 카드 ${banned}종</span>` : ''}${o.note ? `<span class="pill warn">${esc(o.note)}</span>` : ''}</span>` : ''}
+      <div class="act"><button class="mini" type="button" data-act="view">덱 보기</button><button class="mini" type="button" data-act="take">내 덱으로 가져오기</button></div>
+      </div>
+    </article>`;
+  }).join('') : `<p class="empty">조건에 맞는 덱이 없습니다.</p>`;
+}
+$('m-meta').onchange = ev => { mu.meta = ev.target.value; mu.legend = ''; saveMu(); renderMeta(); };
+$('m-rank').onchange = ev => { mu.rank = ev.target.value; saveMu(); renderMeta(); };
+$('m-sort').onchange = ev => { mu.sort = ev.target.value; saveMu(); renderMeta(); };
+$('meta-chips').onclick = ev => { const b = ev.target.closest('[data-tag]'); if (!b) return; mu.legend = b.dataset.tag; saveMu(); renderMeta(); };
+function takeMeta(i) { const id = decks.create(metaDeck(MD.decks[i])); closeDetail(); toast('내 덱으로 가져왔습니다.'); openEditor(id); }
+$('meta-list').onclick = ev => {
+  const b = ev.target.closest('[data-act]'); if (!b) return;
+  const i = +b.closest('[data-mi]').dataset.mi;
+  if (b.dataset.act === 'take') takeMeta(i); else openMetaSheet(i);
+};
+
+let sheetBack = null;
+function openMetaSheet(i) {
+  const o = MD.decks[i], dk = metaDeck(o), om = ownedMap(), own = deckOwn(dk, om), ev = MD.events[o.e], lg = CARDS[o.L];
+  if (!openId && $('sheet').hidden) lastFocus = document.activeElement;
+  openId = null; sheetBack = () => openMetaSheet(i);
+  $('sheet').innerHTML = `
+    <header>
+      <div><div class="code">${o.r != null ? '#' + o.r : ''} · ${esc(ev.ko)} RQ (${esc(ev.en)}) · ${ev.date}</div>
+      <h2 id="d-title">${esc(legendLabel(lg))}<small>${esc(o.p)}${o.lr ? ` · 전설 내 ${o.lr[0]}위/${o.lr[1]}명` : ''}</small></h2></div>
+      <button class="x" type="button" id="d-close" aria-label="닫기">✕</button>
+    </header>
+    <div><div class="ownbar" aria-hidden="true"><i style="width:${own.pct}%"></i></div>
+    <p class="hint" style="margin:6px 0 0">내 컬렉션 기준 보유 ${own.have}/${own.total}장 (${own.pct}%) · 부족 ${own.miss}장. 사이드보드는 계산에서 뺐습니다.${o.note ? ' ' + esc(o.note) + '.' : ''}</p></div>
+    <div class="filters"><button class="btn" type="button" id="ms-take">내 덱으로 가져오기</button><button class="ghost" type="button" id="ms-copy">영문 덱리스트 복사</button><button class="ghost" type="button" id="ms-miss"${own.miss ? '' : ' disabled'}>부족 카드 복사</button></div>
+    <div class="slot"><span class="th sm" style="${thumbStyle(lg, 32)}" aria-hidden="true"></span><span><span class="hint">선택 챔피언</span><br>${o.C != null ? `<button class="nm" type="button" data-cid="${CARDS[o.C].id}">${esc(dName(CARDS[o.C]))}</button>` : '—'}</span></div>
+    <div id="ms-list">${deckListHTML(dk, om, false)}</div>
+    <a class="artlink" href="${ev.url}" target="_blank" rel="noopener">공식 기사 원문 ↗</a>`;
+  $('sheet').hidden = false; $('scrim').hidden = false;
+  $('d-close').onclick = closeDetail;
+  $('ms-take').onclick = () => takeMeta(i);
+  $('ms-copy').onclick = () => copyText(deckText(dk, 'en'), '영문 덱리스트');
+  $('ms-miss').onclick = () => copyText(missingText(dk), '부족 카드 목록');
+  $('sheet').querySelectorAll('[data-cid],[data-act="card"]').forEach(el => el.onclick = () => openDetail(el.dataset.cid || el.closest('[data-id]').dataset.id));
+  $('d-close').focus();
+}
+
+function fillSelects() {
+  const opt = (v, t, sel) => `<option value="${v}"${sel === v ? ' selected' : ''}>${esc(t)}</option>`;
+  $('f-set').innerHTML = opt('', '세트: 전체', ui.set) + SETS.map(s => opt(s.id, `${setName(s.id)} (${s.id})`, ui.set)).join('');
+  // Native <option>s can't hold drawn shapes, so each domain carries a color circle glyph.
+  const DOT = { fury: '🔴', calm: '🟢', mind: '🔵', body: '🟠', chaos: '🟣', order: '🟡', colorless: '⚪' };
+  $('f-domain').innerHTML = opt('', '영역: 전체', ui.domain) + DOM_ORDER.map(d => opt(d, `${DOT[d]} ${L.domain[d][1]} · ${L.domain[d][0]}`, ui.domain)).join('');
+  const types = ['unit','champion','spell','gear','legend','battlefield','rune','signature','token'];
+  $('f-type').innerHTML = opt('', '유형: 전체', ui.type) + types.map(t => opt(t, lbl('type', t), ui.type)).join('');
+  $('f-rarity').innerHTML = opt('', '희귀도: 전체', ui.rarity) + RAR_ORDER.map(r => opt(r, lbl('rarity', r), ui.rarity)).join('');
+  $('f-own').value = ui.own; $('f-sort').value = ui.sort; $('q-text').checked = ui.text;
+  $('lang-ko').setAttribute('aria-pressed', ko()); $('lang-en').setAttribute('aria-pressed', !ko());
+  $('hide-alt').setAttribute('aria-pressed', !!ui.base);
+  $('view-list').setAttribute('aria-pressed', ui.view !== 'album'); $('view-album').setAttribute('aria-pressed', ui.view === 'album');
+}
+
+function displayName(c) {
+  const e = inv.get(c.id), kn = e.nk || c.nk;
+  if (ko() && kn) return { pri: kn, sub: c.sk || (e.nk ? '' : c.s ? c.s : ''), alt: c.n + (c.s ? ' · ' + c.s : ''), badge: e.nk && !c.nk ? 'mine' : c.ko === 1 ? 'est' : '' };
+  return { pri: c.n, sub: c.s || '', alt: kn ? kn + (c.sk ? ' · ' + c.sk : '') : '', badge: '' };
+}
+
+/* ---------- filtering ---------- */
+function matches(c, terms) {
+  for (const t of terms) {
+    if (/^[ㄱ-ㅎ]+$/.test(t)) { if (!c._cho.includes(t)) return false; continue; }
+    const n = norm(t); if (!n) continue;
+    if (!c._name.includes(n) && !(ui.text && c._text.includes(n))) return false;
+  }
+  return true;
+}
+function filtered() {
+  const terms = ui.q.trim().split(/\s+/).filter(Boolean);
+  let out = CARDS.filter(c => {
+    if (ui.set && c.set !== ui.set) return false;
+    if (ui.domain && !(c.d||[]).includes(ui.domain)) return false;
+    if (ui.type && !(c.t||[]).includes(ui.type) && !(c.st||[]).includes(ui.type)) return false;
+    if (ui.rarity && c.r !== ui.rarity) return false;
+    if (ui.base && c._alt) return false;
+    if (ui.own) { const q = inv.q(c.id);
+      if (ui.own === 'own' && !q) return false; if (ui.own === 'missing' && q) return false;
+      if (ui.own === 'under3' && q >= 3) return false; if (ui.own === 'extra' && q < 4) return false; }
+    return !terms.length || matches(c, terms);
+  });
+  const nm = c => (ko() ? (inv.get(c.id).nk || c.nk || c.n) : c.n);
+  if (ui.sort === 'name') { const col = new Intl.Collator(ko() ? 'ko' : 'en'); out.sort((a, b) => col.compare(nm(a), nm(b))); }
+  else if (ui.sort === 'qty') out.sort((a, b) => inv.q(b.id) - inv.q(a.id));
+  else if (ui.sort === 'cost') out.sort((a, b) => (a.e ?? 99) - (b.e ?? 99));
+  return out;
+}
+
+/* ---------- render ---------- */
+function rowHTML(c) {
+  const q = inv.q(c.id), n = displayName(c);
+  const dom = (c.d||[]).map(d => `<i style="--c:var(--d-${d})" title="${esc(lbl('domain', d))}"></i>`).join('');
+  const types = [...(c.st||[]), ...(c.t||[])].map(t => lbl('type', t)).join(' ');
+  const badge = n.badge === 'est' ? '<span class="badge" title="공식 한국어판 미발매 세트: LoL 한국어 표기 기준 추정">추정</span>' : n.badge === 'mine' ? '<span class="badge mine">내 번역</span>' : '';
+  return `<li class="row${q ? ' has' : ''}${q >= 3 ? ' full' : ''}" data-id="${c.id}">
+    <button class="row-main" type="button" data-act="open">
+      <span class="th" style="${thumbStyle(c)}" aria-hidden="true"></span>
+      <span class="code">${esc(c.code)}</span>
+      <span class="names"><span class="pri">${esc(n.pri)}</span>${n.sub ? ` <span class="sub">${esc(n.sub)}</span>` : ''}${badge}${n.alt ? `<span class="alt">${esc(n.alt)}</span>` : ''}</span>
+      <span class="meta"><span class="dom">${dom}</span><span>${esc(types)}</span>${c.e != null ? `<span class="cost" title="에너지">⬡${c.e}</span>` : ''}<span class="gem" style="--c:var(--r-${c.r})">${esc(lbl('rarity', c.r))}</span></span>
+    </button>
+    <div class="step"><button type="button" data-act="dec" aria-label="1장 빼기">−</button><output>${q}</output><button type="button" data-act="inc" aria-label="1장 더하기">+</button></div>
+  </li>`;
+}
+
+// Album tiles crop the large detail sheets with percentage offsets, so the crop holds at any tile width.
+function tileArt(c) {
+  if (!USE_PACK) return `<img src="${cdn(c, 320)}" alt="" loading="lazy">`;
+  const per = G.dn * G.dn, k = c.ix % per, n = G.dn - 1;
+  return `<span class="ti" data-bg="img/d${pad3(Math.floor(c.ix / per))}.webp" style="background-size:${G.dn * 100}% ${G.dn * 100}%;background-position:${(k % G.dn) / n * 100}% ${Math.floor(k / G.dn) / n * 100}%"></span>`;
+}
+function tileHTML(c) {
+  const q = inv.q(c.id), n = displayName(c);
+  return `<li class="tile${q ? ' has' : ''}${q >= 3 ? ' full' : ''}" data-id="${c.id}">
+    <button class="tile-img" type="button" data-act="open" aria-label="${esc(n.pri)} 상세 보기">${tileArt(c)}<span class="qb"${q ? '' : ' hidden'}>×${q}</span></button>
+    <div class="tile-foot"><span class="tname" title="${esc(n.pri)}">${esc(n.pri)}</span><span class="code">${esc(c.code)}</span></div>
+    <div class="step"><button type="button" data-act="dec" aria-label="1장 빼기">−</button><output>${q}</output><button type="button" data-act="inc" aria-label="1장 더하기">+</button></div>
+  </li>`;
+}
+const itemHTML = c => ui.view === 'album' ? tileHTML(c) : rowHTML(c);
+const lazyBg = 'IntersectionObserver' in window ? new IntersectionObserver(es => {
+  for (const e of es) if (e.isIntersecting) { const el = e.target; el.style.backgroundImage = `url('${el.dataset.bg}')`; lazyBg.unobserve(el); }
+}, { rootMargin: '600px 0px' }) : null;
+function wireLazy(root) {
+  root.querySelectorAll('.ti[data-bg]').forEach(el => lazyBg ? lazyBg.observe(el) : (el.style.backgroundImage = `url('${el.dataset.bg}')`));
+}
+
+function renderSummary() {
+  let kinds = 0, copies = 0, baseAll = 0, baseOwn = 0;
+  const per = Object.fromEntries(SETS.map(s => [s.id, { n: 0, own: 0, cp: 0 }]));
+  for (const c of CARDS) {
+    const q = inv.q(c.id), p = per[c.set]; p.n++;
+    if (q) { p.own++; kinds++; copies += q; p.cp += q; }
+    if (!c._alt) { baseAll++; if (q) baseOwn++; }
+  }
+  $('t-pct-base').textContent = (baseOwn / baseAll * 100).toFixed(1) + '%';
+  $('t-base').textContent = `(${baseOwn.toLocaleString()}/${baseAll.toLocaleString()})`;
+  $('t-kinds').textContent = kinds.toLocaleString(); $('t-all').textContent = CARDS.length.toLocaleString();
+  $('t-copies').textContent = copies.toLocaleString(); $('t-pct').textContent = (kinds / CARDS.length * 100).toFixed(1) + '%';
+  $('sets').innerHTML = SETS.map(s => { const p = per[s.id];
+    return `<button class="set" type="button" data-set="${s.id}" aria-pressed="${ui.set === s.id}">
+      <span class="nm"><b>${esc(setName(s.id))}</b><code>${s.id}</code></span>
+      <span class="ct">${p.own} / ${p.n}종 · ${p.cp}장</span>
+      <span class="bar"><i style="width:${(p.own / p.n * 100).toFixed(1)}%"></i></span></button>`; }).join('');
+}
+
+let current = [];
+function render() {
+  renderSummary();
+  current = filtered();
+  const shown = current.slice(0, ui.limit);
+  if (lazyBg) lazyBg.disconnect();
+  $('list').classList.toggle('album', ui.view === 'album');
+  $('list').innerHTML = shown.length ? shown.map(itemHTML).join('') : `<li class="empty">조건에 맞는 카드가 없습니다. 검색어를 줄이거나 필터를 초기화해 보세요.</li>`;
+  $('result').textContent = `${current.length.toLocaleString()}종 표시`;
+  const rest = current.length - shown.length;
+  $('more').hidden = rest <= 0; $('more-btn').textContent = `더 보기 (${rest.toLocaleString()}종 남음)`;
+  wireLazy($('list'));
+}
+
+function updateRow(id) {
+  const li = $('list').querySelector(`[data-id="${CSS.escape(id)}"]`); if (!li) return;
+  const q = inv.q(id); li.querySelector('output').textContent = q;
+  li.classList.toggle('has', q > 0); li.classList.toggle('full', q >= 3);
+  const qb = li.querySelector('.qb'); if (qb) { qb.textContent = '×' + q; qb.hidden = !q; }
+}
+
+function changeQty(id, d) {
+  const q = Math.max(0, Math.min(999, inv.q(id) + d));
+  inv.patch(id, { q }); updateRow(id); renderSummary();
+  if (openId === id) $('d-q').textContent = q;
+}
+
+/* ---------- detail ---------- */
+let openId = null, lastFocus = null;
+function richText(s) {
+  let h = esc(s);
+  h = h.replace(/\[([^\]\n]{1,24})\]/g, '<span class="kw">[$1]</span>')
+    .replace(/:rb_might:/g, '<abbr class="ic" title="Might · 힘">M</abbr>')
+    .replace(/:rb_exhaust:/g, '<abbr class="ic" title="Exhaust · 소진">↷</abbr>')
+    .replace(/:rb_energy_(\d+):/g, '<span class="ic en" title="Energy">$1</span>')
+    .replace(/:rb_rune_rainbow:/g, '<span class="rune rainbow" title="Any rune"></span>')
+    .replace(/:rb_rune_([a-z]+):/g, (m, d) => `<span class="rune" style="--c:var(--d-${d})" title="${d} rune"></span>`);
+  return h;
+}
+function openDetail(id) {
+  const c = BYID.get(id); if (!c) return;
+  if (!openId) lastFocus = document.activeElement;
+  openId = id;
+  const e = inv.get(id), s = SETMAP.get(c.set);
+  const img = IMG + c.img;
+  const types = [...(c.st||[]), ...(c.t||[])].map(t => `${L.type[t]?.[0] || t} (${L.type[t]?.[1] || t})`).join(', ');
+  const doms = (c.d||[]).map(d => `<span class="rune" style="--c:var(--d-${d})"></span> ${L.domain[d][1]}`).join(' &nbsp;') || '—';
+  const stats = [c.e != null && `에너지 ${c.e}`, c.p != null && `파워 ${c.p}`, c.m != null && `힘(Might) ${c.m}`].filter(Boolean).join(' · ') || '—';
+  const tags = (c.tg||[]).map((t, i) => esc(t)).join(', ');
+  const tagsKo = (c.tk||[]).join(', ');
+  const koState = c.ko === 2 ? '공식' : c.ko === 1 ? '추정 (LoL 표기)' : '없음';
+  $('sheet').innerHTML = `
+    <header>
+      <div><div class="code">${esc(c.code)} · ${esc(s.ko)} / ${esc(s.en)}</div>
+      <h2 id="d-title">${esc(e.nk || c.nk || c.n)}${c.sk || c.s ? ' · ' + esc(c.sk || c.s) : ''}<small>${esc(c.n)}${c.s ? ' · ' + esc(c.s) : ''}</small></h2></div>
+      <span style="display:flex;gap:6px">${sheetBack ? '<button class="ghost" type="button" id="d-back">← 덱</button>' : ''}<button class="x" type="button" id="d-close" aria-label="닫기">✕</button></span>
+    </header>
+    <div class="bigstep"><div class="step"><button type="button" id="d-dec" aria-label="1장 빼기">−</button><output id="d-q">${inv.q(id)}</output><button type="button" id="d-inc" aria-label="1장 더하기">+</button></div><span class="hint">보유 수량 · 덱에는 같은 카드 최대 3장</span></div>
+    <dl class="facts">
+      <dt>유형</dt><dd>${esc(types)}</dd>
+      <dt>영역</dt><dd>${doms}</dd>
+      <dt>희귀도</dt><dd><span class="gem" style="--c:var(--r-${c.r})">${esc(L.rarity[c.r][0])} (${esc(L.rarity[c.r][1])})</span></dd>
+      <dt>수치</dt><dd>${stats}</dd>
+      ${tags ? `<dt>태그</dt><dd>${tags}${tagsKo ? ` <span class="hint">(${esc(tagsKo)})</span>` : ''}</dd>` : ''}
+      <dt>일러스트</dt><dd>${esc(c.il || '—')}</dd>
+      <dt>한글명</dt><dd>${koState}</dd>
+    </dl>
+    ${c.txk ? `<div class="txt"><h3>효과 · 한국어</h3>${richText(c.txk)}</div>` : ''}
+    ${c.tx ? `<div class="txt"><h3>Effect · English</h3>${richText(c.tx)}</div>` : ''}
+    <div class="field"><label for="f-nk">내 한글 이름 ${c.nk ? '(공식/추정 이름 대신 표시)' : '(검색에도 반영)'}</label><input id="f-nk" value="${esc(e.nk || '')}" placeholder="${esc(c.nk || '예: 직접 번역한 카드명')}"></div>
+    <div class="field"><label for="f-memo">메모</label><input id="f-memo" value="${esc(e.memo || '')}" placeholder="예: 포일 1장, 트레이드용"></div>
+    <div class="artwrap"><div id="d-art">${USE_PACK ? `<div class="art${c.o === 'l' ? ' land' : ''}"></div>` : `<img class="art${c.o === 'l' ? ' land' : ''}" src="${cdn(c, c.o === 'l' ? 1040 : 744)}" alt="${esc(c.n)} 카드 이미지">`}</div>
+    <a class="artlink" href="${img}" target="_blank" rel="noopener">원본 고해상도 이미지 ↗</a></div>`;
+  if (USE_PACK) drawArt(c, $('d-art')).catch(() => { if (openId === id) $('d-art').innerHTML = '<p class="hint">이미지를 불러오지 못했습니다. 위 링크로 원본을 열 수 있습니다.</p>'; });
+  $('sheet').hidden = false; $('scrim').hidden = false;
+  $('d-close').onclick = closeDetail;
+  if (sheetBack) $('d-back').onclick = () => sheetBack();
+  $('d-dec').onclick = () => changeQty(id, -1);
+  $('d-inc').onclick = () => changeQty(id, +1);
+  let tN, tM;
+  $('f-nk').oninput = ev => { clearTimeout(tN); tN = setTimeout(() => { inv.patch(id, { nk: ev.target.value.trim() }); indexCard(c); const li = $('list').querySelector(`[data-id="${CSS.escape(id)}"]`); if (li) { li.outerHTML = itemHTML(c); wireLazy($('list')); } }, 500); };
+  $('f-memo').oninput = ev => { clearTimeout(tM); tM = setTimeout(() => inv.patch(id, { memo: ev.target.value.trim() }), 500); };
+  if (document.activeElement === document.body || !$('sheet').contains(document.activeElement)) $('d-close').focus();
+}
+function closeDetail() {
+  openId = null; sheetBack = null; $('sheet').hidden = true; $('scrim').hidden = true;
+  if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
+}
+
+/* ---------- export / import ---------- */
+function rowsForExport() {
+  return CARDS.filter(c => { const e = inv.get(c.id); return e.q || e.nk || e.memo; }).map(c => { const e = inv.get(c.id);
+    return { code: c.code, id: c.id, set: c.set, name_en: c.n + (c.s ? ' - ' + c.s : ''), name_ko: (e.nk || c.nk || '') + ((c.sk) ? ' - ' + c.sk : ''), rarity: c.r, qty: e.q || 0, my_ko_name: e.nk || '', memo: e.memo || '' }; });
+}
+const csvCell = v => { const s = String(v ?? ''); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+async function offerFile(filename, text, mime) {
+  if (IN_VIEWER) {
+    try { const dl = await claude.use('downloads'); if (!dl) throw { code: 'unavailable' };
+      await dl.save({ filename, data: text }); toast(`${filename} 저장을 요청했습니다.`); }
+    catch (e) { if (e && e.code === 'declined') return; toast('이 화면에서는 파일 저장을 쓸 수 없습니다.'); }
+    return;
+  }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: mime })); a.download = filename;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+const stamp = () => new Date().toISOString().slice(0, 10);
+$('ex-csv').onclick = () => {
+  const rows = rowsForExport(), head = ['code','set','name_en','name_ko','rarity','qty','my_ko_name','memo'];
+  if (!rows.length) return toast('내보낼 보유 카드가 아직 없습니다.');
+  offerFile(`riftbound-collection-${stamp()}.csv`, '﻿' + [head.join(','), ...rows.map(r => head.map(h => csvCell(r[h])).join(','))].join('\n'), 'text/csv');
+};
+$('ex-json').onclick = () => {
+  const rows = rowsForExport();
+  if (!rows.length && !Object.keys(decks.data).length) return toast('백업할 보유 카드나 덱이 아직 없습니다.');
+  offerFile(`riftbound-collection-${stamp()}.json`, JSON.stringify({ app: 'riftbound-ledger', version: 2, exported: new Date().toISOString(), items: rows, decks: decks.data }, null, 1), 'application/json');
+};
+function parseCSV(text) {
+  const rows = []; let row = [], cell = '', q = false;
+  for (let i = 0; i < text.length; i++) { const ch = text[i];
+    if (q) { if (ch === '"') { if (text[i+1] === '"') { cell += '"'; i++; } else q = false; } else cell += ch; }
+    else if (ch === '"') q = true; else if (ch === ',') { row.push(cell); cell = ''; }
+    else if (ch === '\n' || ch === '\r') { if (ch === '\r' && text[i+1] === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; }
+    else cell += ch; }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  const head = (rows.shift() || []).map(h => h.replace(/^﻿/, '').trim().toLowerCase());
+  return rows.filter(r => r.some(Boolean)).map(r => Object.fromEntries(head.map((h, i) => [h, r[i]])));
+}
+$('im-btn').onclick = () => $('im-file').click();
+$('im-file').onchange = async ev => {
+  const f = ev.target.files[0]; ev.target.value = ''; if (!f) return;
+  const text = await f.text(); let items = [], fileDecks = {};
+  try {
+    if (/\.json$/i.test(f.name) || text.trim().startsWith('{')) { const j = JSON.parse(text); items = j.items || []; fileDecks = j.decks || {}; }
+    else items = parseCSV(text);
+  } catch { return toast('파일을 읽을 수 없습니다. 이 장부에서 내보낸 CSV나 JSON인지 확인해 주세요.'); }
+  const newDecks = Object.entries(fileDecks).filter(([id, d]) => /^deck-[a-z0-9]+$/.test(id) && d && typeof d === 'object' && !decks.data[id]);
+  const found = [];
+  for (const it of items) {
+    const c = BYID.get(it.id) || BYCODE.get(String(it.code || '').trim().toUpperCase()); if (!c) continue;
+    const q = parseInt(it.qty ?? it.quantity ?? it['수량'] ?? 0, 10) || 0;
+    found.push([c.id, { q, nk: (it.my_ko_name || '').trim(), memo: (it.memo || '').trim() }]);
+  }
+  if (!found.length && !newDecks.length) return toast('일치하는 카드가 없습니다. code 또는 id 열과 qty 열이 있어야 합니다.');
+  confirmBox(`${f.name}: ${found.length}종 카드의 수량을 파일 값으로 덮어씁니다. 파일에 없는 카드는 그대로 둡니다.${newDecks.length ? ` 덱 ${newDecks.length}개도 추가합니다.` : ''}`, '가져오기', false, () => {
+    for (const [id, p] of found) inv.patch(id, p);
+    for (const [id, d] of newDecks) { decks.data[id] = { ...newDeck(), ...d }; decks.schedule(id); }
+    afterLoad(); toast(`${found.length}종${newDecks.length ? `, 덱 ${newDecks.length}개` : ''}를 가져왔습니다.`);
+  });
+};
+$('wipe').onclick = () => confirmBox('모든 카드의 보유 수량을 0으로 되돌립니다. 내 번역과 메모는 남습니다. 먼저 JSON 백업을 권장합니다.', '모두 0으로 초기화', true, () => {
+  for (const s of Object.keys(inv.data)) { for (const id of Object.keys(inv.data[s])) { const e = inv.data[s][id]; delete e.q; if (!e.nk && !e.memo) delete inv.data[s][id]; } inv.schedule(s); }
+  render(); toast('모든 수량을 0으로 초기화했습니다.');
+});
+function confirmBox(msg, goLabel, danger, fn) {
+  const a = $('confirm-area');
+  a.innerHTML = `<div class="confirm"><span>${esc(msg)}</span><button class="go${danger ? ' danger' : ''}" type="button" id="cf-go">${esc(goLabel)}</button><button class="ghost" type="button" id="cf-no">취소</button></div>`;
+  $('cf-go').onclick = () => { a.innerHTML = ''; fn(); };
+  $('cf-no').onclick = () => { a.innerHTML = ''; };
+  $('cf-go').focus();
+}
+
+let toastT;
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 3200); }
+
+/* ---------- events ---------- */
+let qT;
+$('q').addEventListener('input', ev => { clearTimeout(qT); qT = setTimeout(() => { ui.q = ev.target.value; ui.limit = 150; render(); }, 120); });
+$('q-text').onchange = ev => { ui.text = ev.target.checked; saveUi(); render(); };
+for (const [id, key] of [['f-set','set'],['f-domain','domain'],['f-type','type'],['f-rarity','rarity'],['f-own','own'],['f-sort','sort']])
+  $(id).onchange = ev => { ui[key] = ev.target.value; ui.limit = 150; saveUi(); render(); };
+for (const v of ['list', 'album']) $('view-' + v).onclick = () => { ui.view = v; saveUi(); fillSelects(); render(); };
+$('lang-ko').onclick = () => { ui.lang = 'ko'; saveUi(); fillSelects(); render(); };
+$('lang-en').onclick = () => { ui.lang = 'en'; saveUi(); fillSelects(); render(); };
+$('hide-alt').onclick = () => { ui.base = !ui.base; ui.limit = 150; saveUi(); fillSelects(); render(); };
+$('reset-f').onclick = () => { Object.assign(ui, { q:'', text:false, set:'', domain:'', type:'', rarity:'', own:'', sort:'set', base:false, limit:150 }); $('q').value = ''; saveUi(); fillSelects(); render(); };
+$('more-btn').onclick = () => { ui.limit += 300; render(); };
+$('sets').onclick = ev => { const b = ev.target.closest('[data-set]'); if (!b) return; ui.set = ui.set === b.dataset.set ? '' : b.dataset.set; ui.limit = 150; saveUi(); fillSelects(); render(); };
+$('list').onclick = ev => {
+  const btn = ev.target.closest('[data-act]'); if (!btn) return;
+  const id = btn.closest('[data-id]').dataset.id;
+  if (btn.dataset.act === 'inc') changeQty(id, +1); else if (btn.dataset.act === 'dec') changeQty(id, -1); else openDetail(id);
+};
+$('scrim').onclick = closeDetail;
+document.addEventListener('keydown', ev => {
+  if (ev.key === 'Escape' && !$('copybox').hidden) { $('copybox').hidden = true; return; }
+  if (ev.key === 'Escape' && !$('sheet').hidden) closeDetail();
+  if (ev.key === '/' && view === 'collection' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) { ev.preventDefault(); $('q').focus(); }
+});
+addEventListener('beforeunload', () => { if (inv.mode === 'local') { if (inv.dirty.size) lsSet(LS_KEY, inv.data); if (decks.dirty.size) lsSet(DK_KEY, decks.data); } });
+
+$('fetched').textContent = RAW.fetched; $('n-cards').textContent = CARDS.length.toLocaleString();
+CARDS.forEach(indexCard);
+fillSelects();
+route();
+initStore();
+})();
+</script>
