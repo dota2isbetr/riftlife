@@ -732,7 +732,7 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
     <div class="meta-grid" id="meta-list"></div>
   </section>
 
-  <p class="foot">카드 데이터: playriftbound.com 공식 카드 갤러리 (영문·한국어, <span id="fetched"></span> 기준, <span id="n-cards"></span>종). 한국어 이름은 공식 한국어판이 있는 오리진 세트만 <b>공식</b>이며, 이후 세트의 챔피언 이름은 리그 오브 레전드 한국어 표기를 따른 <b>추정</b>입니다. 한글명이 없는 카드는 상세 화면에서 내 번역을 직접 넣을 수 있고, 검색에도 반영됩니다. 카드 이미지 © Riot Games, 비영리 목적으로 허가를 받아 사용합니다. 메타 덱: playriftbound.com 공식 Organized Play 기사의 지역 예선(RQ) 덱리스트이며, 메타는 각 대회에서 사용된 가장 최신 확장팩 기준으로 나눴습니다. 금지 카드는 공식 금지 목록(Standard)을 기준으로 표시합니다. <span class="build">빌드 __BUILD__</span></p>
+  <p class="foot">카드 데이터: playriftbound.com 공식 카드 갤러리 (영문·한국어, <span id="fetched"></span> 기준, <span id="n-cards"></span>종). 한국어 이름은 공식 한국어판이 있는 오리진 세트만 <b>공식</b>이며, 이후 세트의 챔피언 이름은 리그 오브 레전드 한국어 표기를 따른 <b>추정</b>입니다. 한글명이 없는 카드는 상세 화면에서 내 번역을 직접 넣을 수 있고, 검색에도 반영됩니다. 갤러리에 없는 프로모·지역 한정 카드와 일부 토큰은 playriftbound.com 공식 뉴스에 공개된 카드 이미지를 기준으로 추가했습니다(상세 화면에 출처 표시). 카드 이미지 © Riot Games, 비영리 목적으로 허가를 받아 사용합니다. 메타 덱: playriftbound.com 공식 Organized Play 기사의 지역 예선(RQ) 덱리스트이며, 메타는 각 대회에서 사용된 가장 최신 확장팩 기준으로 나눴습니다. 금지 카드는 공식 금지 목록(Standard)을 기준으로 표시합니다. <span class="build">빌드 __BUILD__</span></p>
 </div>
 
 <div class="scrim" id="scrim" hidden></div>
@@ -808,9 +808,9 @@ const SETMAP = new Map(SETS.map(s => [s.id, s]));
 // Alternate-art printings: showcase rarity, numbered past the set size (overnumbered), "*" signed versions, or "a" variants.
 for (const c of CARDS) c._alt = c.r === 'showcase' || c.r === 'promo' || !!c.x || c.no > SETMAP.get(c.set).max || /-star-/.test(c.id) || /-\d+[a-z]-/.test(c.id);
 // Set order: gallery cards keep their array position; extras (appended for stable ix) slot in after the printing named in `after`.
-{ const pos = new Map(); CARDS.forEach((c, i) => { if (!c.x) pos.set(c.id, c._o = i); });
-  CARDS.forEach((c, i) => { if (c.x) c._o = (pos.get(c.after) ?? CARDS.length) + 0.5 + i / 1e6; }); }
-const HAS_EXTRAS = CARDS.some(c => c.x);
+{ const pos = new Map(); CARDS.forEach((c, i) => { if (!c.ex) pos.set(c.id, c._o = i); });
+  CARDS.forEach((c, i) => { if (c.ex) c._o = (pos.get(c.after) ?? CARDS.length) + 0.5 + i / 1e6; }); }
+const HAS_EXTRAS = CARDS.some(c => c.ex);
 const DOM_ORDER = Object.keys(L.domain), RAR_ORDER = Object.keys(L.rarity);
 
 /* ---------- search index ---------- */
@@ -822,7 +822,7 @@ function indexCard(c) {
   const e = inv.get(c.id);
   const ko = [c.nk, c.sk, e.nk, ...(c.tk||[])].filter(Boolean);
   c._name = '|' + [c.n, c.s, ...ko, ...(c.tg||[]), c.code, c.code.replace(/\/.*/, ''), c.set + c.no,
-    ...typeWords(c), ...(c.d||[]).flatMap(d => L.domain[d]||[]), ...(L.rarity[c.r]||[]), c.il, ...(c.x ? [c.x, c.xs, '한정', '한국 한정', '지역 한정'] : [])].map(norm).join('|') + '|';
+    ...typeWords(c), ...(c.d||[]).flatMap(d => L.domain[d]||[]), ...(L.rarity[c.r]||[]), c.il, c.x, c.xs, ...(c.kw||[])].map(norm).join('|') + '|';
   c._cho = ko.map(k => cho(k)).join('|');
   c._text = norm((c.tx||'') + '|' + (c.txk||''));
 }
@@ -2249,7 +2249,7 @@ function openDetail(id) {
       <dt>유형</dt><dd>${esc(types)}</dd>
       <dt>영역</dt><dd>${doms}</dd>
       <dt>희귀도</dt><dd><span class="gem" style="--c:var(--r-${c.r})">${esc(L.rarity[c.r][0])} (${esc(L.rarity[c.r][1])})</span></dd>
-      ${c.xs ? `<dt>구분</dt><dd><span class="gem" style="--c:var(--r-promo)">${esc(c.x)} 한정</span> ${esc(c.xs)}</dd>` : ''}
+      ${c.xs ? `<dt>구분</dt><dd><span class="gem" style="--c:var(--r-promo)">${esc(c.x || '')}</span> ${esc(c.xs)}${c.src ? ` <a href="${esc(c.src)}" target="_blank" rel="noopener">출처 ↗</a>` : ''}</dd>` : ''}
       <dt>수치</dt><dd>${stats}</dd>
       ${tags ? `<dt>태그</dt><dd>${tags}${tagsKo ? ` <span class="hint">(${esc(tagsKo)})</span>` : ''}</dd>` : ''}
       <dt>일러스트</dt><dd>${esc(c.il || '—')}</dd>
@@ -2260,7 +2260,7 @@ function openDetail(id) {
     <div class="field"><label for="f-nk">내 한글 이름 ${c.nk ? '(공식/추정 이름 대신 표시)' : '(검색에도 반영)'}</label><input id="f-nk" value="${esc(e.nk || '')}" placeholder="${esc(c.nk || '예: 직접 번역한 카드명')}"></div>
     <div class="field"><label for="f-memo">메모</label><input id="f-memo" value="${esc(e.memo || '')}" placeholder="예: 포일 1장, 트레이드용"></div>
     <div class="artwrap"><div id="d-art">${USE_PACK ? `<div class="art${c.o === 'l' ? ' land' : ''}"></div>` : `<img class="art${c.o === 'l' ? ' land' : ''}" src="${cdn(c, c.o === 'l' ? 1040 : 744)}" alt="${esc(c.n)} 카드 이미지">`}</div>
-    <a class="artlink" href="${img}" target="_blank" rel="noopener">원본 고해상도 이미지 ↗</a></div>`;
+    <a class="artlink" href="${img}" target="_blank" rel="noopener">${c.ex ? '공식 공지 이미지 ↗' : '원본 고해상도 이미지 ↗'}</a></div>`;
   if (USE_PACK) drawArt(c, $('d-art')).catch(() => { if (openId === id) $('d-art').innerHTML = '<p class="hint">이미지를 불러오지 못했습니다. 위 링크로 원본을 열 수 있습니다.</p>'; });
   $('sheet').hidden = false; $('scrim').hidden = false;
   $('d-close').onclick = closeDetail;

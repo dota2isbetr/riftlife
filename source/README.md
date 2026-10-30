@@ -41,7 +41,7 @@ https://riftlife.life 에 게시된 앱(`/index.html`, `/img/`)을 만드는 원
 
 공식 카드 갤러리에는 프로모·지역 한정 카드가 올라오지 않습니다. 이런 카드는 `data/extras.json`에 직접 적습니다.
 
-1. `extras.json`의 `cards`에 항목 추가: `id`, 게임 데이터를 복사해 올 `base` 카드 id, `code`, `r`(promo/showcase), `il`, `x`(지역, 예: KR), `xs`(설명), `src`(출처 공지), `img`(공식 공지 속 카드 이미지 URL)
+1. `extras.json`의 `cards`에 항목 추가: `id`, 게임 데이터를 복사해 올 `base` 카드 id, `code`(중복 불가), `r`(promo/showcase), `il`, `x`(상세 화면 배지, 예: 한국 한정·프로모), `xs`(설명), `kw`(추가 검색어), `src`(출처 공지), `img`(공식 공지 속 카드 이미지 URL), 필요하면 `box`(이미지 속 카드 영역)와 `after`/`before`(표시 순서). 토큰처럼 대체 인쇄본이 아닌 누락 카드는 `x` 없이 넣음. 자세한 규칙은 파일 맨 위 `note`
 2. 저장소 루트에서 `python3 -I source/scripts/add_extras.py --fetch`
    - 공지 이미지에서 카드 부분을 잘라 `source/extras/<id>.webp`로 저장하고, cards.json 끝에 붙이고, `/img/`의 마지막 시트에 이어 붙임
    - 갤러리 카드의 `ix`와 meta.json은 바뀌지 않음. 화면에서는 `after`로 지정된 같은 번호 카드 바로 뒤에 정렬됨
@@ -62,6 +62,6 @@ https://riftlife.life 에 게시된 앱(`/index.html`, `/img/`)을 만드는 원
 
 ## 출처
 
-- 카드 데이터·이미지: playriftbound.com 공식 카드 갤러리 (영문·한국어). 한국 한정 카드 4종은 공식 공지 「9월 18일, 대한민국에 협곡이 열립니다」의 이미지. 카드 이미지 © Riot Games, 비영리 목적으로 허가를 받아 사용.
+- 카드 데이터·이미지: playriftbound.com 공식 카드 갤러리 (영문·한국어). 프로모·지역 한정 카드와 일부 토큰(31종)은 playriftbound.com 공식 뉴스 공지의 카드 이미지 (카드별 출처는 extras.json의 `src`). 카드 이미지 © Riot Games, 비영리 목적으로 허가를 받아 사용.
 - 대회 덱: playriftbound.com Organized Play 지역 예선(RQ) Top Decks 기사
 - 덱 규칙: 공식 Deckbuilding Primer, 대회 규정 (2026년 7월 24일부터 사이드보드 10장 이하)

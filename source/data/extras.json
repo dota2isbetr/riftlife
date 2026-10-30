@@ -1,29 +1,537 @@
 {
-  "note": "공식 카드 갤러리에 없는 프로모·지역 한정 카드. base 카드의 게임 데이터를 복사하고 아래 값만 덮어씀. 이미지는 source/extras/<id>.webp (744x1039).",
-  "cards": [
-    {
-      "id": "ogn-303a-298", "base": "ogn-303-298", "code": "OGN-303a/298 KR", "r": "showcase", "il": "Allen Song",
-      "x": "KR", "xs": "한국어판 오리진 부스터 한정 오버넘버 (한복 아리 오마주)",
-      "src": "https://playriftbound.com/ko-kr/news/announcements/koreas-rift-opens-on-september-18/",
-      "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/5460eec92189cb7e00c1c4a740c1146c8ad85c40-1848x1063.jpg"
-    },
-    {
-      "id": "ogn-030-kr-298", "base": "ogn-030-298", "code": "OGN-030/298 P KR", "r": "promo", "il": "Kudos Productions",
-      "x": "KR", "xs": "한국 출시 이벤트 프로모 (출시 특별판 스탬프)",
-      "src": "https://playriftbound.com/ko-kr/news/announcements/koreas-rift-opens-on-september-18/",
-      "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/dda8706e0b7bb4ab59807650f8e02fc8eb0e49eb-1848x1063.jpg"
-    },
-    {
-      "id": "ogn-076b-298", "base": "ogn-076-298", "code": "OGN-076b/298 P KR", "r": "promo", "il": "Kim Star",
-      "x": "KR", "xs": "한국 오리진 출시 이벤트 프로모",
-      "src": "https://playriftbound.com/ko-kr/news/announcements/koreas-rift-opens-on-september-18/",
-      "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/9ddf848f09b3f13047ab473aa4f09cc6ebf16906-1848x1063.jpg"
-    },
-    {
-      "id": "ogn-197b-298", "base": "ogn-197-298", "code": "OGN-197b/298 P KR", "r": "promo", "il": "Alsie Lau",
-      "x": "KR", "xs": "한국 넥서스 나이트 프로모 (GG EZ)",
-      "src": "https://playriftbound.com/ko-kr/news/announcements/koreas-rift-opens-on-september-18/",
-      "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/e9e879f0711473ce756b10e737980ac601f0ee77-1848x1063.jpg"
-    }
-  ]
+ "note": "공식 카드 갤러리에 없는 카드 (프로모·지역 한정·누락 토큰). base 카드의 게임 데이터를 복사하고 나머지 값으로 덮어씀(null이면 삭제). x = 상세 화면 배지 문구(있으면 대체 인쇄본으로 취급), xs = 설명, kw = 추가 검색어, box = img에서 카드 영역 [l,t,r,b] (없으면 흰 배경 자동 감지), after/before = 표시 순서 기준 카드 (없으면 같은 세트·번호의 마지막 인쇄본 뒤). 이미지는 source/extras/<id>.webp (744x1039).",
+ "cards": [
+  {
+   "id": "ogn-303a-298",
+   "base": "ogn-303-298",
+   "code": "OGN-303a/298 KR",
+   "r": "showcase",
+   "il": "Allen Song",
+   "x": "한국 한정",
+   "xs": "한국어판 오리진 부스터 한정 오버넘버 (한복 아리 오마주)",
+   "src": "https://playriftbound.com/ko-kr/news/announcements/koreas-rift-opens-on-september-18/",
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/5460eec92189cb7e00c1c4a740c1146c8ad85c40-1848x1063.jpg",
+   "kw": [
+    "KR",
+    "한정",
+    "지역 한정"
+   ]
+  },
+  {
+   "id": "ogn-030-kr-298",
+   "base": "ogn-030-298",
+   "code": "OGN-030/298 P KR",
+   "r": "promo",
+   "il": "Kudos Productions",
+   "x": "한국 한정",
+   "xs": "한국 출시 이벤트 프로모 (출시 특별판 스탬프)",
+   "src": "https://playriftbound.com/ko-kr/news/announcements/koreas-rift-opens-on-september-18/",
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/dda8706e0b7bb4ab59807650f8e02fc8eb0e49eb-1848x1063.jpg",
+   "kw": [
+    "KR",
+    "한정",
+    "지역 한정",
+    "promo",
+    "프로모"
+   ]
+  },
+  {
+   "id": "ogn-076b-298",
+   "base": "ogn-076-298",
+   "code": "OGN-076b/298 P KR",
+   "r": "promo",
+   "il": "Kim Star",
+   "x": "한국 한정",
+   "xs": "한국 오리진 출시 이벤트 프로모",
+   "src": "https://playriftbound.com/ko-kr/news/announcements/koreas-rift-opens-on-september-18/",
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/9ddf848f09b3f13047ab473aa4f09cc6ebf16906-1848x1063.jpg",
+   "kw": [
+    "KR",
+    "한정",
+    "지역 한정",
+    "promo",
+    "프로모"
+   ]
+  },
+  {
+   "id": "ogn-197b-298",
+   "base": "ogn-197-298",
+   "code": "OGN-197b/298 P KR",
+   "r": "promo",
+   "il": "Alsie Lau",
+   "x": "한국 한정",
+   "xs": "한국 넥서스 나이트 프로모 (GG EZ)",
+   "src": "https://playriftbound.com/ko-kr/news/announcements/koreas-rift-opens-on-september-18/",
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/e9e879f0711473ce756b10e737980ac601f0ee77-1848x1063.jpg",
+   "kw": [
+    "KR",
+    "한정",
+    "지역 한정",
+    "promo",
+    "프로모"
+   ]
+  },
+  {
+   "id": "ogn-111-judge-298",
+   "base": "ogn-111-298",
+   "code": "OGN-111/298 Judge",
+   "r": "promo",
+   "x": "프로모",
+   "xs": "심판 프로모 (첫 공식 대회 심판 보상, 포일)",
+   "kw": [
+    "promo",
+    "심판",
+    "judge"
+   ],
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/34ccd037879f79e9740ae59384813e96c0ed93f2-744x1039.png",
+   "src": "https://playriftbound.com/en-us/news/announcements/riftbounds-first-english-regional-qualifier-and-other-op-updates/"
+  },
+  {
+   "id": "ogn-197-demo-298",
+   "base": "ogn-197-298",
+   "code": "OGN-197/298 Demo",
+   "r": "promo",
+   "x": "프로모",
+   "xs": "매장 데모 참가 프로모 (2025)",
+   "kw": [
+    "promo",
+    "데모",
+    "demo"
+   ],
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/f02161bb740972e5bb6d896ac7f0c83aa35c9b1e-744x1039.png",
+   "src": "https://playriftbound.com/en-us/news/announcements/riftbounds-first-english-regional-qualifier-and-other-op-updates/"
+  },
+  {
+   "id": "ogn-066-event-298",
+   "base": "ogn-066-298",
+   "code": "OGN-066/298 Event",
+   "r": "promo",
+   "x": "프로모",
+   "xs": "2025 행사 데모 프로모 (포일, 중국 외 지역)",
+   "kw": [
+    "promo",
+    "행사",
+    "event"
+   ],
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/6cb05db002a596b7a6e853a77dac06f46f5ae5f0-1920x1081.jpg",
+   "box": [
+    627,
+    76,
+    1292,
+    1005
+   ],
+   "src": "https://playriftbound.com/en-us/news/announcements/riftbound-at-events-in-2025/"
+  },
+  {
+   "id": "ogs-011-p-024",
+   "base": "ogs-011-024",
+   "code": "OGS-011/024 P",
+   "r": "promo",
+   "x": "프로모",
+   "xs": "플래시 프로모 (Riftbound Play Network 매장 배포)",
+   "kw": [
+    "promo",
+    "매장"
+   ],
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/e647ac8bd9ce0d49b8b8056decc6ca285f4c9e00-1920x1080.jpg",
+   "box": [
+    573,
+    0,
+    1347,
+    1080
+   ],
+   "src": "https://playriftbound.com/en-us/news/announcements/flash-promos-and-origins-reprint-updates/"
+  },
+  {
+   "id": "unl-169-p-219",
+   "base": "unl-169-219",
+   "code": "UNL-169/219 P",
+   "r": "promo",
+   "x": "프로모",
+   "xs": "언리시드 Pre-Rift 프로모",
+   "kw": [
+    "promo",
+    "pre-rift",
+    "prerelease",
+    "프리릴리즈"
+   ],
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/2a8b70fb77a4a0011cba4d53110b1532b9f3cd5e-744x1039.jpg",
+   "src": "https://playriftbound.com/en-us/news/announcements/the-unleashed-overview/"
+  },
+  {
+   "id": "unl-056-p-219",
+   "base": "unl-056-219",
+   "code": "UNL-056/219 P",
+   "r": "promo",
+   "x": "프로모",
+   "xs": "언리시드 서머너 스커미시 1 참가 프로모",
+   "kw": [
+    "promo",
+    "서머너 스커미시",
+    "summoner skirmish"
+   ],
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/2de27ba77ea00df7a1dbd7560ec083ad83ba9aea-744x1039.jpg",
+   "src": "https://playriftbound.com/en-us/news/announcements/the-unleashed-overview/"
+  },
+  {
+   "id": "unl-120-p-219",
+   "base": "unl-120-219",
+   "code": "UNL-120/219 P",
+   "r": "promo",
+   "x": "프로모",
+   "xs": "언리시드 서머너 스커미시 1 상위권(Top Cut) 프로모",
+   "kw": [
+    "promo",
+    "서머너 스커미시",
+    "summoner skirmish"
+   ],
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/2a37aed64ca9d45fddd1ba050697e19e514ab769-744x1039.jpg",
+   "src": "https://playriftbound.com/en-us/news/announcements/the-unleashed-overview/"
+  },
+  {
+   "id": "unl-120-pc-219",
+   "base": "unl-120-219",
+   "code": "UNL-120/219 P Champion",
+   "r": "promo",
+   "x": "프로모",
+   "xs": "언리시드 서머너 스커미시 1 우승 프로모 (CHAMPION 스탬프)",
+   "kw": [
+    "promo",
+    "서머너 스커미시",
+    "summoner skirmish",
+    "우승"
+   ],
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/3801c6b9a99c6c22cfcabd652fa166562b86d240-744x1039.jpg",
+   "src": "https://playriftbound.com/en-us/news/announcements/the-unleashed-overview/"
+  },
+  {
+   "id": "unl-086-p-219",
+   "base": "unl-086-219",
+   "code": "UNL-086/219 P",
+   "r": "promo",
+   "x": "프로모",
+   "xs": "언리시드 서머너 스커미시 2 참가 프로모",
+   "kw": [
+    "promo",
+    "서머너 스커미시",
+    "summoner skirmish"
+   ],
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/f0548abedb8396d12f6e21be564a839a8210be25-744x1039.jpg",
+   "src": "https://playriftbound.com/en-us/news/announcements/the-unleashed-overview/"
+  },
+  {
+   "id": "unl-058-p-219",
+   "base": "unl-058-219",
+   "code": "UNL-058/219 P",
+   "r": "promo",
+   "x": "프로모",
+   "xs": "언리시드 서머너 스커미시 2 상위권(Top Cut) 프로모",
+   "kw": [
+    "promo",
+    "서머너 스커미시",
+    "summoner skirmish"
+   ],
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/6fd2a8817f6de22c7d6501589d7d7d68b860d7e2-744x1039.jpg",
+   "src": "https://playriftbound.com/en-us/news/announcements/the-unleashed-overview/"
+  },
+  {
+   "id": "unl-058-pc-219",
+   "base": "unl-058-219",
+   "code": "UNL-058/219 P Champion",
+   "r": "promo",
+   "x": "프로모",
+   "xs": "언리시드 서머너 스커미시 2 우승 프로모 (CHAMPION 스탬프)",
+   "kw": [
+    "promo",
+    "서머너 스커미시",
+    "summoner skirmish",
+    "우승"
+   ],
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/9660a700b5b46eb1f8a688e477828ca74b0f9b79-744x1039.jpg",
+   "src": "https://playriftbound.com/en-us/news/announcements/the-unleashed-overview/"
+  },
+  {
+   "id": "ven-041-p-166",
+   "base": "ven-041-166",
+   "code": "VEN-041/166 P EN",
+   "r": "promo",
+   "x": "프로모",
+   "xs": "벤데타 Pre-Rift 프로모",
+   "kw": [
+    "promo",
+    "pre-rift",
+    "prerelease",
+    "프리릴리즈"
+   ],
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/4e506b5a2a12df743aa72be0bbaef8779dcc8513-744x1039.png",
+   "src": "https://playriftbound.com/en-us/news/announcements/the-vendetta-overview/"
+  },
+  {
+   "id": "ven-041a-p-166",
+   "base": "ven-041-166",
+   "code": "VEN-041a/166 P EN",
+   "r": "promo",
+   "x": "프로모",
+   "xs": "2026 행사 프로모 (Gen Con·PAX West 데모 참가)",
+   "kw": [
+    "promo",
+    "행사",
+    "event"
+   ],
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/db7d06f4b3a03922ababc60532c4b75b3d404705-1848x1039.jpg",
+   "il": "League Splash Team",
+   "box": [
+    552,
+    0,
+    1296,
+    1039
+   ],
+   "src": "https://playriftbound.com/en-us/news/announcements/riftbound-at-gen-con-2026/"
+  },
+  {
+   "id": "ven-139a-p-166",
+   "base": "ven-139-166",
+   "code": "VEN-139a/166 P EN",
+   "r": "promo",
+   "x": "프로모",
+   "xs": "Gift of the Rift 번들 영문판 한정 프로모",
+   "kw": [
+    "promo",
+    "gift of the rift",
+    "번들"
+   ],
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/fdf97284fecd92386fac4a3a5fc7c881a931d302-1039x489.jpg",
+   "il": "Luscinia Studio, Allen Song",
+   "box": [
+    344,
+    0,
+    695,
+    489
+   ],
+   "src": "https://playriftbound.com/en-us/news/announcements/riftbounds-2026-drawings/"
+  },
+  {
+   "id": "rad-132-p-167",
+   "base": "rad-132-167",
+   "code": "RAD-132/167 EN Pre-Rift",
+   "r": "promo",
+   "x": "프로모",
+   "xs": "레디언스 Pre-Rift 프로모",
+   "kw": [
+    "promo",
+    "pre-rift",
+    "prerelease",
+    "프리릴리즈"
+   ],
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/9126f3ac5c032144ff9df70b9bf396e940706716-1848x1063.jpg",
+   "box": [
+    552,
+    12,
+    1296,
+    1051
+   ],
+   "src": "https://playriftbound.com/en-us/news/announcements/the-radiance-overview/"
+  },
+  {
+   "id": "rad-085-p-167",
+   "base": "rad-085-167",
+   "code": "RAD-085/167 P EN",
+   "r": "promo",
+   "x": "프로모",
+   "xs": "레디언스 서머너 스커미시 1 참가 프로모",
+   "kw": [
+    "promo",
+    "서머너 스커미시",
+    "summoner skirmish"
+   ],
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/ccd61e76b43036fc435ac0153e3974284f21f6e0-744x1039.png",
+   "il": "Yeon Art Studio",
+   "src": "https://playriftbound.com/en-us/news/announcements/the-radiance-overview/"
+  },
+  {
+   "id": "rad-015-p-167",
+   "base": "rad-015-167",
+   "code": "RAD-015/167 P EN",
+   "r": "promo",
+   "x": "프로모",
+   "xs": "레디언스 서머너 스커미시 1 상위권(Top Cut) 프로모",
+   "kw": [
+    "promo",
+    "서머너 스커미시",
+    "summoner skirmish"
+   ],
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/3821c891598256663fdfdfac43e4f78a3e015529-744x1039.png",
+   "src": "https://playriftbound.com/en-us/news/announcements/the-radiance-overview/"
+  },
+  {
+   "id": "rad-015-pc-167",
+   "base": "rad-015-167",
+   "code": "RAD-015/167 P EN Champion",
+   "r": "promo",
+   "x": "프로모",
+   "xs": "레디언스 서머너 스커미시 1 우승 프로모",
+   "kw": [
+    "promo",
+    "서머너 스커미시",
+    "summoner skirmish",
+    "우승"
+   ],
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/ed2b6a2bdcf1aebe69862412053a1e96b342d883-744x1039.png",
+   "src": "https://playriftbound.com/en-us/news/announcements/the-radiance-overview/"
+  },
+  {
+   "id": "rad-110-p-167",
+   "base": "rad-110-167",
+   "code": "RAD-110/167 P EN",
+   "r": "promo",
+   "x": "프로모",
+   "xs": "레디언스 서머너 스커미시 2 참가 프로모",
+   "kw": [
+    "promo",
+    "서머너 스커미시",
+    "summoner skirmish"
+   ],
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/58000a55f3e4186393c85992cf81d8b7983d5b82-744x1039.png",
+   "src": "https://playriftbound.com/en-us/news/announcements/the-radiance-overview/"
+  },
+  {
+   "id": "rad-038-p-167",
+   "base": "rad-038-167",
+   "code": "RAD-038/167 P EN",
+   "r": "promo",
+   "x": "프로모",
+   "xs": "레디언스 서머너 스커미시 2 상위권(Top Cut) 프로모",
+   "kw": [
+    "promo",
+    "서머너 스커미시",
+    "summoner skirmish"
+   ],
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/b83164c722352be0d8b505555ada2f75e50b9cce-744x1039.jpg",
+   "src": "https://playriftbound.com/en-us/news/announcements/the-radiance-overview/"
+  },
+  {
+   "id": "rad-038-pc-167",
+   "base": "rad-038-167",
+   "code": "RAD-038/167 P EN Champion",
+   "r": "promo",
+   "x": "프로모",
+   "xs": "레디언스 서머너 스커미시 2 우승 프로모",
+   "kw": [
+    "promo",
+    "서머너 스커미시",
+    "summoner skirmish",
+    "우승"
+   ],
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/c3d01599e6b0eaa2508b5b2942f3ac898ec5b918-744x1039.jpg",
+   "src": "https://playriftbound.com/en-us/news/announcements/the-radiance-overview/"
+  },
+  {
+   "id": "rad-086-p-167",
+   "base": "rad-086-167",
+   "code": "RAD-086/167 P EN",
+   "r": "promo",
+   "x": "프로모",
+   "xs": "2026 지역 챔피언십 참가 프로모",
+   "kw": [
+    "promo",
+    "지역 챔피언십",
+    "regional championship"
+   ],
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/54edc525a36df7ffbd4a3dc46f529d499110a203-1920x1080.png",
+   "il": "Pixelverse",
+   "box": [
+    573,
+    0,
+    1347,
+    1080
+   ],
+   "src": "https://playriftbound.com/en-us/news/organizedplay/2026-regional-championship-info/"
+  },
+  {
+   "id": "rad-086a-p-167",
+   "base": "rad-086-167",
+   "code": "RAD-086a/167 P EN",
+   "r": "promo",
+   "x": "프로모",
+   "xs": "2026 지역 챔피언십 2일차 진출 프로모",
+   "kw": [
+    "promo",
+    "지역 챔피언십",
+    "regional championship"
+   ],
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/567301b3d8a156fc0bb8010f66f28d0d52fec20c-1920x1080.png",
+   "il": "HXY",
+   "box": [
+    573,
+    0,
+    1347,
+    1080
+   ],
+   "src": "https://playriftbound.com/en-us/news/organizedplay/2026-regional-championship-info/"
+  },
+  {
+   "id": "rad-086b-p-167",
+   "base": "rad-086-167",
+   "code": "RAD-086b/167 P EN",
+   "r": "promo",
+   "x": "프로모",
+   "xs": "2026 지역 챔피언십 Top 8 프로모",
+   "kw": [
+    "promo",
+    "지역 챔피언십",
+    "regional championship"
+   ],
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/e4f37441f379f725480b56eaa8047b9c2df60fb6-1920x1080.png",
+   "il": "TUTU",
+   "box": [
+    22,
+    158,
+    570,
+    923
+   ],
+   "src": "https://playriftbound.com/en-us/news/organizedplay/2026-regional-championship-info/"
+  },
+  {
+   "id": "ven-t01",
+   "base": "ven-t04",
+   "code": "VEN-T01",
+   "no": 1,
+   "before": "ven-t04",
+   "n": "Empowered",
+   "t": null,
+   "m": null,
+   "tg": null,
+   "tx": "Use to mark legends, units, and gear that are [Empowered].",
+   "il": "Six More Vodka",
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/d8f215ab4333ecef02a472d817beada5f20d0e4f-744x1039.png",
+   "src": "https://playriftbound.com/en-us/news/announcements/the-vendetta-overview/"
+  },
+  {
+   "id": "ven-t05",
+   "base": "ven-t04",
+   "code": "VEN-T05",
+   "no": 5,
+   "n": "Shadow Clone",
+   "m": 0,
+   "tg": null,
+   "tx": "When I attack, you may banish a unit from your trash. If you do, give me [Assault 4] this turn. (+4 :rb_might: while I'm an attacker.)",
+   "il": "Six More Vodka",
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/1827779cd1db1f6987fd9281cffab33fe5fd5f57-744x1039.png",
+   "src": "https://playriftbound.com/en-us/news/announcements/the-vendetta-overview/"
+  },
+  {
+   "id": "ven-t06",
+   "base": "ven-t04",
+   "code": "VEN-T06",
+   "no": 6,
+   "n": "Tentacle",
+   "m": 1,
+   "tg": [
+    "Bilgewater"
+   ],
+   "il": "Michal Ivan",
+   "img": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/4eaf43866f4d25b0a4cc2f5eed88edef95fb73f9-744x1039.png",
+   "src": "https://playriftbound.com/en-us/news/announcements/the-vendetta-overview/"
+  }
+ ]
 }
