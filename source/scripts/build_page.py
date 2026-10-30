@@ -10,7 +10,9 @@ src = os.path.join(root, 'source')
 t = open(os.path.join(src, 'template.html'), encoding='utf-8').read()
 cards = open(os.path.join(src, 'data', 'cards.json'), encoding='utf-8').read().replace('</', '<\\/')
 meta = open(os.path.join(src, 'data', 'meta.json'), encoding='utf-8').read().replace('</', '<\\/')
-page = t.replace('__DATA__', cards).replace('__META__', meta)
+import datetime
+stamp = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).strftime('%Y-%m-%d %H:%M KST')
+page = t.replace('__DATA__', cards).replace('__META__', meta).replace('__BUILD__', stamp)
 os.makedirs(os.path.join(src, 'build'), exist_ok=True)
 open(os.path.join(src, 'build', 'artifact.html'), 'w', encoding='utf-8').write(page)
 open(os.path.join(root, 'index.html'), 'w', encoding='utf-8').write(

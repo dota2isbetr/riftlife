@@ -662,7 +662,7 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
     <div class="meta-grid" id="meta-list"></div>
   </section>
 
-  <p class="foot">카드 데이터: playriftbound.com 공식 카드 갤러리 (영문·한국어, <span id="fetched"></span> 기준, <span id="n-cards"></span>종). 한국어 이름은 공식 한국어판이 있는 오리진 세트만 <b>공식</b>이며, 이후 세트의 챔피언 이름은 리그 오브 레전드 한국어 표기를 따른 <b>추정</b>입니다. 한글명이 없는 카드는 상세 화면에서 내 번역을 직접 넣을 수 있고, 검색에도 반영됩니다. 카드 이미지 © Riot Games, 비영리 목적으로 허가를 받아 사용합니다. 메타 덱: playriftbound.com 공식 Organized Play 기사의 지역 예선(RQ) 덱리스트이며, 메타는 각 대회에서 사용된 가장 최신 확장팩 기준으로 나눴습니다. 금지 카드는 공식 금지 목록(Standard)을 기준으로 표시합니다.</p>
+  <p class="foot">카드 데이터: playriftbound.com 공식 카드 갤러리 (영문·한국어, <span id="fetched"></span> 기준, <span id="n-cards"></span>종). 한국어 이름은 공식 한국어판이 있는 오리진 세트만 <b>공식</b>이며, 이후 세트의 챔피언 이름은 리그 오브 레전드 한국어 표기를 따른 <b>추정</b>입니다. 한글명이 없는 카드는 상세 화면에서 내 번역을 직접 넣을 수 있고, 검색에도 반영됩니다. 카드 이미지 © Riot Games, 비영리 목적으로 허가를 받아 사용합니다. 메타 덱: playriftbound.com 공식 Organized Play 기사의 지역 예선(RQ) 덱리스트이며, 메타는 각 대회에서 사용된 가장 최신 확장팩 기준으로 나눴습니다. 금지 카드는 공식 금지 목록(Standard)을 기준으로 표시합니다. <span class="build">빌드 __BUILD__</span></p>
 </div>
 
 <div class="scrim" id="scrim" hidden></div>
@@ -1085,6 +1085,41 @@ function closeEditor() { edId = null; edBuilt = null; $('deck-edit').hidden = tr
 // Square crop of a card's illustration from the large image sheets (W = rendered card width).
 // Image sheets that have been shown once are painted straight away on later renders; only unseen ones wait
 // for the lazy loader. Re-rendering the deck editor otherwise left every card blank for a couple of frames.
+/* Re-render by patching the live DOM toward new markup instead of replacing it. Elements are matched by
+   data-id (+ data-sec) where present, so card tiles - and their image layers - survive edits; only counts,
+   badges and order change. Replacing them made every visible card image repaint (a full-screen blink). */
+function morphInto(el, html) {
+  const tpl = document.createElement('template'); tpl.innerHTML = html;
+  morphChildren(el, tpl.content);
+}
+const morphKey = n => n.nodeType === 1 && n.dataset && n.dataset.id ? n.dataset.id + '|' + (n.dataset.sec || '') : null;
+function morphChildren(oldP, newP) {
+  const keyed = new Map();
+  for (const n of oldP.childNodes) { const k = morphKey(n); if (k && !keyed.has(k)) keyed.set(k, n); }
+  let cur = oldP.firstChild;
+  for (const nn of [...newP.childNodes]) {
+    const k = morphKey(nn);
+    let m = null;
+    if (k) { m = keyed.get(k) || null; if (m) keyed.delete(k); }
+    else if (cur && !morphKey(cur) && cur.nodeType === nn.nodeType && cur.nodeName === nn.nodeName) m = cur;
+    if (!m) { oldP.insertBefore(nn, cur); continue; }
+    if (m === cur) cur = cur.nextSibling; else oldP.insertBefore(m, cur);
+    morphNode(m, nn);
+  }
+  while (cur) { const nx = cur.nextSibling; oldP.removeChild(cur); cur = nx; }
+}
+function morphNode(o, n) {
+  if (o.nodeType !== 1) { if (o.nodeValue !== n.nodeValue) o.nodeValue = n.nodeValue; return; }
+  const isArt = o.classList.contains('ti'), oldBg = isArt ? o.style.backgroundImage : '';
+  for (const a of [...o.attributes]) if (!n.hasAttribute(a.name)) o.removeAttribute(a.name);
+  for (const a of n.attributes) if (o.getAttribute(a.name) !== a.value) o.setAttribute(a.name, a.value);
+  if (oldBg) {   // keep an image the lazy loader already attached when the new markup points at the same sheet
+    const want = n.getAttribute('data-bg') || '';
+    if ((want && oldBg.includes(want)) || n.style.backgroundImage === oldBg) { if (o.style.backgroundImage !== oldBg) o.style.backgroundImage = oldBg; o.removeAttribute('data-bg'); }
+  }
+  morphChildren(o, n);
+  if (o.nodeName === 'SELECT' || o.nodeName === 'INPUT' || o.nodeName === 'TEXTAREA') { if (o.value !== n.value) o.value = n.value; if (o.type === 'checkbox') o.checked = n.checked; }
+}
 const BG_SEEN = new Set();
 const bgAttrs = (url, style) => BG_SEEN.has(url) ? `style="background-image:url('${url}');${style}"` : `data-bg="${url}" style="${style}"`;
 function cropAttrs(c, w, h, W = w / 0.62, cx = 0.55, cy = 0.27) {
@@ -1223,7 +1258,7 @@ function renderBrowser() {
   const list = browserList(dk, om), shown = list.slice(0, pk.limit);
   $('bt-count').textContent = `${SEC_LABEL[pk.sec]}: ${list.length.toLocaleString()}장`;
   const picked = id => (pk.sec === 'legend' && dk.legend === id) || (pk.sec === 'champion' && dk.champion && nameKey(BYID.get(dk.champion)) === nameKey(BYID.get(id)));
-  $('bt-grid').innerHTML = shown.length ? shown.map(({ c, legal, n, own }) => {
+  morphInto($('bt-grid'), shown.length ? shown.map(({ c, legal, n, own }) => {
     const sel = picked(c.id), badge = (pk.sec === 'legend' || pk.sec === 'champion') ? (sel ? '<span class="bt-n">선택됨</span>' : '') : (n ? `<span class="bt-n">×${n}</span>` : '');
     return `<div class="bt${legal ? '' : ' off'}${sel || (n && pk.sec !== 'legend' && pk.sec !== 'champion') ? ' in' : ''}" data-id="${c.id}">
       <button class="bt-img" type="button" data-act="add" aria-label="${esc(dName(c))} ${pk.sec === 'legend' || pk.sec === 'champion' ? '선택' : '추가'}" title="${esc(enName(c))}">${tileArt(c)}</button>
@@ -1231,7 +1266,7 @@ function renderBrowser() {
       <div class="bt-foot"><span class="bt-name">${esc(dName(c))}</span><span class="${own ? 'hint' : 'hint dim'}">보유 ${own}</span></div>
       <div class="bt-act">${n && pk.sec !== 'legend' ? '<button class="mini" type="button" data-act="dec" aria-label="1장 빼기">−</button>' : ''}<button class="mini" type="button" data-act="card">정보</button></div>
     </div>`;
-  }).join('') : `<p class="empty">조건에 맞는 카드가 없습니다.</p>`;
+  }).join('') : `<p class="empty">조건에 맞는 카드가 없습니다.</p>`);
   $('bt-more').hidden = list.length <= pk.limit;
   wireLazy($('bt-grid'));
 }
@@ -1336,7 +1371,7 @@ function renderWorkspace() {
   $('sw-count').textContent = `${v.mainN}/40`;
   $('ed-grid').dataset.pane = ws.pane;
   for (const b of $('deck-edit').querySelectorAll('[data-pane]')) b.setAttribute('aria-pressed', b.dataset.pane === ws.pane);
-  $('ws-body').innerHTML = ws.view === 'art' ? artView(dk) : ws.view === 'stats' ? statsView(dk, om) : listView(dk, om);
+  morphInto($('ws-body'), ws.view === 'art' ? artView(dk) : ws.view === 'stats' ? statsView(dk, om) : listView(dk, om));
   wireLazy($('ws-body'));
   edSaveState();
 }
@@ -1846,7 +1881,7 @@ function render() {
   $('list').classList.toggle('album', ui.view === 'album');
   $('list').classList.toggle('fixed-cols', ui.view === 'album' && ui.cols !== 'auto');
   $('list').style.setProperty('--cols', ui.cols === 'auto' ? 6 : ui.cols);
-  $('list').innerHTML = shown.length ? shown.map(itemHTML).join('') : `<li class="empty">조건에 맞는 카드가 없습니다. 검색어를 줄이거나 필터를 초기화해 보세요.</li>`;
+  morphInto($('list'), shown.length ? shown.map(itemHTML).join('') : `<li class="empty">조건에 맞는 카드가 없습니다. 검색어를 줄이거나 필터를 초기화해 보세요.</li>`);
   $('result').textContent = `${current.length.toLocaleString()}종 표시`;
   const rest = current.length - shown.length;
   $('more').hidden = rest <= 0; $('more-btn').textContent = `더 보기 (${rest.toLocaleString()}종 남음)`;
