@@ -473,6 +473,8 @@ h2.vh{margin:0;font-size:18.5px}
 #kr-sum{margin-bottom:26px}.kr-head{flex-direction:column;align-items:flex-start;gap:10px}.page-lead{margin:0;font-size:clamp(17px,2.2vw,22px);font-weight:500;line-height:1.45;color:var(--muted);letter-spacing:-.01em;word-break:keep-all}.kr-env{margin:0 0 14px}.kr-env button{padding:8px 16px;font-size:14.5px}
 .beta{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;line-height:1.5;padding:0 7px;margin-left:4px;border-radius:999px;background:var(--accent-soft);color:var(--accent);vertical-align:2px;text-transform:lowercase}
 .beta-note{display:flex;gap:10px;align-items:baseline;margin:0 0 6px;padding:12px 14px;border-radius:10px;background:var(--accent-soft);color:var(--ink);font-size:14px;line-height:1.55;word-break:keep-all}
+.page-title .beta{font-family:var(--f-body);font-size:clamp(13px,1.6vw,17px);padding:2px 12px;margin-left:12px;vertical-align:.9em;letter-spacing:.06em}
+.navlinks .beta{font-size:10px;padding:0 6px;margin-left:2px;vertical-align:1px}
 .beta-note .beta{margin:0;background:var(--accent);color:var(--bg);flex:none}
 .bt-ctl{margin-bottom:6px}
 .pk-sets{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:2px 0 10px}
@@ -742,7 +744,7 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
 }
 @media (max-width:460px){.topnav .wordmark{display:none}.navlinks a{padding:6px 8px}}
 @media (max-width:560px){.meta-grid{grid-template-columns:minmax(0,1fr);gap:14px}.mdeck{padding:16px;gap:16px;grid-template-columns:84px minmax(0,1fr)}.mthumb{width:84px}.mdeck b{font-size:16.5px}}
-@media (max-width:660px){.navlinks .long{display:none}.navlinks .short{display:inline}}
+@media (max-width:760px){.navlinks .long{display:none}.navlinks .short{display:inline}}
 @media (max-width:560px){
   .navlinks .long{display:none}
   .navlinks .short{display:inline}
@@ -910,7 +912,7 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
     <a id="tab-decks" href="#decks"><span class="long">덱 빌더</span><span class="short">덱</span></a>
     <a id="tab-kr" href="#kr"><span class="long">한국 환경 샘플 덱</span><span class="short">샘플</span></a>
     <a id="tab-meta" href="#meta"><span class="long">메타 덱</span><span class="short">메타</span></a>
-    <a id="tab-seoul" href="#seoul"><span class="long">서울 보드</span><span class="short">서울</span></a>
+    <a id="tab-seoul" href="#seoul"><span class="long">서울 보드 <span class="beta">beta</span></span><span class="short">서울</span></a>
   </div>
   <a class="nav-search" href="#collection" id="nav-search" aria-label="카드 검색"><svg viewBox="0 0 20 20" width="17" height="17" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m13 13 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></a>
   <div class="storage" id="storage" data-mode="loading" title="저장 위치"><i></i><span id="storage-text">보관함 불러오는 중…</span></div>
@@ -1061,7 +1063,7 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
   </section>
 
   <section id="v-seoul" hidden>
-    <div class="page-head kr-head"><h1 class="page-title">서울 보드</h1><p class="page-lead">서울 카드샵의 넥서스 나이트, 스토어 예선, 강습회 일정을 리스트와 달력으로 모아 봅니다.</p>
+    <div class="page-head kr-head"><h1 class="page-title">서울 보드<span class="beta">beta</span></h1><p class="page-lead">서울 카드샵의 넥서스 나이트, 스토어 예선, 강습회 일정을 리스트와 달력으로 모아 봅니다.</p>
       <div class="sb-ctl">
         <button class="btn" id="sb-refresh" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg><span>새로고침</span></button>
         <span class="sb-status" id="sb-status" role="status" aria-live="polite">일정을 불러오는 중입니다.</span>
