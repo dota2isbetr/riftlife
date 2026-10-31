@@ -414,6 +414,8 @@ h2.vh{margin:0;font-size:18px}
 .icon-btn svg{fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .icon-btn:hover,.icon-btn[aria-expanded="true"]{color:var(--ink);border-color:var(--muted)}
 .icon-btn.danger:hover{color:var(--danger);border-color:var(--danger)}
+.icon-btn.edit{background:#3D6FB3;border-color:#3D6FB3;color:#fff}
+.icon-btn.edit:hover{background:#2F5C99;border-color:#2F5C99;color:#fff}
 .dk-menu{position:absolute;left:12px;bottom:calc(100% - 4px);z-index:20;display:grid;min-width:220px;padding:6px;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 30px rgb(0 0 0 / .18)}
 .dk-menu button{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:2px;padding:8px 10px;border-radius:6px;font-size:13.5px}
 .dk-menu button small{font-size:11.5px;color:var(--muted)}
@@ -927,7 +929,7 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
     <div class="meta-grid" id="kr-list"></div>
   </section>
 
-  <p class="foot">카드 데이터: playriftbound.com 공식 카드 갤러리 (영문·한국어, <span id="fetched"></span> 기준, <span id="n-cards"></span>종). 한국어 이름은 공식 한국어판이 있는 오리진 세트만 <b>공식</b>이며, 이후 세트의 챔피언 이름은 리그 오브 레전드 한국어 표기를 따른 <b>추정</b>입니다. 한글명이 없는 카드는 상세 화면에서 내 번역을 직접 넣을 수 있고, 검색에도 반영됩니다. 갤러리에 없는 프로모·지역 한정 카드와 일부 토큰은 playriftbound.com 공식 뉴스에 공개된 카드 이미지를 기준으로 추가했습니다(상세 화면에 출처 표시). 카드 이미지 © Riot Games, 비영리 목적으로 허가를 받아 사용합니다. 메타 덱: playriftbound.com 공식 Organized Play 기사의 지역 예선(RQ) 덱리스트이며, 메타는 각 대회에서 사용된 가장 최신 확장팩 기준으로 나눴습니다. 금지 카드는 공식 금지 목록(Standard)을 기준으로 표시합니다. <span class="build">빌드 2026-10-31 16:27 KST</span></p>
+  <p class="foot">카드 데이터: playriftbound.com 공식 카드 갤러리 (영문·한국어, <span id="fetched"></span> 기준, <span id="n-cards"></span>종). 한국어 이름은 공식 한국어판이 있는 오리진 세트만 <b>공식</b>이며, 이후 세트의 챔피언 이름은 리그 오브 레전드 한국어 표기를 따른 <b>추정</b>입니다. 한글명이 없는 카드는 상세 화면에서 내 번역을 직접 넣을 수 있고, 검색에도 반영됩니다. 갤러리에 없는 프로모·지역 한정 카드와 일부 토큰은 playriftbound.com 공식 뉴스에 공개된 카드 이미지를 기준으로 추가했습니다(상세 화면에 출처 표시). 카드 이미지 © Riot Games, 비영리 목적으로 허가를 받아 사용합니다. 메타 덱: playriftbound.com 공식 Organized Play 기사의 지역 예선(RQ) 덱리스트이며, 메타는 각 대회에서 사용된 가장 최신 확장팩 기준으로 나눴습니다. 금지 카드는 공식 금지 목록(Standard)을 기준으로 표시합니다. <span class="build">빌드 2026-10-31 16:28 KST</span></p>
   <footer class="legal">
     <p>Copyright © 2026 riftlife.life</p>
     <p>RiftLife 는 Riot Games의 "Legal Jibber Jabber" 정책을 준수하여 만들었습니다. 모든 지적 재산권의 소유권은 Riot Games에 있으며 RiftLife는 그 어떤 수익 창출이나 영리 목적 활동을 하지 않습니다. 또한 Riot Games는 RiftLife를 제작하지 않았고 스폰서를 제공한 적이 없습니다. RiftLife는 개인 기록 보관 및 교육 목적만을 가지고 있는 완전 비영리 웹입니다.</p>
@@ -4011,6 +4013,7 @@ function deckSummary(dk, om) {
 const dkDate = t => { const d = new Date(t || Date.now()); return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 업데이트`; };
 const ICON = {
   share: '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><circle cx="15" cy="4.5" r="2.3"/><circle cx="5" cy="10" r="2.3"/><circle cx="15" cy="15.5" r="2.3"/><path d="m7 9 6-3.4M7 11l6 3.4"/></svg>',
+  edit: '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M13.6 3.4a1.9 1.9 0 0 1 2.7 2.7L7.2 15.2 3.6 16.4l1.2-3.6z"/><path d="m12.3 4.7 3 3"/></svg>',
   trash: '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M3.5 5.5h13M8 5.5V3.8h4v1.7M5.2 5.5l.8 11h8l.8-11M8.4 8.5v5.5M11.6 8.5v5.5"/></svg>',
 };
 // up to four random main-deck cards (runes and battlefields live elsewhere, the chosen champion is excluded)
@@ -4038,7 +4041,7 @@ function renderDeckHome() {
       </div>
       <div class="dk-actions">
         <button class="ghost dk-view" type="button" data-view="${id}">덱 보기</button>
-        <button class="btn" type="button" data-deck="${id}">편집</button>
+        <button class="icon-btn edit" type="button" data-deck="${id}" aria-label="${esc(name)} 편집" title="편집">${ICON.edit}</button>
         <button class="ghost" type="button" data-mull="${id}">멀리건</button>
         <span class="dk-actions-gap" aria-hidden="true"></span>
         <button class="icon-btn" type="button" data-share="${id}" aria-label="공유" aria-haspopup="menu" aria-expanded="false" title="공유">${ICON.share}</button>
