@@ -414,6 +414,10 @@ h2.vh{margin:0;font-size:18px}
 .icon-btn svg{fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .icon-btn:hover,.icon-btn[aria-expanded="true"]{color:var(--ink);border-color:var(--muted)}
 .icon-btn.danger:hover{color:var(--danger);border-color:var(--danger)}
+.icon-btn.view{background:#2F8A57;border-color:#2F8A57;color:#fff}
+.icon-btn.view:hover{background:#25734A;border-color:#25734A;color:#fff}
+.icon-btn.mulligan{color:var(--ink)}
+.icon-btn.mulligan:hover{color:var(--accent);border-color:var(--accent)}
 .icon-btn.edit{background:#3D6FB3;border-color:#3D6FB3;color:#fff}
 .icon-btn.edit:hover{background:#2F5C99;border-color:#2F5C99;color:#fff}
 .dk-menu{position:absolute;left:12px;bottom:calc(100% - 4px);z-index:20;display:grid;min-width:220px;padding:6px;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 30px rgb(0 0 0 / .18)}
@@ -1334,6 +1338,9 @@ function deckSummary(dk, om) {
 const dkDate = t => { const d = new Date(t || Date.now()); return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 업데이트`; };
 const ICON = {
   share: '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><circle cx="15" cy="4.5" r="2.3"/><circle cx="5" cy="10" r="2.3"/><circle cx="15" cy="15.5" r="2.3"/><path d="m7 9 6-3.4M7 11l6 3.4"/></svg>',
+  eye: '<svg viewBox="0 0 20 20" width="17" height="17" aria-hidden="true"><path d="M1.8 10S4.8 4.5 10 4.5 18.2 10 18.2 10 15.2 15.5 10 15.5 1.8 10 1.8 10z"/><circle cx="10" cy="10" r="2.6"/></svg>',
+  // a card with the RIFTLIFE mark, for the mulligan test
+  card: '<svg viewBox="0 0 20 20" width="17" height="17" aria-hidden="true"><rect x="4.2" y="1.8" width="11.6" height="16.4" rx="2"/><use href="#rl-mark" x="6.4" y="6.4" width="7.2" height="7.2" style="stroke:none;fill:currentColor"/></svg>',
   edit: '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M13.6 3.4a1.9 1.9 0 0 1 2.7 2.7L7.2 15.2 3.6 16.4l1.2-3.6z"/><path d="m12.3 4.7 3 3"/></svg>',
   trash: '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M3.5 5.5h13M8 5.5V3.8h4v1.7M5.2 5.5l.8 11h8l.8-11M8.4 8.5v5.5M11.6 8.5v5.5"/></svg>',
 };
@@ -1361,9 +1368,9 @@ function renderDeckHome() {
         <span class="hint dk-date">${dkDate(dk.updated)}${dk.src ? ` · ${dk.src.kr ? '한국 환경 샘플 덱' : `${esc(MD.events[dk.src.e]?.ko || '')} #${dk.src.r ?? '-'}`}에서 가져옴` : ''}</span>
       </div>
       <div class="dk-actions">
-        <button class="ghost dk-view" type="button" data-view="${id}">덱 보기</button>
+        <button class="icon-btn view" type="button" data-view="${id}" aria-label="${esc(name)} 덱 보기" title="덱 보기">${ICON.eye}</button>
         <button class="icon-btn edit" type="button" data-deck="${id}" aria-label="${esc(name)} 편집" title="편집">${ICON.edit}</button>
-        <button class="ghost" type="button" data-mull="${id}">멀리건</button>
+        <button class="icon-btn mulligan" type="button" data-mull="${id}" aria-label="${esc(name)} 멀리건 테스트" title="멀리건 테스트">${ICON.card}</button>
         <span class="dk-actions-gap" aria-hidden="true"></span>
         <button class="icon-btn" type="button" data-share="${id}" aria-label="공유" aria-haspopup="menu" aria-expanded="false" title="공유">${ICON.share}</button>
         <button class="icon-btn danger" type="button" data-del="${id}" aria-label="${esc(name)} 삭제" title="삭제">${ICON.trash}</button>
