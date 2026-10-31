@@ -11,6 +11,7 @@ https://riftlife.life 에 게시된 앱(`/index.html`, `/img/`)을 만드는 원
 | `data/cards.json` | 카드 1,408종 (영문·한글, 이미지 시트 위치 `ix`/`wh`/`rot` 포함) |
 | `data/meta.json` | 메타 덱: 대회, 덱리스트, 금지 목록 |
 | `data/samples_kr.json` | 한국 환경 샘플 덱 ("한국 환경 샘플 덱" 탭). 저장소 루트의 덱 이미지에서 옮겨 적음 |
+| `data/meta_extra.json` | 공식 기사 외 대회(SCG CON, CCS 등)의 상위 덱. 카드 id로 적고 `build_page.py`가 meta.json 뒤에 붙임 (build_meta.py를 다시 돌려도 유지됨) |
 | `data/decks_raw.json` | 대회 기사에서 파싱한 원본 덱 (meta.json의 입력) |
 | `scripts/` | 데이터 수집·가공 스크립트 (아래 순서) |
 

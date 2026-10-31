@@ -9,7 +9,17 @@ root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 src = os.path.join(root, 'source')
 t = open(os.path.join(src, 'template.html'), encoding='utf-8').read()
 cards = open(os.path.join(src, 'data', 'cards.json'), encoding='utf-8').read().replace('</', '<\\/')
-meta = open(os.path.join(src, 'data', 'meta.json'), encoding='utf-8').read().replace('</', '<\\/')
+import json
+# meta.json comes from the official-article pipeline (build_meta.py); meta_extra.json holds other events' top decks with card ids
+_meta = json.load(open(os.path.join(src, 'data', 'meta.json'), encoding='utf-8'))
+_extra = json.load(open(os.path.join(src, 'data', 'meta_extra.json'), encoding='utf-8'))
+_ix = {c['id']: c['ix'] for c in json.load(open(os.path.join(src, 'data', 'cards.json'), encoding='utf-8'))['cards']}
+_e0 = len(_meta['events']); _meta['events'] += _extra['events']
+for d in _extra['decks']:
+    d = dict(d, e=d['e'] + _e0, L=_ix[d['L']], C=_ix[d['C']] if d.get('C') else None, b=[_ix[i] for i in d['b']],
+             m=[[_ix[i], n] for i, n in d['m']], u=[[_ix[i], n] for i, n in d['u']], s=[[_ix[i], n] for i, n in d['s']])
+    _meta['decks'].append(d)
+meta = json.dumps(_meta, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
 kr = open(os.path.join(src, 'data', 'samples_kr.json'), encoding='utf-8').read().replace('</', '<\\/')
 import datetime
 stamp = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).strftime('%Y-%m-%d %H:%M KST')
