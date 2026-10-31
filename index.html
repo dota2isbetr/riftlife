@@ -386,7 +386,7 @@ h2.vh{margin:0;font-size:18px}
 .dk-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
 .dk-head h2{margin-right:auto}
 .paste{display:grid;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px;margin-bottom:14px}
-.dk-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px}
+.dk-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(290px,100%),1fr));gap:18px}
 .dk-li{position:relative;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:visible;min-width:0}
 .dk-li:hover{border-color:var(--muted)}
 .dk-stage{all:unset;box-sizing:border-box;cursor:pointer;position:relative;display:block;height:210px;border-radius:var(--radius) var(--radius) 0 0;background:radial-gradient(120% 90% at 50% 100%,#1B2433 0%,#0B0F14 70%);overflow:hidden}
@@ -407,8 +407,9 @@ h2.vh{margin:0;font-size:18px}
 .dk-info .pills{display:flex;gap:6px;flex-wrap:wrap}
 .dk-date{font-variant-numeric:tabular-nums}
 .dk-actions{display:flex;align-items:center;gap:6px;padding:10px 12px 12px;margin-top:auto;position:relative}
-.dk-actions .btn{padding:6px 14px}
-.dk-actions [data-del]{margin-left:auto}
+.dk-actions{flex-wrap:nowrap;gap:5px}
+.dk-actions .btn,.dk-actions .ghost{padding:6px 10px;font-weight:600;font-size:13px;border-radius:8px;white-space:nowrap}
+.dk-actions-gap{flex:1}
 .icon-btn{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer;padding:0}
 .icon-btn svg{fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .icon-btn:hover,.icon-btn[aria-expanded="true"]{color:var(--ink);border-color:var(--muted)}
@@ -643,9 +644,13 @@ table.an td.pc{color:var(--ink);background:linear-gradient(90deg,var(--rift-soft
 }
 @media (max-width:560px){.mull-hand{grid-template-columns:repeat(2,minmax(0,1fr))}.mull{padding:16px}.mull-table{grid-template-columns:minmax(0,1fr) 64px;gap:10px}.pile{width:52px}}
 /* deck list delete */
-.dk-confirm{display:grid;gap:8px;background:var(--accent-soft);border-radius:var(--radius);padding:12px;font-size:13px}
-.dk-confirm div{display:flex;gap:6px}
-.dk-confirm .go{background:var(--danger);color:#fff;border:0;border-radius:6px;padding:6px 12px}
+.dk-confirm{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:28px 20px;border-radius:var(--radius);background:var(--surface)}
+.dk-confirm-ico{fill:none;stroke:var(--danger);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;padding:12px;box-sizing:content-box;border-radius:50%;background:color-mix(in srgb,var(--danger) 12%,transparent)}
+.dk-confirm p{margin:0;font-size:17px;line-height:1.5;font-weight:500;word-break:keep-all}
+.dk-confirm p b{font-weight:800}
+.dk-confirm div{display:flex;gap:10px}
+.dk-confirm button{min-width:96px;padding:10px 18px;font-size:15px;font-weight:700;border-radius:10px}
+.dk-confirm .go{background:var(--danger);color:#fff;border:0}
 /* deck card hover preview */
 .hover-card{position:fixed;left:0;top:0;z-index:45;width:300px;pointer-events:none;display:grid;gap:8px;filter:drop-shadow(0 18px 36px rgb(0 0 0 / .32))}
 .hp-card{position:relative;width:300px;aspect-ratio:420/588;border-radius:14px;overflow:hidden;background:var(--sunk)}
@@ -922,7 +927,7 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
     <div class="meta-grid" id="kr-list"></div>
   </section>
 
-  <p class="foot">카드 데이터: playriftbound.com 공식 카드 갤러리 (영문·한국어, <span id="fetched"></span> 기준, <span id="n-cards"></span>종). 한국어 이름은 공식 한국어판이 있는 오리진 세트만 <b>공식</b>이며, 이후 세트의 챔피언 이름은 리그 오브 레전드 한국어 표기를 따른 <b>추정</b>입니다. 한글명이 없는 카드는 상세 화면에서 내 번역을 직접 넣을 수 있고, 검색에도 반영됩니다. 갤러리에 없는 프로모·지역 한정 카드와 일부 토큰은 playriftbound.com 공식 뉴스에 공개된 카드 이미지를 기준으로 추가했습니다(상세 화면에 출처 표시). 카드 이미지 © Riot Games, 비영리 목적으로 허가를 받아 사용합니다. 메타 덱: playriftbound.com 공식 Organized Play 기사의 지역 예선(RQ) 덱리스트이며, 메타는 각 대회에서 사용된 가장 최신 확장팩 기준으로 나눴습니다. 금지 카드는 공식 금지 목록(Standard)을 기준으로 표시합니다. <span class="build">빌드 2026-10-31 16:05 KST</span></p>
+  <p class="foot">카드 데이터: playriftbound.com 공식 카드 갤러리 (영문·한국어, <span id="fetched"></span> 기준, <span id="n-cards"></span>종). 한국어 이름은 공식 한국어판이 있는 오리진 세트만 <b>공식</b>이며, 이후 세트의 챔피언 이름은 리그 오브 레전드 한국어 표기를 따른 <b>추정</b>입니다. 한글명이 없는 카드는 상세 화면에서 내 번역을 직접 넣을 수 있고, 검색에도 반영됩니다. 갤러리에 없는 프로모·지역 한정 카드와 일부 토큰은 playriftbound.com 공식 뉴스에 공개된 카드 이미지를 기준으로 추가했습니다(상세 화면에 출처 표시). 카드 이미지 © Riot Games, 비영리 목적으로 허가를 받아 사용합니다. 메타 덱: playriftbound.com 공식 Organized Play 기사의 지역 예선(RQ) 덱리스트이며, 메타는 각 대회에서 사용된 가장 최신 확장팩 기준으로 나눴습니다. 금지 카드는 공식 금지 목록(Standard)을 기준으로 표시합니다. <span class="build">빌드 2026-10-31 16:27 KST</span></p>
   <footer class="legal">
     <p>Copyright © 2026 riftlife.life</p>
     <p>RiftLife 는 Riot Games의 "Legal Jibber Jabber" 정책을 준수하여 만들었습니다. 모든 지적 재산권의 소유권은 Riot Games에 있으며 RiftLife는 그 어떤 수익 창출이나 영리 목적 활동을 하지 않습니다. 또한 Riot Games는 RiftLife를 제작하지 않았고 스폰서를 제공한 적이 없습니다. RiftLife는 개인 기록 보관 및 교육 목적만을 가지고 있는 완전 비영리 웹입니다.</p>
@@ -4032,13 +4037,23 @@ function renderDeckHome() {
         <span class="hint dk-date">${dkDate(dk.updated)}${dk.src ? ` · ${dk.src.kr ? '한국 환경 샘플 덱' : `${esc(MD.events[dk.src.e]?.ko || '')} #${dk.src.r ?? '-'}`}에서 가져옴` : ''}</span>
       </div>
       <div class="dk-actions">
+        <button class="ghost dk-view" type="button" data-view="${id}">덱 보기</button>
         <button class="btn" type="button" data-deck="${id}">편집</button>
+        <button class="ghost" type="button" data-mull="${id}">멀리건</button>
+        <span class="dk-actions-gap" aria-hidden="true"></span>
         <button class="icon-btn" type="button" data-share="${id}" aria-label="공유" aria-haspopup="menu" aria-expanded="false" title="공유">${ICON.share}</button>
         <button class="icon-btn danger" type="button" data-del="${id}" aria-label="${esc(name)} 삭제" title="삭제">${ICON.trash}</button>
       </div>
     </li>`;
   }).join('') : `<li class="empty">아직 만든 덱이 없습니다. "새 덱 만들기"로 시작하거나, 한국 환경 샘플 덱·메타 덱 탭에서 덱을 가져와 보세요.</li>`;
   wireLazy($('dk-list'));
+}
+// read-only board for a saved deck, with edit and mulligan in place of "take"
+function openMyDeckSheet(id) {
+  const dk = decks.data[id]; if (!dk) return;
+  const lg = BYID.get(dk.legend);
+  openDeckSheet({ dk, lg, champ: BYID.get(dk.champion), head: `내 덱 · ${dkDate(dk.updated)}`, title: dk.name || '이름 없는 덱', sub: lg ? legendLabel(lg) : '전설 미선택',
+    edit: () => openEditor(id), mull: () => openMull(id), back: () => openMyDeckSheet(id) });
 }
 /* deck code: the deck as card codes, deflated and base64url'd ("RL1."), or plain base64url where CompressionStream is missing ("RL0.") */
 const b64u = u8 => btoa(String.fromCharCode(...u8)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
@@ -4076,10 +4091,13 @@ $('dk-list').onclick = async ev => {
     share.insertAdjacentHTML('afterend', `<div class="dk-menu" role="menu" data-for="${share.dataset.share}"><button type="button" role="menuitem" data-share-opt="code">덱 코드 복사<small>붙여넣기로 그대로 불러올 수 있어요</small></button><button type="button" role="menuitem" data-share-opt="en">영문 덱리스트 복사</button><button type="button" role="menuitem" data-share-opt="ko">한글 덱리스트 복사</button></div>`);
     document.querySelector('.dk-menu button').focus(); return;
   }
+  const vw = ev.target.closest('[data-view]'), mu = ev.target.closest('[data-mull]');
+  if (vw) { openMyDeckSheet(vw.dataset.view); return; }
+  if (mu) { openMull(mu.dataset.mull); return; }
   const del = ev.target.closest('[data-del]'), go = ev.target.closest('[data-del-go]'), no = ev.target.closest('[data-del-no]');
   if (del) {
     const id = del.dataset.del, li = del.closest('.dk-li'), name = (decks.data[id] || {}).name || '이름 없는 덱';
-    li.innerHTML = `<div class="dk-confirm" role="alert"><span>"${esc(name)}" 덱을 삭제할까요? 되돌릴 수 없습니다.</span><div><button class="go" type="button" data-del-go="${id}">삭제</button><button class="ghost" type="button" data-del-no>취소</button></div></div>`;
+    li.innerHTML = `<div class="dk-confirm" role="alertdialog" aria-label="덱 삭제 확인"><svg class="dk-confirm-ico" viewBox="0 0 20 20" width="34" height="34" aria-hidden="true"><path d="M3.5 5.5h13M8 5.5V3.8h4v1.7M5.2 5.5l.8 11h8l.8-11M8.4 8.5v5.5M11.6 8.5v5.5"/></svg><p><b>${esc(name)}</b>${/덱$/.test(name.trim()) ? '을' : ' 덱을'}<br>진짜로 삭제할까요?</p><div><button class="ghost" type="button" data-del-no>취소</button><button class="go" type="button" data-del-go="${id}">삭제</button></div></div>`;
     li.querySelector('[data-del-no]').focus(); return;
   }
   if (go) { const id = go.dataset.delGo, name = (decks.data[id] || {}).name || '덱'; decks.remove(id); renderDeckHome(); toast(`"${name}" 덱을 삭제했습니다.`); return; }
@@ -4593,14 +4611,14 @@ function analysisView(dk) {
 }
 
 /* ---------- mulligan test ---------- */
-const mull = { lib: [], hand: [], drawn: [], pick: new Set(), phase: 'choose', hands: 0, mulls: 0, back: null, busy: false };
+const mull = { deckId: null, lib: [], hand: [], drawn: [], pick: new Set(), phase: 'choose', hands: 0, mulls: 0, back: null, busy: false };
 function shuffled(a) {
   const r = new Uint32Array(a.length); crypto.getRandomValues(r);
   for (let i = a.length - 1; i > 0; i--) { const j = r[i] % (i + 1); [a[i], a[j]] = [a[j], a[i]]; }
   return a;
 }
 function mullDeal() {
-  const dk = decks.data[edId], ids = [];
+  const dk = decks.data[mull.deckId || edId], ids = [];
   for (const [c, n] of rows(dk.main)) for (let i = 0; i < n; i++) ids.push(c.id);
   if (ids.length < HAND) { toast(`주 덱에 카드가 ${HAND}장 이상 있어야 합니다.`); return false; }
   const lib = shuffled(ids), deal = mull.hands + 1;
@@ -4644,7 +4662,10 @@ function renderMull() {
   mullControls(); dealIn();
 }
 function bumpDeck() { if (!reduceMotion()) $('mull-deck').querySelector('.pile').animate([{ transform: 'none' }, { transform: 'translateY(4px) scale(.96)' }, { transform: 'none' }], { duration: 260, easing: 'ease-out' }); }
-function openMull() {
+// id: a saved deck to test from the deck list; without it, the deck open in the editor
+function openMull(id) {
+  if (id && id !== mull.deckId) mull.hands = 0;
+  mull.deckId = id || edId;
   if (!mullDeal()) return;
   mull.back = document.activeElement; hidePreview(); mull.busy = false;
   $('mull-hand').innerHTML = '';
@@ -4993,7 +5014,7 @@ $('meta-list').onclick = ev => {
 
 let sheetBack = null;
 // Read-only deck sheet shared by meta decks and sample decks: head line, title, subtitle, note, source link, take action.
-function openDeckSheet({ dk, lg, champ, head, title, sub, note, link, linkText, take, back }) {
+function openDeckSheet({ dk, lg, champ, head, title, sub, note, link, linkText, take, edit, mull: mullIt, back }) {
   const om = ownedMap(), own = deckOwn(dk, om);
   if (!openId && $('sheet').hidden) lastFocus = document.activeElement;
   openId = null; sheetBack = back; $('sheet').classList.add('wide');
@@ -5005,12 +5026,13 @@ function openDeckSheet({ dk, lg, champ, head, title, sub, note, link, linkText, 
     </header>
     <div><div class="ownbar" aria-hidden="true"><i style="width:${own.pct}%"></i></div>
     <p class="hint" style="margin:6px 0 0">내 컬렉션 기준 보유 ${own.have}/${own.total}장 (${own.pct}%) · 부족 ${own.miss}장. 사이드보드는 계산에서 뺐습니다.${note ? ' ' + esc(note) + '.' : ''}</p></div>
-    <div class="filters"><button class="btn" type="button" id="ms-take">내 덱으로 가져오기</button><button class="ghost" type="button" id="ms-copy">영문 덱리스트 복사</button><button class="ghost" type="button" id="ms-miss"${own.miss ? '' : ' disabled'}>부족 카드 복사</button></div>
+    <div class="filters">${take ? '<button class="btn" type="button" id="ms-take">내 덱으로 가져오기</button>' : ''}${edit ? '<button class="btn" type="button" id="ms-edit">편집</button><button class="ghost" type="button" id="ms-mull">멀리건 테스트</button>' : ''}<button class="ghost" type="button" id="ms-copy">영문 덱리스트 복사</button><button class="ghost" type="button" id="ms-miss"${own.miss ? '' : ' disabled'}>부족 카드 복사</button></div>
     <div id="ms-list">${deckBoardHTML(dk)}</div>
     ${link ? `<a class="artlink" href="${link}" target="_blank" rel="noopener">${esc(linkText)}</a>` : ''}`;
   $('sheet').hidden = false; $('scrim').hidden = false;
   $('d-close').onclick = closeDetail;
-  $('ms-take').onclick = take;
+  if (take) $('ms-take').onclick = take;
+  if (edit) { $('ms-edit').onclick = () => { closeDetail(); edit(); }; $('ms-mull').onclick = mullIt; }
   $('ms-copy').onclick = () => copyText(deckText(dk, 'en'), '영문 덱리스트');
   $('ms-miss').onclick = () => copyText(missingText(dk), '부족 카드 목록');
   wireLazy($('sheet'));
