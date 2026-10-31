@@ -1612,7 +1612,7 @@ function edSaveState() {
   const el = $('ws-save'); if (!el || !edId) return;
   const pending = decks.pending(edId);
   el.className = 'save' + (pending ? '' : ' ok');
-  el.textContent = pending ? '저장 중…' : inv.mode === 'db' ? '✓ 계정에 저장됨' : '✓ 이 브라우저에 저장됨';
+  el.textContent = pending ? '저장 중…' : '✓ 저장됨 - 편집하는 내용은 자동 저장됩니다.';
 }
 
 /* left: card browser */
