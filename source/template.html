@@ -762,6 +762,132 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
   .filters .spacer{display:none}
 }
 @media (prefers-reduced-motion:no-preference){.bar>i{transition:width .3s ease}}
+/* seoul board: Seoul store events from TCG Calendar, list + month calendar, store/notice side rail */
+#v-seoul{--sb-sun:var(--d-fury);--sb-sat:var(--d-mind);--sb-warn:#B7791F}
+#v-seoul .sb-c-special{--c:var(--d-chaos)}#v-seoul .sb-c-qualifier{--c:var(--d-fury)}#v-seoul .sb-c-nexus{--c:var(--d-calm)}
+#v-seoul .sb-c-tournament{--c:var(--d-order)}#v-seoul .sb-c-learn{--c:var(--d-mind)}#v-seoul .sb-c-other{--c:var(--d-colorless)}
+#v-seoul [class*="sb-c-"]{--ct:color-mix(in srgb,var(--c) 78%,var(--ink));--cb:color-mix(in srgb,var(--c) 15%,var(--surface))}
+.sb-ctl{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.sb-ctl .btn{display:inline-flex;align-items:center;gap:7px}
+.sb-ctl .btn svg,.sb-seg svg,.sb-ibtn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sb-ctl .btn.spinning svg{animation:sb-spin 1s linear infinite}
+@keyframes sb-spin{to{transform:rotate(360deg)}}
+.sb-status{font-size:12px;color:var(--muted);font-family:var(--f-mono)}
+.sb-status.err{color:var(--danger)}
+.sb-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);margin-bottom:26px}
+.sb-strip>div{padding:12px 18px;border-left:1px solid var(--line);display:grid;gap:2px;min-width:0}
+.sb-strip>div:first-child{border-left:0}
+.sb-strip .k{font-size:12px;color:var(--muted)}
+.sb-strip .v{font-family:var(--f-mono);font-weight:500;font-size:22.5px;font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-strip .v small{font-family:var(--f-body);font-size:13px;font-weight:500;color:var(--muted);margin-left:6px}
+.sb-main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:32px;align-items:start}
+.sb-h2{font-family:var(--f-display);font-weight:700;font-size:20.5px;letter-spacing:-.01em;margin:0}
+.sb-sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.sb-sec-head p{margin:0;font-size:12.5px;color:var(--muted)}
+.sb-viewbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sb-seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.sb-seg button{border:0;background:none;padding:7px 14px;font-size:14px;font-weight:500;display:inline-flex;gap:6px;align-items:center}
+.sb-seg button+button{border-left:1px solid var(--line)}
+.sb-seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.sb-cats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.sb-chip{font-size:13.5px;padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface)}
+.sb-chip .n{font-family:var(--f-mono);font-size:11px;color:var(--muted);margin-left:5px}
+.sb-chip .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px;background:var(--c)}
+.sb-chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sb-chip[aria-pressed="true"] .n{color:var(--bg);opacity:.7}
+.sb-f2{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-bottom:16px;font-size:13px;color:var(--muted)}
+.sb-f2 select,.sb-f2 input[type="search"]{font-size:13.5px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 8px;max-width:100%}
+.sb-f2 input[type="search"]{width:200px}
+.sb-f2 label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.sb-tag{font-size:12px;font-weight:600;padding:1px 8px;border-radius:4px;white-space:nowrap;color:var(--ct);background:var(--cb)}
+.sb-day{display:grid;margin-bottom:18px}
+.sb-dh{display:flex;align-items:baseline;gap:10px;padding:6px 0;border-bottom:2px solid var(--ink);position:sticky;top:calc(env(safe-area-inset-top,0px) + 48px);background:var(--bg);z-index:2}
+.sb-dh .sb-dt{font-family:var(--f-mono);font-weight:500;font-size:16.5px;font-variant-numeric:tabular-nums}
+.sb-dh .wd{font-weight:700}
+#v-seoul .sun{color:var(--sb-sun)}#v-seoul .sat{color:var(--sb-sat)}
+.sb-dh .rel{font-size:12.5px;color:var(--accent);font-weight:700}
+.sb-dh .sb-cnt{margin-left:auto;font-size:12px;color:var(--muted);font-family:var(--f-mono)}
+.sb-day.past .sb-dh{border-bottom-color:var(--line);color:var(--muted)}
+.sb-day.past .sb-row{opacity:.6}
+.sb-row{display:grid;grid-template-columns:58px minmax(0,1fr) auto;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);align-items:start}
+.sb-row .tm{font-family:var(--f-mono);font-size:14.5px;font-weight:500;font-variant-numeric:tabular-nums;padding-top:1px}
+.sb-row .tm.none{color:var(--muted);font-size:12px}
+.sb-row .tm.check{color:var(--sb-warn)}
+.sb-row .info{min-width:0;display:grid;gap:2px}
+.sb-row .store{font-weight:700;font-size:14.5px}
+.sb-row .subj{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.sb-row .note{font-size:12.5px}
+.sb-row .flag{font-size:11.5px;color:var(--sb-warn)}
+.sb-row .side{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.sb-links{display:flex;gap:6px}
+.sb-lnk{font-size:11px;font-weight:500;font-family:var(--f-mono);text-decoration:none;border:1px solid var(--line);border-radius:4px;padding:1px 6px;color:var(--muted);white-space:nowrap}
+.sb-lnk:hover{color:var(--ink);border-color:var(--ink)}
+.sb-lnk.off{color:var(--d-calm);border-color:var(--d-calm)}
+.sb-more{width:100%;padding:10px;border:1px dashed var(--line);background:none;border-radius:8px;font-size:13.5px}
+.sb-empty{padding:20px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:8px}
+.sb-cal-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.sb-cal-head .month{font-family:var(--f-display);font-weight:700;font-size:20.5px;min-width:7.5em}
+.sb-ibtn{border:1px solid var(--line);background:var(--surface);border-radius:8px;width:34px;height:34px;display:inline-grid;place-items:center}
+.sb-ibtn[disabled]{opacity:.35;cursor:default}
+.sb-cal-head .ghost{margin-left:4px}
+.sb-cal-head .note{margin-left:auto;font-size:12px;color:var(--muted)}
+.sb-cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-top:1px solid var(--line);border-left:1px solid var(--line);background:var(--surface);border-radius:var(--radius);overflow:hidden}
+.sb-cal .wdh{font-size:12px;font-weight:700;text-align:center;padding:6px 0;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--sunk)}
+.sb-cell{min-height:112px;border:0;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:4px;display:flex;flex-direction:column;gap:3px;text-align:left;background:var(--surface);min-width:0}
+.sb-cell.out{background:var(--sunk);color:var(--muted);cursor:default}
+.sb-cell:not(.out):hover{background:var(--sunk)}
+.sb-cell .num{font-family:var(--f-mono);font-size:12px;font-weight:500;display:flex;justify-content:space-between;align-items:center}
+.sb-cell.sun .num span:first-child{color:var(--sb-sun)}.sb-cell.sat .num span:first-child{color:var(--sb-sat)}
+.sb-cell.today .num span:first-child{background:var(--accent);color:var(--bg);border-radius:4px;padding:0 5px}
+.sb-cell.sel{box-shadow:inset 0 0 0 2px var(--ink)}
+.sb-cell .total{font-size:10px;color:var(--muted)}
+.sb-cell.past:not(.out) .sb-ev,.sb-cell.past:not(.out) .num{opacity:.55}
+.sb-ev{font-size:11px;line-height:1.35;padding:1px 4px;border-radius:3px;color:var(--ct);background:var(--cb);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-ev b{font-family:var(--f-mono);font-weight:500;margin-right:3px}
+.sb-ev-more{font-size:11px;color:var(--muted);padding-left:4px}
+.sb-dots{display:none;flex-wrap:wrap;gap:3px}
+.sb-dots i{width:6px;height:6px;border-radius:50%;background:var(--c);display:block}
+.sb-agenda{margin-top:18px}
+.sb-agenda h3{font-size:16.5px;margin:0 0 4px;display:flex;gap:8px;align-items:baseline}
+.sb-agenda h3 .who{font-size:12px;color:var(--muted);font-weight:400}
+.sb-side{display:grid;gap:28px}
+.sb-ul{display:grid;border-top:1px solid var(--line)}
+.sb-item{padding:10px 0;border-bottom:1px solid var(--line);display:grid;gap:3px}
+.sb-item .when{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.sb-item .what{font-weight:500;font-size:14px;line-height:1.45}
+.sb-item a{color:inherit;text-decoration:none}
+.sb-item a:hover{text-decoration:underline}
+.sb-item .who{font-size:12px;color:var(--muted)}
+.sb-item.handle-row{grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+.sb-item .handle{font-family:var(--f-mono);font-size:13px}
+.sb-vf{font-size:11px;font-family:var(--f-mono)}
+.sb-vf.ok{color:var(--d-calm)}.sb-vf.check{color:var(--danger)}
+.sb-stores{border-top:1px solid var(--line);max-height:420px;overflow-y:auto}
+.sb-store{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:7px 2px;font-size:14px}
+.sb-store:hover .sb-nm{text-decoration:underline}
+.sb-store .sb-cnt{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.sb-store[aria-pressed="true"] .sb-nm{color:var(--accent);font-weight:700}
+.sb-notes{margin-top:32px;border-top:1px solid var(--line);padding-top:14px;display:grid;gap:6px;font-size:12px;color:var(--muted)}
+.sb-notes p{margin:0;max-width:90ch}
+.sb-notes a{color:var(--rift)}
+@media (max-width:960px){
+  .sb-main{grid-template-columns:minmax(0,1fr)}
+  .sb-strip{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sb-strip>div:nth-child(3){border-left:0}
+  .sb-strip>div:nth-child(n+3){border-top:1px solid var(--line)}
+}
+@media (max-width:640px){
+  .sb-cell{min-height:58px;padding:3px}
+  .sb-cell .sb-ev,.sb-cell .sb-ev-more{display:none}
+  .sb-cell .sb-dots{display:flex}
+  .sb-cal-head .month{font-size:18px;min-width:0}
+}
+@media (max-width:400px){.navlinks a{padding:6px 6px}.navlinks{gap:0}.brand{margin-right:2px}}
+@media (max-width:520px){
+  .sb-row{grid-template-columns:50px minmax(0,1fr)}
+  .sb-row .side{grid-column:2;flex-direction:row;align-items:center;flex-wrap:wrap}
+  .sb-f2 input[type="search"]{width:100%}
+}
 </style>
 <script>/* apply the saved theme before first paint */ try { const t = JSON.parse(localStorage.getItem('rb-ledger-theme') || 'null'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch {}</script>
 
@@ -784,6 +910,7 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
     <a id="tab-decks" href="#decks"><span class="long">덱 빌더</span><span class="short">덱</span></a>
     <a id="tab-kr" href="#kr"><span class="long">한국 환경 샘플 덱</span><span class="short">샘플</span></a>
     <a id="tab-meta" href="#meta"><span class="long">메타 덱</span><span class="short">메타</span></a>
+    <a id="tab-seoul" href="#seoul"><span class="long">서울 보드</span><span class="short">서울</span></a>
   </div>
   <a class="nav-search" href="#collection" id="nav-search" aria-label="카드 검색"><svg viewBox="0 0 20 20" width="17" height="17" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m13 13 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></a>
   <div class="storage" id="storage" data-mode="loading" title="저장 위치"><i></i><span id="storage-text">보관함 불러오는 중…</span></div>
@@ -933,6 +1060,68 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
     <div class="meta-grid" id="kr-list"></div>
   </section>
 
+  <section id="v-seoul" hidden>
+    <div class="page-head kr-head"><h1 class="page-title">서울 보드</h1><p class="page-lead">서울 카드샵의 넥서스 나이트, 스토어 예선, 강습회 일정을 리스트와 달력으로 모아 봅니다.</p>
+      <div class="sb-ctl">
+        <button class="btn" id="sb-refresh" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg><span>새로고침</span></button>
+        <span class="sb-status" id="sb-status" role="status" aria-live="polite">일정을 불러오는 중입니다.</span>
+      </div>
+    </div>
+    <section class="sb-strip" aria-label="요약">
+      <div><span class="k">오늘</span><span class="v" id="sb-n-today">-</span></div>
+      <div><span class="k">이번 주 남은 일정</span><span class="v" id="sb-n-week">-</span></div>
+      <div><span class="k">다음 스토어 예선</span><span class="v" id="sb-n-sq">-</span></div>
+      <div><span class="k">일정 올리는 매장</span><span class="v" id="sb-n-stores">-</span></div>
+    </section>
+    <div class="sb-main">
+      <section aria-labelledby="sb-h-events">
+        <div class="sb-viewbar">
+          <h2 class="sb-h2" id="sb-h-events">서울 일정</h2>
+          <div class="sb-seg" role="group" aria-label="보기 방식">
+            <button type="button" id="sb-view-list" data-sb-view="list" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>리스트</button>
+            <button type="button" id="sb-view-cal" data-sb-view="calendar" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>달력</button>
+          </div>
+        </div>
+        <div class="sb-cats" role="group" aria-label="유형 필터" id="sb-cats"></div>
+        <div class="sb-f2">
+          <select id="sb-store-sel" aria-label="매장 선택"><option value="">모든 매장</option></select>
+          <input type="search" id="sb-q" placeholder="매장·제목 검색" aria-label="일정 검색">
+          <label for="sb-past" id="sb-past-wrap"><input type="checkbox" id="sb-past"> 지난 일정 보기</label>
+        </div>
+        <div id="sb-list"><div class="sb-empty">TCG 캘린더에서 서울 일정을 불러오는 중입니다.</div></div>
+        <div id="sb-calv" hidden>
+          <div class="sb-cal-head">
+            <button class="sb-ibtn" id="sb-prev" type="button" aria-label="이전 달"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+            <span class="month" id="sb-cal-title"></span>
+            <button class="sb-ibtn" id="sb-next" type="button" aria-label="다음 달"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
+            <button class="ghost" id="sb-today" type="button">오늘</button>
+            <span class="note" id="sb-cal-note"></span>
+          </div>
+          <div class="sb-cal" id="sb-grid"></div>
+          <div class="sb-agenda" id="sb-agenda"></div>
+        </div>
+      </section>
+      <div class="sb-side">
+        <section aria-labelledby="sb-h-stores">
+          <div class="sb-sec-head"><h2 class="sb-h2" id="sb-h-stores">서울 매장</h2><p>앞으로 일정 수</p></div>
+          <div class="sb-stores" id="sb-stores"></div>
+        </section>
+        <section aria-labelledby="sb-h-notice">
+          <div class="sb-sec-head"><h2 class="sb-h2" id="sb-h-notice">공지</h2></div>
+          <div class="sb-ul" id="sb-notices"></div>
+        </section>
+        <section aria-labelledby="sb-h-sns">
+          <div class="sb-sec-head"><h2 class="sb-h2" id="sb-h-sns">SNS 바로가기</h2></div>
+          <div class="sb-ul" id="sb-sns"></div>
+        </section>
+      </div>
+    </div>
+    <div class="sb-notes">
+      <p>매장 일정은 <a href="https://tcg-calendar.co.kr/" target="_blank" rel="noopener">TCG 캘린더</a>에서 운영자 허락을 받아 불러옵니다. TCG 캘린더는 매장 X 계정과 공식 이벤트 페이지에서 일정을 모읍니다. 주요 행사와 공지는 공식 채널과 기사에서 골라 직접 넣은 것입니다.</p>
+      <p>시간은 원본 그대로 보여줍니다. 오전 10시 이전 시간은 매장이 오전·오후를 잘못 넣은 경우가 있어 주황색으로 표시합니다. 같은 일정이 공식 페이지와 X에 모두 있으면 하나로 합치고 두 링크를 함께 답니다.</p>
+    </div>
+  </section>
+
   <p class="foot">카드 데이터: playriftbound.com 공식 카드 갤러리 (영문·한국어, <span id="fetched"></span> 기준, <span id="n-cards"></span>종). 한국어 이름은 공식 한국어판이 있는 오리진 세트만 <b>공식</b>이며, 이후 세트의 챔피언 이름은 리그 오브 레전드 한국어 표기를 따른 <b>추정</b>입니다. 한글명이 없는 카드는 상세 화면에서 내 번역을 직접 넣을 수 있고, 검색에도 반영됩니다. 갤러리에 없는 프로모·지역 한정 카드와 일부 토큰은 playriftbound.com 공식 뉴스에 공개된 카드 이미지를 기준으로 추가했습니다(상세 화면에 출처 표시). 카드 이미지 © Riot Games, 비영리 목적으로 허가를 받아 사용합니다. 메타 덱: playriftbound.com 공식 Organized Play 기사의 지역 예선(RQ) 덱리스트와, 오리진 환경의 SCG CON 애틀랜타 $10K·CCS $25K 초청 퀄리파이어 #1 상위 4덱이며, 메타는 각 대회에서 사용된 가장 최신 확장팩 기준으로 나눴습니다. 금지 카드는 공식 금지 목록(Standard)을 기준으로 표시합니다. <span class="build">빌드 __BUILD__</span></p>
   <footer class="legal">
     <p>Copyright © 2026 riftlife.life</p>
@@ -962,6 +1151,342 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
 </section>
 <div class="copybox" id="copybox" hidden role="dialog" aria-label="복사할 텍스트"><p>자동 복사가 막혀 있습니다. 아래 텍스트를 선택해서 복사하세요.</p><textarea id="copybox-text" readonly></textarea><div><button class="ghost" id="copybox-close" type="button">닫기</button></div></div>
 
+<script>/* seoul board: lazy-loaded on first visit to #seoul. Events come live from TCG Calendar (CORS open), with a bundled snapshot fallback. */
+window.seoulBoard = (() => {
+"use strict";
+const DATA_BASE = 'https://tcg-calendar.co.kr/data';
+const SNAPSHOT_URL = 'data/tcg-seoul.json';
+const REGION = '서울';
+const AUTO_REFRESH_MS = 30 * 60 * 1000;
+const CAT = { all: '전체', special: '주요 행사', nexus: '넥서스 나이트', qualifier: '스토어 예선', tournament: '대회·리그', learn: '강습·체험', other: '교류회·기타' };
+const CAT_ORDER = ['all', 'special', 'nexus', 'qualifier', 'tournament', 'learn', 'other'];
+const CAT_RULES = [
+  ['qualifier', /스토어\s*예선|매장\s*예선|예선전|store\s*qual/i],
+  ['learn', /강습|설명회|초심자|초보자|체험/],
+  ['nexus', /넥서스|nexus/i],
+  ['tournament', /대회|토너먼트|쟁탈전|리그|팀전|선발전|홈&어웨이|쇼다운|단판전/]
+];
+const TITLE_RE = /^\[([^\]]+)\]\s*(.+?)\s+-\s+(.+)$/;
+
+// 서울에서 열리는 주요 행사 (공식 공지·기사 기준, 직접 관리)
+const SPECIALS = [
+  { date: '2026-10-29', time: null, store: '롯데월드몰 아트리움 · 트렌드팟 바이 올리브영N 성수', subject: '리프트바운드 한정 상품 3종 판매 시작 (K/DA · 월즈 · T1)', note: '뮤직 & 월즈 26 팝업스토어 현장 판매. 종료일 미공개.', url: 'https://playriftbound.com/ko-kr/news/riftbound-limited-edition-sale/', linkLabel: '공식' },
+  { date: '2026-11-08', time: null, store: 'T1 베이스캠프 강남점', subject: 'T1 리프트바운드 대회 결선', note: '기사 기준. 예선은 11/1 킨텍스(경기 고양).', url: 'http://www.efnews.co.kr/news/articleView.html?idxno=133448', linkLabel: '기사' }
+];
+const NOTICES = [
+  { date: '2026.10.23', title: '한정 상품 3종 출시 발표, 10월 29일 팝업 현장 판매', who: 'ZDNet Korea', url: 'https://zdnet.co.kr/view/?no=20261023145617' },
+  { date: '2026.09.18', title: "리프트바운드 한국어판 '오리진' 정식 출시", who: '공식', url: 'https://playriftbound.com/ko-kr/news/announcements/koreas-rift-opens-on-september-18/' },
+  { date: '2026.09.14', title: 'PlayRiftbound.com 개편, 이벤트 검색·등록 기능 추가', who: '공식', url: 'https://playriftbound.com/ko-kr/news/announcements/introducing-the-new-playriftboundcom/' },
+  { date: '2026.09', title: '한국 주요 일정: 넥서스 나이트·스토어 예선 9~11월, 코리아 메이저 12/5~6', who: '공식', url: 'https://playriftbound.com/ko-kr/news/announcements/kr-origin-op-notice/' }
+];
+const SNS = [
+  { handle: '@RiftboundKR', who: '리프트바운드 한국 공식 · 인스타그램', url: 'https://www.instagram.com/riftboundkr/', ok: true },
+  { handle: '@t1lol', who: 'T1 · 인스타그램', url: 'https://www.instagram.com/t1lol/', ok: false },
+  { handle: '@gengesports', who: 'Gen.G (GGX) · 인스타그램', url: 'https://www.instagram.com/gengesports/', ok: false }
+];
+
+const WD = ['일', '월', '화', '수', '목', '금', '토'];
+const DAY = 86400000;
+const $ = id => document.getElementById('sb-' + id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const kstToday = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' });
+const toDate = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const ymd = dt => `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+const md = s => { const x = toDate(s); return `${x.getMonth() + 1}.${String(x.getDate()).padStart(2, '0')}`; };
+const wdClass = i => i === 0 ? 'sun' : i === 6 ? 'sat' : '';
+const ls = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+
+/* ---------- data ---------- */
+function classify(subject) { for (const [key, re] of CAT_RULES) if (re.test(subject)) return key; return 'other'; }
+function parseRaw(raw) {
+  const m = TITLE_RE.exec(raw.title || '');
+  if (!m || m[3].trim() !== 'RIFTBOUND' || m[1] !== REGION) return null;
+  const start = raw.start || '';
+  let time = start.slice(11, 16), timeFlag = 'ok';
+  if (!time || time === '00:00') { time = null; timeFlag = 'none'; }
+  else if (parseInt(time.slice(0, 2), 10) < 10) timeFlag = 'check';
+  const url = raw.xUrl || '';
+  const source = url.includes('playriftbound.com') ? 'official' : /x\.com|twitter\.com/.test(url) ? 'x' : 'other';
+  const subject = (raw.subject || '').trim();
+  return { date: start.slice(0, 10), time, timeFlag, store: m[2].trim(), category: classify(subject), subject, url, source };
+}
+const mins = t => t ? parseInt(t.slice(0, 2), 10) * 60 + parseInt(t.slice(3, 5), 10) : null;
+function mergeDuplicates(list) {
+  const official = new Map();
+  for (const e of list) if (e.source === 'official') {
+    const k = `${e.store}|${e.date}|${e.category}`;
+    if (!official.has(k)) official.set(k, []);
+    official.get(k).push(e);
+  }
+  return list.filter(e => {
+    if (e.source !== 'x') return true;
+    const twins = official.get(`${e.store}|${e.date}|${e.category}`) || [];
+    const a = mins(e.time);
+    const twin = twins.find(o => a === null || o.time === null || Math.abs(mins(o.time) - a) <= 30);
+    if (twin) { twin.xUrl = e.url; return false; }
+    return true;
+  });
+}
+const sortEvents = list => list.sort((a, b) => a.date.localeCompare(b.date) || (a.time || '99:99').localeCompare(b.time || '99:99') || a.store.localeCompare(b.store, 'ko'));
+const db = { index: null, months: new Map(), mode: 'live', events: [] };
+function rebuild() {
+  let all = [];
+  for (const list of db.months.values()) all = all.concat(list);
+  all = mergeDuplicates(all.map(e => ({ ...e })));
+  const specials = SPECIALS.map(s => ({ ...s, timeFlag: s.time ? 'ok' : 'none', category: 'special', source: 'special' }));
+  db.events = sortEvents(all.concat(specials));
+}
+async function getJSON(url) { const r = await fetch(url, { cache: 'no-store' }); if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }
+async function loadMonth(key, bust) {
+  const ver = bust ? Date.now() : String(db.index.updated || '').replace(/\D/g, '');
+  const data = await getJSON(`${DATA_BASE}/calendar_${key}.json?v=${ver}`);
+  db.months.set(key, (data.events || []).map(parseRaw).filter(Boolean));
+}
+const availableMonths = () => db.index ? db.index.months.map(m => m.key).sort() : [...db.months.keys()].sort();
+async function loadLive(bust) {
+  db.index = await getJSON(`${DATA_BASE}/calendar_index.json?v=${Date.now()}`);
+  const thisMonth = kstToday().slice(0, 7);
+  const want = new Set(availableMonths().filter(k => k >= thisMonth));
+  for (const k of db.months.keys()) want.add(k);
+  if (bust) db.months.clear();
+  await Promise.all([...want].map(k => loadMonth(k, bust)));
+  db.mode = 'live';
+}
+async function loadSnapshot() {
+  const snap = await getJSON(SNAPSHOT_URL);
+  db.months.clear();
+  for (const e of snap.events || []) {
+    const k = e.date.slice(0, 7);
+    if (!db.months.has(k)) db.months.set(k, []);
+    const { xUrl, id, region, ...rest } = e;
+    db.months.get(k).push(rest);
+    if (xUrl) db.months.get(k).push({ ...rest, source: 'x', url: xUrl });
+  }
+  db.index = { updated: snap.sourceUpdated, months: [...db.months.keys()].map(key => ({ key })) };
+  db.mode = 'snapshot';
+}
+
+/* ---------- state ---------- */
+const ui = { view: 'list', cat: 'all', store: '', q: '', past: false, limit: 14, calMonth: kstToday().slice(0, 7), selDay: kstToday() };
+try {
+  const s = JSON.parse(ls.get('rb-seoul-ui') || '{}');
+  if (CAT[s.cat]) ui.cat = s.cat;
+  if (typeof s.past === 'boolean') ui.past = s.past;
+  if (s.view === 'list' || s.view === 'calendar') ui.view = s.view;
+} catch (e) {}
+const saveUI = () => ls.set('rb-seoul-ui', JSON.stringify({ cat: ui.cat, past: ui.past, view: ui.view }));
+function matches(e) {
+  const q = ui.q.trim().toLowerCase();
+  return (ui.cat === 'all' || e.category === ui.cat) && (!ui.store || e.store === ui.store) && (!q || `${e.store} ${e.subject}`.toLowerCase().includes(q));
+}
+
+/* ---------- render ---------- */
+function linkHTML(e) {
+  const out = [];
+  const a = (url, label, cls = '') => `<a class="sb-lnk ${cls}" href="${esc(url)}" target="_blank" rel="noopener">${label}</a>`;
+  if (e.source === 'official') out.push(a(e.url, '공식', 'off'));
+  else if (e.source === 'x') out.push(a(e.url, 'X'));
+  else if (e.source === 'special') out.push(a(e.url, esc(e.linkLabel || '출처'), e.linkLabel === '공식' ? 'off' : ''));
+  if (e.xUrl) out.push(a(e.xUrl, 'X'));
+  return out.join('');
+}
+function rowHTML(e) {
+  const tm = e.time
+    ? `<span class="tm ${e.timeFlag === 'check' ? 'check' : ''}">${e.time}</span>`
+    : `<span class="tm none">${e.category === 'special' ? '종일' : '시간 미정'}</span>`;
+  return `<div class="sb-row">${tm}
+    <div class="info"><span class="store">${esc(e.store)}</span><span class="subj">${esc(e.subject)}</span>
+      ${e.note ? `<span class="note">${esc(e.note)}</span>` : ''}
+      ${e.timeFlag === 'check' ? '<span class="flag">시간 확인 필요 (오전·오후 오입력 가능)</span>' : ''}</div>
+    <div class="side sb-c-${e.category}"><span class="sb-tag">${CAT[e.category]}</span><div class="sb-links">${linkHTML(e)}</div></div>
+  </div>`;
+}
+function dayHead(day, count) {
+  const n = Math.round((toDate(day) - toDate(kstToday())) / DAY);
+  const rel = n === 0 ? '오늘' : n === 1 ? '내일' : n > 1 && n < 7 ? `${n}일 뒤` : '';
+  const w = toDate(day).getDay();
+  return `<div class="sb-dh"><span class="sb-dt">${md(day)}</span><span class="wd ${wdClass(w)}">${WD[w]}</span>${rel ? `<span class="rel">${rel}</span>` : ''}<span class="sb-cnt">${count}건</span></div>`;
+}
+function renderCats() {
+  const today = kstToday();
+  const base = db.events.filter(e => (ui.view === 'calendar' || ui.past || e.date >= today) && (!ui.store || e.store === ui.store));
+  const counts = { all: base.length };
+  base.forEach(e => counts[e.category] = (counts[e.category] || 0) + 1);
+  $('cats').innerHTML = CAT_ORDER.map(k =>
+    `<button class="sb-chip ${k !== 'all' ? 'sb-c-' + k : ''}" type="button" data-sb-cat="${k}" aria-pressed="${ui.cat === k}">${k !== 'all' ? '<span class="dot"></span>' : ''}${CAT[k]}<span class="n">${counts[k] || 0}</span></button>`
+  ).join('');
+}
+function renderList() {
+  const today = kstToday();
+  const list = db.events.filter(e => (ui.past || e.date >= today) && matches(e));
+  const el = $('list');
+  if (!list.length) { el.innerHTML = '<div class="sb-empty">조건에 맞는 일정이 없습니다. 유형이나 매장 선택을 풀어 보세요.</div>'; return; }
+  const byDay = new Map();
+  for (const e of list) { if (!byDay.has(e.date)) byDay.set(e.date, []); byDay.get(e.date).push(e); }
+  const days = [...byDay.keys()];
+  if (ui.past) days.reverse();
+  const shown = days.slice(0, ui.limit);
+  el.innerHTML = shown.map(day => `<div class="sb-day ${day < today ? 'past' : ''}">${dayHead(day, byDay.get(day).length)}${byDay.get(day).map(rowHTML).join('')}</div>`).join('') +
+    (days.length > shown.length ? `<button class="sb-more" data-sb-more type="button">${days.length - shown.length}일치 더 보기</button>` : '');
+}
+function renderCalendar() {
+  const today = kstToday();
+  const [y, m] = ui.calMonth.split('-').map(Number);
+  $('cal-title').textContent = `${y}년 ${m}월`;
+  const months = availableMonths();
+  $('prev').disabled = !months.some(k => k < ui.calMonth);
+  $('next').disabled = !months.some(k => k > ui.calMonth);
+  const byDay = new Map();
+  for (const e of db.events) if (matches(e)) { if (!byDay.has(e.date)) byDay.set(e.date, []); byDay.get(e.date).push(e); }
+  const first = new Date(y, m - 1, 1);
+  const start = new Date(y, m - 1, 1 - first.getDay());
+  const last = new Date(y, m, 0);
+  const cells = Math.ceil((first.getDay() + last.getDate()) / 7) * 7;
+  let html = WD.map((w, i) => `<div class="wdh ${wdClass(i)}">${w}</div>`).join('');
+  for (let i = 0; i < cells; i++) {
+    const dt = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    const key = ymd(dt);
+    const out = dt.getMonth() !== m - 1;
+    const evs = out ? [] : (byDay.get(key) || []);
+    const cls = ['sb-cell', wdClass(dt.getDay()), out ? 'out' : '', key === today ? 'today' : '', key < today ? 'past' : '', !out && key === ui.selDay ? 'sel' : ''].join(' ');
+    const chips = evs.slice(0, 3).map(e => `<span class="sb-ev sb-c-${e.category}" title="${esc((e.time || '') + ' ' + e.store + ' · ' + e.subject)}">${e.time ? `<b>${e.time}</b>` : ''}${esc(e.store)}</span>`).join('');
+    const more = evs.length > 3 ? `<span class="sb-ev-more">+${evs.length - 3}건</span>` : '';
+    const dots = evs.length ? `<span class="sb-dots">${evs.slice(0, 8).map(e => `<i class="sb-c-${e.category}"></i>`).join('')}</span>` : '';
+    const label = `${dt.getMonth() + 1}월 ${dt.getDate()}일 ${WD[dt.getDay()]}요일, 일정 ${evs.length}건`;
+    html += out
+      ? `<div class="${cls}" aria-hidden="true"><span class="num"><span>${dt.getDate()}</span></span></div>`
+      : `<button type="button" class="${cls}" data-sb-day="${key}" aria-label="${label}" aria-pressed="${key === ui.selDay}"><span class="num"><span>${dt.getDate()}</span>${evs.length ? `<span class="total">${evs.length}</span>` : ''}</span>${chips}${more}${dots}</button>`;
+  }
+  $('grid').innerHTML = html;
+  const sel = ui.selDay.slice(0, 7) === ui.calMonth ? ui.selDay : null;
+  const ag = $('agenda');
+  if (!sel) { ag.innerHTML = '<div class="sb-empty">날짜를 누르면 그날 일정이 여기에 나옵니다.</div>'; return; }
+  const evs = byDay.get(sel) || [];
+  const w = toDate(sel).getDay();
+  ag.innerHTML = `<h3>${toDate(sel).getMonth() + 1}월 ${toDate(sel).getDate()}일 <span class="wd ${wdClass(w)}">${WD[w]}요일</span><span class="who">${evs.length}건</span></h3>` +
+    (evs.length ? `<div class="sb-day ${sel < today ? 'past' : ''}">${evs.map(rowHTML).join('')}</div>` : '<div class="sb-empty">이 날은 조건에 맞는 일정이 없습니다.</div>');
+}
+function renderStores() {
+  const today = kstToday();
+  const counts = new Map();
+  db.events.forEach(e => { if (e.category !== 'special' && !counts.has(e.store)) counts.set(e.store, 0); });
+  db.events.forEach(e => { if (e.category !== 'special' && e.date >= today) counts.set(e.store, counts.get(e.store) + 1); });
+  const list = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ko'));
+  $('stores').innerHTML = list.map(([s, n]) => `<button class="sb-store" type="button" data-sb-store="${esc(s)}" aria-pressed="${ui.store === s}"><span class="sb-nm">${esc(s)}</span><span class="sb-cnt">${n}</span></button>`).join('');
+  const sel = $('store-sel');
+  sel.innerHTML = `<option value="">모든 매장 (${list.length})</option>` + [...list].sort((a, b) => a[0].localeCompare(b[0], 'ko')).map(([s]) => `<option value="${esc(s)}">${esc(s)}</option>`).join('');
+  sel.value = ui.store;
+}
+function renderStrip() {
+  const today = kstToday();
+  const t = toDate(today);
+  const weekEnd = ymd(new Date(t.getFullYear(), t.getMonth(), t.getDate() + (6 - t.getDay())));
+  const up = db.events.filter(e => e.date >= today);
+  $('n-today').textContent = `${db.events.filter(e => e.date === today).length}건`;
+  $('n-week').textContent = `${up.filter(e => e.date <= weekEnd).length}건`;
+  const sq = up.find(e => e.category === 'qualifier');
+  $('n-sq').innerHTML = sq ? `${md(sq.date)}<small>${esc(sq.store)}</small>` : '-';
+  $('n-stores').textContent = `${new Set(up.filter(e => e.category !== 'special').map(e => e.store)).size}곳`;
+}
+function renderSide() {
+  $('notices').innerHTML = NOTICES.map(n => `<div class="sb-item"><span class="when">${esc(n.date)}</span><span class="what"><a href="${esc(n.url)}" target="_blank" rel="noopener">${esc(n.title)}</a></span><span class="who">${esc(n.who)}</span></div>`).join('');
+  $('sns').innerHTML = SNS.map(s => `<div class="sb-item handle-row"><div><div class="handle"><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.handle)}</a></div><div class="who">${esc(s.who)}</div></div><span class="sb-vf ${s.ok ? 'ok' : 'check'}">${s.ok ? '공식 공지 확인' : '핸들 확인 필요'}</span></div>`).join('');
+}
+function renderView() {
+  $('view-list').setAttribute('aria-pressed', String(ui.view === 'list'));
+  $('view-cal').setAttribute('aria-pressed', String(ui.view === 'calendar'));
+  $('list').hidden = ui.view !== 'list';
+  $('calv').hidden = ui.view !== 'calendar';
+  $('past-wrap').hidden = ui.view !== 'list';
+  if (!db.events.length) return;
+  renderCats();
+  if (ui.view === 'list') renderList(); else renderCalendar();
+}
+function renderAll() { renderStrip(); renderStores(); renderView(); }
+
+/* ---------- refresh ---------- */
+function setStatus(text, err) { const s = $('status'); s.textContent = text; s.classList.toggle('err', !!err); }
+function stamp() {
+  const now = new Date().toLocaleTimeString('ko-KR', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', hour12: false });
+  const src = db.index && db.index.updated ? String(db.index.updated).slice(5, 16).replace('-', '.') : '-';
+  return db.mode === 'live' ? `${now} 불러옴 · TCG 캘린더 원본 ${src} 기준` : `실시간 연결이 막혀 저장본을 표시 중 · 원본 ${src} 기준`;
+}
+let busy = false, lastLoad = 0;
+async function refresh(bust) {
+  if (busy) return;
+  busy = true; lastLoad = Date.now();
+  const btn = $('refresh');
+  btn.disabled = true; btn.classList.add('spinning');
+  setStatus('TCG 캘린더에서 최신 일정을 불러오는 중입니다.');
+  try { await loadLive(bust); rebuild(); renderAll(); setStatus(stamp()); }
+  catch (err) {
+    if (!db.events.length) {
+      try { await loadSnapshot(); rebuild(); renderAll(); setStatus(stamp(), true); }
+      catch (e2) { $('list').innerHTML = '<div class="sb-empty">일정을 불러오지 못했습니다. 인터넷 연결을 확인하고 새로고침을 눌러 주세요.</div>'; setStatus('불러오기 실패. 잠시 뒤 새로고침을 눌러 주세요.', true); }
+    } else setStatus(db.mode === 'snapshot' ? '실시간 연결이 막혀 저장본을 계속 보여줍니다.' : `갱신 실패, 이전 일정을 그대로 보여줍니다 (${err.message})`, true);
+  } finally { busy = false; btn.disabled = false; btn.classList.remove('spinning'); }
+}
+async function showMonth(key) {
+  ui.calMonth = key;
+  if (db.mode === 'live' && !db.months.has(key) && availableMonths().includes(key)) {
+    $('cal-note').textContent = '불러오는 중…';
+    renderCalendar();
+    try { await loadMonth(key, false); rebuild(); renderStores(); } catch (e) {}
+    $('cal-note').textContent = '';
+  }
+  renderCats(); renderCalendar();
+}
+function stepMonth(dir) {
+  const months = availableMonths();
+  const next = dir < 0 ? months.filter(k => k < ui.calMonth).pop() : months.find(k => k > ui.calMonth);
+  if (next) showMonth(next);
+}
+
+/* ---------- events (scoped to the section so the rest of RIFTLIFE never sees them) ---------- */
+const sec = document.getElementById('v-seoul');
+sec.addEventListener('click', ev => {
+  const t = ev.target;
+  const v = t.closest('[data-sb-view]');
+  if (v) { ui.view = v.dataset.sbView; saveUI(); renderView(); return; }
+  const cat = t.closest('[data-sb-cat]');
+  if (cat) { ui.cat = cat.dataset.sbCat; ui.limit = 14; saveUI(); renderView(); return; }
+  const st = t.closest('[data-sb-store]');
+  if (st) { ui.store = ui.store === st.dataset.sbStore ? '' : st.dataset.sbStore; ui.limit = 14; renderStores(); renderView(); $('h-events').scrollIntoView({ block: 'start', behavior: 'smooth' }); return; }
+  const day = t.closest('[data-sb-day]');
+  if (day) { ui.selDay = day.dataset.sbDay; renderCalendar(); $('agenda').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); return; }
+  if (t.closest('[data-sb-more]')) { ui.limit += 14; renderList(); }
+});
+$('refresh').addEventListener('click', () => refresh(true));
+$('prev').addEventListener('click', () => stepMonth(-1));
+$('next').addEventListener('click', () => stepMonth(1));
+$('today').addEventListener('click', () => { ui.selDay = kstToday(); showMonth(kstToday().slice(0, 7)); });
+$('store-sel').addEventListener('change', e => { ui.store = e.target.value; ui.limit = 14; renderStores(); renderView(); });
+$('q').addEventListener('input', e => { ui.q = e.target.value; ui.limit = 14; if (ui.view === 'list') renderList(); else renderCalendar(); });
+const pastBox = $('past');
+pastBox.checked = ui.past;
+pastBox.addEventListener('change', async e => {
+  ui.past = e.target.checked; ui.limit = 14; saveUI();
+  if (ui.past && db.mode === 'live') {
+    const prev = availableMonths().filter(k => k < kstToday().slice(0, 7)).pop();
+    if (prev && !db.months.has(prev)) { try { await loadMonth(prev, false); rebuild(); } catch (err) {} }
+  }
+  renderView();
+});
+
+let started = false, active = false;
+const stale = () => db.mode === 'live' && Date.now() - lastLoad > AUTO_REFRESH_MS;
+document.addEventListener('visibilitychange', () => { if (active && document.visibilityState === 'visible' && stale()) refresh(false); });
+setInterval(() => { if (active && document.visibilityState === 'visible' && stale()) refresh(false); }, 60 * 1000);
+return {
+  show() {
+    active = true;
+    if (!started) { started = true; renderSide(); renderView(); refresh(false); return; }
+    if (stale()) refresh(false); else if (db.events.length) renderAll();
+  },
+  hide() { active = false; }
+};
+})();
+</script>
 <script id="card-data" type="application/json">__DATA__</script>
 <script id="meta-data" type="application/json">__META__</script>
 <script id="kr-data" type="application/json">__KR__</script>
@@ -1311,17 +1836,19 @@ const decks = {
 };
 
 /* ---------- views ---------- */
-const VIEWS = ['home', 'collection', 'decks', 'meta', 'kr'];
+const VIEWS = ['home', 'collection', 'decks', 'meta', 'kr', 'seoul'];
 let view = 'collection';
 function route() {
   const h = location.hash.slice(1);
   view = VIEWS.includes(h) ? h : 'home';
   for (const v of VIEWS) { $('v-' + v).hidden = v !== view; $('tab-' + v).setAttribute('aria-current', v === view ? 'page' : 'false'); }
+  if (view !== 'seoul' && window.seoulBoard) seoulBoard.hide();
   renderActive(); syncEditing();
 }
 function renderActive() {
   if (view === 'collection') { render(); return; }
   if (view === 'home') { renderSummary(); renderHome(); return; }
+  if (view === 'seoul') { if (window.seoulBoard) seoulBoard.show(); return; }
   renderSummary();
   if (view === 'decks') { if (edId && decks.data[edId]) renderEditor(); else { if (edId) closeEditor(); renderDeckHome(); } }
   else if (view === 'kr') renderKr();
