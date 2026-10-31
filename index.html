@@ -933,7 +933,7 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
     <div class="meta-grid" id="kr-list"></div>
   </section>
 
-  <p class="foot">카드 데이터: playriftbound.com 공식 카드 갤러리 (영문·한국어, <span id="fetched"></span> 기준, <span id="n-cards"></span>종). 한국어 이름은 공식 한국어판이 있는 오리진 세트만 <b>공식</b>이며, 이후 세트의 챔피언 이름은 리그 오브 레전드 한국어 표기를 따른 <b>추정</b>입니다. 한글명이 없는 카드는 상세 화면에서 내 번역을 직접 넣을 수 있고, 검색에도 반영됩니다. 갤러리에 없는 프로모·지역 한정 카드와 일부 토큰은 playriftbound.com 공식 뉴스에 공개된 카드 이미지를 기준으로 추가했습니다(상세 화면에 출처 표시). 카드 이미지 © Riot Games, 비영리 목적으로 허가를 받아 사용합니다. 메타 덱: playriftbound.com 공식 Organized Play 기사의 지역 예선(RQ) 덱리스트와, 오리진 환경의 SCG CON 애틀랜타 $10K·CCS $25K 초청 퀄리파이어 #1 상위 4덱이며, 메타는 각 대회에서 사용된 가장 최신 확장팩 기준으로 나눴습니다. 금지 카드는 공식 금지 목록(Standard)을 기준으로 표시합니다. <span class="build">빌드 2026-10-31 17:57 KST</span></p>
+  <p class="foot">카드 데이터: playriftbound.com 공식 카드 갤러리 (영문·한국어, <span id="fetched"></span> 기준, <span id="n-cards"></span>종). 한국어 이름은 공식 한국어판이 있는 오리진 세트만 <b>공식</b>이며, 이후 세트의 챔피언 이름은 리그 오브 레전드 한국어 표기를 따른 <b>추정</b>입니다. 한글명이 없는 카드는 상세 화면에서 내 번역을 직접 넣을 수 있고, 검색에도 반영됩니다. 갤러리에 없는 프로모·지역 한정 카드와 일부 토큰은 playriftbound.com 공식 뉴스에 공개된 카드 이미지를 기준으로 추가했습니다(상세 화면에 출처 표시). 카드 이미지 © Riot Games, 비영리 목적으로 허가를 받아 사용합니다. 메타 덱: playriftbound.com 공식 Organized Play 기사의 지역 예선(RQ) 덱리스트와, 오리진 환경의 SCG CON 애틀랜타 $10K·CCS $25K 초청 퀄리파이어 #1 상위 4덱이며, 메타는 각 대회에서 사용된 가장 최신 확장팩 기준으로 나눴습니다. 금지 카드는 공식 금지 목록(Standard)을 기준으로 표시합니다. <span class="build">빌드 2026-10-31 21:47 KST</span></p>
   <footer class="legal">
     <p>Copyright © 2026 riftlife.life</p>
     <p>RiftLife 는 Riot Games의 "Legal Jibber Jabber" 정책을 준수하여 만들었습니다. 모든 지적 재산권의 소유권은 Riot Games에 있으며 RiftLife는 그 어떤 수익 창출이나 영리 목적 활동을 하지 않습니다. 또한 Riot Games는 RiftLife를 제작하지 않았고 스폰서를 제공한 적이 없습니다. RiftLife는 개인 기록 보관 및 교육 목적만을 가지고 있는 완전 비영리 웹입니다.</p>
@@ -4411,10 +4411,77 @@ function listView(dk, om) {
 }
 // Deck "board": legend and champion over the battlefields on the left, the main deck as a centred card wall on the right,
 // runes and sideboard side by side under it. Used by the editor's full-art view and the read-only deck sheets.
-function deckBoardHTML(dk) {
-  const lg = BYID.get(dk.legend), ch = BYID.get(dk.champion);
+function boardParts(dk) {
   const byCost = rs => rs.sort((a, b) => (a[0].e ?? 99) - (b[0].e ?? 99) || TYPE_RANK(a[0]) - TYPE_RANK(b[0]) || dName(a[0]).localeCompare(dName(b[0]), 'ko'));
-  const main = byCost(rows(dk.main)), side = byCost(rows(dk.side)), runes = rows(dk.runes), bf = (dk.bf || []).map(id => BYID.get(id)).filter(Boolean);
+  return { lg: BYID.get(dk.legend), ch: BYID.get(dk.champion), main: byCost(rows(dk.main)), side: byCost(rows(dk.side)), runes: rows(dk.runes), bf: (dk.bf || []).map(id => BYID.get(id)).filter(Boolean) };
+}
+// The same board drawn onto a canvas from the full-size card sheets, saved as one PNG (about 2400px wide).
+async function boardPNG(dk, title, sub) {
+  const { lg, ch, main, side, runes, bf } = boardParts(dk);
+  const per = G.dn * G.dn, all = [lg, ch, ...bf, ...[...main, ...side, ...runes].map(r => r[0])].filter(Boolean);
+  await Promise.all([...new Set(all.map(c => Math.floor(c.ix / per)))].map(loadSheet));
+  await document.fonts.ready;
+  const PAD = 64, CW = 230, CH = Math.round(CW * 588 / 420), GAP = 18, COLS = 7, LW = CW * 2 + 20, RW = COLS * CW + (COLS - 1) * GAP, MID = 72;
+  const SW = Math.round(CW * .7), SH = Math.round(SW * 588 / 420), BW = Math.round(LW * .84), BH = Math.round(BW * 420 / 588), HEAD = 46, TOP = 150;
+  const mainRows = Math.ceil(main.length / COLS);
+  const rightH = HEAD + mainRows * CH + Math.max(0, mainRows - 1) * GAP + (runes.length || side.length ? 50 + HEAD + SH : 0);
+  const leftH = HEAD + CH + 40 + HEAD + bf.length * (BH + 20);
+  const W = PAD * 2 + LW + MID + RW, H = TOP + Math.max(leftH, rightH) + PAD;
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d');
+  const bg = g.createRadialGradient(W * .7, 0, 0, W * .7, 0, W * .9); bg.addColorStop(0, '#1B2A4A'); bg.addColorStop(.55, '#0E1626'); bg.addColorStop(1, '#0A101C');
+  g.fillStyle = bg; g.fillRect(0, 0, W, H);
+  const font = (w, px, fam = 'var') => `${w} ${px}px ${fam === 'mono' ? '"IBM Plex Mono",ui-monospace,monospace' : '"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif'}`;
+  g.textBaseline = 'alphabetic'; g.fillStyle = '#F2F4F5'; g.font = font(800, 54); g.fillText(title, PAD, 92);
+  g.fillStyle = '#9AA7B1'; g.font = font(500, 26); g.fillText(sub || '', PAD, 130);
+  g.textAlign = 'right'; g.fillStyle = '#E0A84A'; g.font = font(800, 30, 'mono'); g.fillText('RIFTLIFE', W - PAD, 92);
+  g.fillStyle = '#9AA7B1'; g.font = font(500, 22); g.fillText('riftlife.life', W - PAD, 126); g.textAlign = 'left';
+  const head = (t, x, y, w) => { g.fillStyle = '#E0A84A'; g.font = font(700, 26); g.fillText(t, x, y + 26); const tw = g.measureText(t).width + 16;
+    const lin = g.createLinearGradient(x + tw, 0, x + w, 0); lin.addColorStop(0, 'rgba(224,168,74,.45)'); lin.addColorStop(1, 'rgba(224,168,74,.06)'); g.fillStyle = lin; g.fillRect(x + tw, y + 17, Math.max(0, w - tw), 2); };
+  const rr = (x, y, w, h, r) => { g.beginPath(); g.roundRect(x, y, w, h, r); };
+  const draws = [];
+  const put = (c, x, y, w, h, n) => draws.push({ c, x, y, w, h, n });
+  // left column
+  let y = TOP; const L0 = PAD;
+  head('전설', L0, y, CW); head('챔피언', L0 + CW + 20, y, CW); y += HEAD;
+  if (lg) put(lg, L0, y, CW, CH); if (ch) put(ch, L0 + CW + 20, y, CW, CH); y += CH + 40;
+  head(`전장 // ${bf.length}장`, L0, y, LW); y += HEAD;
+  for (const c of bf) { put(c, L0 + (LW - BW) / 2, y, BW, BH); y += BH + 20; }
+  // right column
+  const R0 = PAD + LW + MID; y = TOP;
+  head(`주 덱 // ${sum(main)}장`, R0, y, RW); y += HEAD;
+  for (let r = 0; r < mainRows; r++) {
+    const rowCards = main.slice(r * COLS, r * COLS + COLS), rowW = rowCards.length * CW + (rowCards.length - 1) * GAP;
+    rowCards.forEach(([c, n], i) => put(c, R0 + (RW - rowW) / 2 + i * (CW + GAP), y, CW, CH, n)); y += CH + GAP;
+  }
+  if (runes.length || side.length) {
+    y += 50 - GAP;
+    const groups = [['룬', runes], ['보조 덱', side]].filter(([, rs]) => rs.length).map(([t, rs]) => ({ t, rs, w: rs.length * SW + (rs.length - 1) * 12 }));
+    const total = groups.reduce((a, gr) => a + gr.w, 0) + (groups.length - 1) * 60; let x = R0 + (RW - total) / 2;
+    for (const gr of groups) { head(`${gr.t} // ${sum(gr.rs)}장`, x, y, Math.max(gr.w, 200)); gr.rs.forEach(([c, n], i) => put(c, x + i * (SW + 12), y + HEAD, SW, SH, n)); x += gr.w + 60; }
+  }
+  for (const d of draws) {
+    const { c, x, y: yy, w, h, n } = d, k = c.ix % per, img = await loadSheet(Math.floor(c.ix / per)), [cw, chh] = c.wh, sx = (k % G.dn) * G.cw, sy = Math.floor(k / G.dn) * G.ch;
+    g.save(); g.shadowColor = 'rgba(0,0,0,.5)'; g.shadowBlur = 18; g.shadowOffsetY = 8; rr(x, yy, w, h, Math.min(w, h) * .05); g.fillStyle = '#15203A'; g.fill(); g.restore();
+    g.save(); rr(x, yy, w, h, Math.min(w, h) * .05); g.clip();
+    if (c.rot) { g.translate(x + w, yy); g.rotate(Math.PI / 2); g.drawImage(img, sx, sy, chh, cw, 0, 0, h, w); }   // stored rotated counter-clockwise; turn it back
+    else g.drawImage(img, sx, sy, cw, chh, x, yy, w, h);
+    g.restore();
+    if (n) { const fs = Math.round(w * .13), bx = x + w * .05, by = yy + h - w * .05 - fs * 1.45, bw = fs * 1.95, bh = fs * 1.45;
+      rr(bx, by, bw, bh, fs * .3); g.fillStyle = '#16264A'; g.fill(); g.lineWidth = Math.max(2, fs * .1); g.strokeStyle = '#8EA3CC'; g.stroke();
+      g.fillStyle = '#fff'; g.font = font(700, fs, 'mono'); g.textAlign = 'center'; g.fillText('×' + n, bx + bw / 2, by + bh * .74); g.textAlign = 'left'; }
+  }
+  return new Promise(res => cv.toBlob(res, 'image/png'));
+}
+async function saveBoardPNG(dk, title, sub) {
+  if (!USE_PACK) { toast('이미지 저장은 riftlife.life에서 쓸 수 있습니다.'); return; }
+  toast('덱 이미지를 만드는 중…');
+  // ASCII file name from the legend's English name: some browsers drop non-ASCII download names
+  const lg = BYID.get(dk.legend), slug = (lg ? enName(lg) : 'deck').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  try { const blob = await boardPNG(dk, title, sub); await offerFile(`riftlife-${slug}-${stamp()}.png`, blob, 'image/png'); }
+  catch (e) { toast('이미지를 만들지 못했습니다.'); }
+}
+function deckBoardHTML(dk) {
+  const { lg, ch, main, side, runes, bf } = boardParts(dk);
   if (!lg && !ch && !main.length && !bf.length) return '<p class="empty">아직 카드가 없습니다. 왼쪽에서 전설부터 고르세요.</p>';
   const art = c => c.rot && USE_PACK ? `<span class="bd-rot">${tileArt(c)}</span>` : tileArt(c);   // battlefields sit rotated in the sheets
   const card = (c, n, land) => `<button class="bd-card${land ? ' land' : ''}" type="button" data-act="card" data-cid="${c.id}" title="${esc(dName(c))}">${art(c)}${n ? `<span class="bd-n">×${n}</span>` : ''}</button>`;
@@ -5039,7 +5106,7 @@ function openDeckSheet({ dk, lg, champ, head, title, sub, note, link, linkText, 
     </header>
     <div><div class="ownbar" aria-hidden="true"><i style="width:${own.pct}%"></i></div>
     <p class="hint" style="margin:6px 0 0">내 컬렉션 기준 보유 ${own.have}/${own.total}장 (${own.pct}%) · 부족 ${own.miss}장. 사이드보드는 계산에서 뺐습니다.${note ? ' ' + esc(note) + '.' : ''}</p></div>
-    <div class="filters">${take ? '<button class="btn" type="button" id="ms-take">내 덱으로 가져오기</button>' : ''}${edit ? '<button class="btn" type="button" id="ms-edit">편집</button><button class="ghost" type="button" id="ms-mull">멀리건 테스트</button>' : ''}<button class="ghost" type="button" id="ms-copy">영문 덱리스트 복사</button><button class="ghost" type="button" id="ms-miss"${own.miss ? '' : ' disabled'}>부족 카드 복사</button></div>
+    <div class="filters">${take ? '<button class="btn" type="button" id="ms-take">내 덱으로 가져오기</button>' : ''}${edit ? '<button class="btn" type="button" id="ms-edit">편집</button><button class="ghost" type="button" id="ms-mull">멀리건 테스트</button>' : ''}<button class="ghost" type="button" id="ms-png">이미지로 저장</button><button class="ghost" type="button" id="ms-copy">영문 덱리스트 복사</button><button class="ghost" type="button" id="ms-miss"${own.miss ? '' : ' disabled'}>부족 카드 복사</button></div>
     <div id="ms-list">${deckBoardHTML(dk)}</div>
     ${link ? `<a class="artlink" href="${link}" target="_blank" rel="noopener">${esc(linkText)}</a>` : ''}`;
   $('sheet').hidden = false; $('scrim').hidden = false;
@@ -5047,6 +5114,7 @@ function openDeckSheet({ dk, lg, champ, head, title, sub, note, link, linkText, 
   if (take) $('ms-take').onclick = take;
   if (edit) { $('ms-edit').onclick = () => { closeDetail(); edit(); }; $('ms-mull').onclick = mullIt; }
   $('ms-copy').onclick = () => copyText(deckText(dk, 'en'), '영문 덱리스트');
+  $('ms-png').onclick = () => { const t = document.createElement('div'); t.innerHTML = head; saveBoardPNG(dk, title, [sub, t.textContent.trim()].filter(Boolean).join('  ·  ')); };
   $('ms-miss').onclick = () => copyText(missingText(dk), '부족 카드 목록');
   wireLazy($('sheet'));
   $('sheet').querySelectorAll('[data-cid],[data-act="card"]').forEach(el => el.onclick = () => openDetail(el.dataset.cid || el.closest('[data-id]').dataset.id));
