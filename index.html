@@ -764,6 +764,56 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
   .filters .spacer{display:none}
 }
 @media (prefers-reduced-motion:no-preference){.bar>i{transition:width .3s ease}}
+/* articles: list of analysis pieces, then a single-column reader (#articles/<id>) */
+.ar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(340px,100%),1fr));gap:22px;margin-top:6px}
+.ar-item{display:grid;grid-template-rows:auto 1fr;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:border-color .2s,box-shadow .2s,transform .2s}
+.ar-item:hover{border-color:var(--muted);box-shadow:0 14px 34px rgb(0 0 0 / .12);transform:translateY(-2px)}
+.ar-cover{position:relative;aspect-ratio:16/9;background:var(--sunk);overflow:hidden;margin:0}
+.ar-cover img{display:block;width:100%;height:100%;object-fit:cover}
+.ar-item .ar-cover img{transition:transform .5s ease}
+.ar-item:hover .ar-cover img{transform:scale(1.04)}
+.ar-item-body{display:grid;gap:8px;align-content:start;padding:16px 18px 18px}
+.ar-tags{display:flex;flex-wrap:wrap;gap:6px}
+.ar-tags span{font-size:11.5px;font-weight:600;color:var(--rift);background:var(--rift-soft);border-radius:999px;padding:1px 9px}
+.ar-item h2{margin:0;font-family:var(--f-display);font-size:22.5px;font-weight:700;letter-spacing:-.02em;line-height:1.25;word-break:keep-all}
+.ar-item p{margin:0;font-size:14.5px;line-height:1.6;color:var(--muted);word-break:keep-all}
+.ar-by{font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}
+.ar-by b{color:var(--ink);font-weight:600}
+.ar-by i{width:3px;height:3px;border-radius:50%;background:currentColor;opacity:.6}
+.ar-read{max-width:760px;margin:0 auto;padding-top:28px}
+.ar-back{display:inline-flex;gap:6px;align-items:center;font-size:13.5px;color:var(--muted);text-decoration:none;margin-bottom:22px}
+.ar-back:hover{color:var(--ink)}
+.ar-read h1{margin:10px 0 12px;font-family:var(--f-display);font-size:clamp(34px,5.6vw,56px);font-weight:700;letter-spacing:-.035em;line-height:1.08;word-break:keep-all}
+.ar-dek{margin:0 0 16px;font-size:clamp(17px,2.1vw,20.5px);line-height:1.55;color:var(--muted);font-weight:500;word-break:keep-all}
+.ar-read>.ar-by{padding-bottom:22px;border-bottom:1px solid var(--line);margin-bottom:26px;font-size:13px}
+.ar-read>.ar-cover{border-radius:14px;margin-bottom:8px}
+.ar-cap{display:block;font-size:12px;color:var(--muted);margin:8px 0 0;text-align:center}
+.ar-body{font-size:16.5px;line-height:1.85;word-break:keep-all;overflow-wrap:anywhere;margin-top:30px}
+.ar-body p{margin:0 0 1.15em}
+.ar-body h2{font-family:var(--f-display);font-size:24.5px;font-weight:700;letter-spacing:-.02em;line-height:1.3;margin:1.9em 0 .6em}
+.ar-body b{font-weight:700}
+.ar-note{margin:0 0 1.6em;padding:14px 16px;border-radius:10px;background:var(--accent-soft);font-size:14.5px;line-height:1.65}
+.ar-body blockquote{margin:1.6em 0;padding:4px 0 4px 20px;border-left:3px solid var(--accent);font-family:var(--f-display);font-size:20.5px;font-weight:600;line-height:1.5;letter-spacing:-.01em}
+.ar-cn{all:unset;cursor:pointer;color:var(--rift);font-weight:600;border-bottom:1px dashed color-mix(in srgb,var(--rift) 55%,transparent)}
+.ar-cn:hover{border-bottom-style:solid}
+.ar-cn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ar-fig{margin:1.6em 0 1.8em}
+.ar-fig figcaption{font-size:12.5px;line-height:1.5;color:var(--muted);margin-top:10px;text-align:center}
+.ar-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(130px,40%),1fr));gap:12px;justify-items:center}
+.ar-card{all:unset;cursor:pointer;display:block;width:100%;max-width:170px;aspect-ratio:420/588;border-radius:8px;overflow:hidden;background:var(--sunk);box-shadow:0 8px 22px rgb(0 0 0 / .2);transition:transform .2s}
+.ar-card:hover{transform:translateY(-4px)}
+.ar-card:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.ar-card .ti,.ar-card img{display:block;width:100%;height:100%;object-fit:contain;background-repeat:no-repeat}
+.ar-bars{display:grid;gap:8px;padding:16px 18px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.ar-bar{display:grid;grid-template-columns:52px minmax(0,1fr) 108px;gap:12px;align-items:center;font-size:13.5px;line-height:1.3}
+.ar-bar>span:first-child{font-weight:600}
+.ar-bar .tr{height:12px;border-radius:6px;background:var(--sunk);overflow:hidden}
+.ar-bar .tr i{display:block;height:100%;border-radius:6px;background:var(--c,var(--rift))}
+.ar-bar .v{font-family:var(--f-mono);font-size:12px;color:var(--muted);text-align:right;white-space:nowrap}
+.ar-end{margin-top:38px;padding-top:18px;border-top:1px solid var(--line)}
+@media (max-width:560px){.ar-bar{grid-template-columns:40px minmax(0,1fr) 86px;gap:8px}.ar-body{font-size:16px}}
+@media (prefers-reduced-motion:reduce){.ar-item,.ar-item .ar-cover img,.ar-card{transition:none}.ar-item:hover,.ar-item:hover .ar-cover img,.ar-card:hover{transform:none}}
+
 /* seoul board: Seoul store events from TCG Calendar, list + month calendar, store/notice side rail */
 #v-seoul{--sb-sun:var(--d-fury);--sb-sat:var(--d-mind);--sb-warn:#B7791F}
 #v-seoul .sb-c-special{--c:var(--d-chaos)}#v-seoul .sb-c-qualifier{--c:var(--d-fury)}#v-seoul .sb-c-nexus{--c:var(--d-calm)}
@@ -884,7 +934,8 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
   .sb-cell .sb-dots{display:flex}
   .sb-cal-head .month{font-size:18px;min-width:0}
 }
-@media (max-width:400px){.navlinks a{padding:6px 6px}.navlinks{gap:0}.brand{margin-right:2px}}
+@media (max-width:400px){.navlinks a{padding:6px 5px}.navlinks{gap:0}.brand{margin-right:2px}}
+@media (max-width:370px){.navlinks a{padding:6px 4px;font-size:13px}}
 @media (max-width:520px){
   .sb-row{grid-template-columns:50px minmax(0,1fr)}
   .sb-row .side{grid-column:2;flex-direction:row;align-items:center;flex-wrap:wrap}
@@ -912,6 +963,7 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
     <a id="tab-decks" href="#decks"><span class="long">덱 빌더</span><span class="short">덱</span></a>
     <a id="tab-kr" href="#kr"><span class="long">한국 환경 샘플 덱</span><span class="short">샘플</span></a>
     <a id="tab-meta" href="#meta"><span class="long">메타 덱</span><span class="short">메타</span></a>
+    <a id="tab-articles" href="#articles"><span class="long">아티클</span><span class="short">글</span></a>
     <a id="tab-seoul" href="#seoul"><span class="long">서울 보드 <span class="beta">beta</span></span><span class="short">서울</span></a>
   </div>
   <a class="nav-search" href="#collection" id="nav-search" aria-label="카드 검색"><svg viewBox="0 0 20 20" width="17" height="17" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m13 13 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></a>
@@ -1062,6 +1114,14 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
     <div class="meta-grid" id="kr-list"></div>
   </section>
 
+  <section id="v-articles" hidden>
+    <div id="ar-home">
+      <div class="page-head kr-head"><h1 class="page-title">아티클</h1><p class="page-lead">3~10분 안에 읽는 리프트바운드 분석글을 모아 둡니다.</p></div>
+      <div class="ar-grid" id="ar-list"></div>
+    </div>
+    <article class="ar-read" id="ar-read" hidden></article>
+  </section>
+
   <section id="v-seoul" hidden>
     <div class="page-head kr-head"><h1 class="page-title">서울 보드<span class="beta">beta</span></h1><p class="page-lead">서울 카드샵의 넥서스 나이트, 스토어 예선, 강습회 일정을 리스트와 달력으로 모아 봅니다.</p>
       <div class="sb-ctl">
@@ -1124,7 +1184,7 @@ body.drag-from-deck #ed-browser.drop-hover{box-shadow:0 0 0 2px var(--danger)}
     </div>
   </section>
 
-  <p class="foot">카드 데이터: playriftbound.com 공식 카드 갤러리 (영문·한국어, <span id="fetched"></span> 기준, <span id="n-cards"></span>종). 한국어 이름은 공식 한국어판이 있는 오리진 세트만 <b>공식</b>이며, 이후 세트의 챔피언 이름은 리그 오브 레전드 한국어 표기를 따른 <b>추정</b>입니다. 한글명이 없는 카드는 상세 화면에서 내 번역을 직접 넣을 수 있고, 검색에도 반영됩니다. 갤러리에 없는 프로모·지역 한정 카드와 일부 토큰은 playriftbound.com 공식 뉴스에 공개된 카드 이미지를 기준으로 추가했습니다(상세 화면에 출처 표시). 카드 이미지 © Riot Games, 비영리 목적으로 허가를 받아 사용합니다. 메타 덱: playriftbound.com 공식 Organized Play 기사의 지역 예선(RQ) 덱리스트와, 오리진 환경의 SCG CON 애틀랜타 $10K·CCS $25K 초청 퀄리파이어 #1 상위 4덱이며, 메타는 각 대회에서 사용된 가장 최신 확장팩 기준으로 나눴습니다. 금지 카드는 공식 금지 목록(Standard)을 기준으로 표시합니다. <span class="build">빌드 2026-11-02 18:41 KST</span></p>
+  <p class="foot">카드 데이터: playriftbound.com 공식 카드 갤러리 (영문·한국어, <span id="fetched"></span> 기준, <span id="n-cards"></span>종). 한국어 이름은 공식 한국어판이 있는 오리진 세트만 <b>공식</b>이며, 이후 세트의 챔피언 이름은 리그 오브 레전드 한국어 표기를 따른 <b>추정</b>입니다. 한글명이 없는 카드는 상세 화면에서 내 번역을 직접 넣을 수 있고, 검색에도 반영됩니다. 갤러리에 없는 프로모·지역 한정 카드와 일부 토큰은 playriftbound.com 공식 뉴스에 공개된 카드 이미지를 기준으로 추가했습니다(상세 화면에 출처 표시). 카드 이미지 © Riot Games, 비영리 목적으로 허가를 받아 사용합니다. 메타 덱: playriftbound.com 공식 Organized Play 기사의 지역 예선(RQ) 덱리스트와, 오리진 환경의 SCG CON 애틀랜타 $10K·CCS $25K 초청 퀄리파이어 #1 상위 4덱이며, 메타는 각 대회에서 사용된 가장 최신 확장팩 기준으로 나눴습니다. 금지 카드는 공식 금지 목록(Standard)을 기준으로 표시합니다. <span class="build">빌드 2026-11-03 16:59 KST</span></p>
   <footer class="legal">
     <p>Copyright © 2026 riftlife.life</p>
     <p>RiftLife 는 Riot Games의 "Legal Jibber Jabber" 정책을 준수하여 만들었습니다. 모든 지적 재산권의 소유권은 Riot Games에 있으며 RiftLife는 그 어떤 수익 창출이나 영리 목적 활동을 하지 않습니다. 또한 Riot Games는 RiftLife를 제작하지 않았고 스폰서를 제공한 적이 없습니다. RiftLife는 개인 기록 보관 및 교육 목적만을 가지고 있는 완전 비영리 웹입니다.</p>
@@ -4272,6 +4332,46 @@ return {
   }
  ]
 }</script>
+<script id="article-data" type="application/json">{
+ "note": "아티클 탭. 최신 글이 위로 오도록 date 내림차순으로 보여 줍니다. id는 주소(#articles/<id>)에 쓰이므로 영문 소문자·숫자·하이픈만. cover.card = 표지로 쓸 카드 id(카드 일러스트를 잘라 씀), cover.pos = 자를 위치(CSS object-position), cover.zoom = 확대 배율(카드 테두리를 잘라 냄, 기본 1.25). body 블록: h(소제목) p(문단) note(안내 상자) quote(인용) cards(카드 이미지 줄, ids·cap) bars(막대 그래프, rows=[이름, 값, 표시 문구, 영역], cap). 문단 안에서 **굵게**, [[카드 id]]는 카드 이름(마우스를 올리면 미리보기). 읽는 시간은 글자 수로 자동 계산.",
+ "articles": [
+  {
+   "id": "placeholder",
+   "title": "플레이스홀더",
+   "author": "에디터",
+   "date": "2026-11-03",
+   "tags": ["테스트", "한국 오리진", "덱 구성"],
+   "dek": "한국 오리진 샘플 덱 15개를 한 장씩 세어 보며 아티클 화면을 시험합니다. 룬 배분, 비용 곡선, 영역마다 따라오는 카드까지.",
+   "cover": { "card": "ogn-251-298", "pos": "75% 12%", "zoom": 1.5 },
+   "body": [
+    { "type": "note", "text": "**테스트용 글입니다.** 아티클 화면이 제대로 보이는지 확인하려고 올린 임시 글이며, 첫 정식 아티클이 올라오면 내릴 예정입니다. 본문 수치는 RIFTLIFE '한국 환경 샘플 덱' 탭의 한국 오리진 덱 15개(주 덱 40장, 선택 챔피언 포함)를 직접 센 것입니다." },
+    { "type": "h", "text": "15개 덱, 11가지 조합" },
+    { "type": "p", "text": "한국 오리진 샘플 덱 15개를 전설이 정하는 두 영역 조합으로 나누면 11가지가 나옵니다. 두 번씩 나온 조합은 신체·질서(가렌, 세트), 정신·질서(럭스, 빅토르), 평정·신체(리 신, 마스터 이), 분노·혼돈(애니, 징크스) 네 가지이고, 나머지 일곱 조합은 한 덱씩입니다." },
+    { "type": "p", "text": "영역 하나하나로 세면 **질서가 6개 덱**으로 가장 많고, 분노·평정·정신·신체가 5개씩, 혼돈이 4개입니다. 한 영역이 환경을 독점하기보다는 여섯 영역이 고르게 쓰이는 모습입니다." },
+    { "type": "bars", "cap": "영역별 덱 수 (덱 하나가 영역 두 개를 씁니다)", "rows": [["질서", 6, "6개", "order"], ["분노", 5, "5개", "fury"], ["평정", 5, "5개", "calm"], ["정신", 5, "5개", "mind"], ["신체", 5, "5개", "body"], ["혼돈", 4, "4개", "chaos"]] },
+    { "type": "h", "text": "룬은 6:6이 기본" },
+    { "type": "p", "text": "룬 12장의 배분은 생각보다 단순합니다. 15개 중 **9개 덱이 두 영역 룬을 6장씩** 똑같이 넣었고, 5개 덱이 7:5로 한쪽을 한 장 더 넣었습니다. 균형을 크게 깬 덱은 분노 룬 9장, 혼돈 룬 3장을 쓴 징크스 덱([[ogn-251-298]]) 하나뿐입니다." },
+    { "type": "bars", "cap": "룬 배분별 덱 수", "rows": [["6 : 6", 9, "9개", ""], ["7 : 5", 5, "5개", ""], ["9 : 3", 1, "1개", ""]] },
+    { "type": "p", "text": "흥미로운 점은 주 덱의 영역 비율과 룬 비율이 꼭 맞아떨어지지는 않는다는 것입니다. 야스오 덱은 평정 카드 31장, 혼돈 카드 9장인데도 룬은 6:6이고, 리 신 덱은 평정 카드가 29장인데 룬은 오히려 신체 쪽이 7장입니다. 반대로 징크스 덱은 주 덱 40장 중 분노 카드가 32장이라 룬도 분노 쪽으로 크게 기울였습니다. 카드 장수만 보고 룬 비율을 정하지는 않는다는 뜻입니다." },
+    { "type": "h", "text": "2코스트가 덱의 3분의 1" },
+    { "type": "p", "text": "주 덱 600장(15개 × 40장)을 에너지 비용으로 나누면 **2코스트가 189장, 31.5%**로 가장 많습니다. 0~3코스트를 모두 더하면 64.5%로, 덱의 3분의 2 가까이가 3코스트 이하입니다. 평균 비용은 약 3.3입니다." },
+    { "type": "bars", "cap": "에너지 비용별 장수 (15개 덱 합계 600장)", "rows": [["0", 12, "12장 · 2.0%", ""], ["1", 81, "81장 · 13.5%", ""], ["2", 189, "189장 · 31.5%", ""], ["3", 105, "105장 · 17.5%", ""], ["4", 78, "78장 · 13.0%", ""], ["5", 48, "48장 · 8.0%", ""], ["6", 25, "25장 · 4.2%", ""], ["7+", 62, "62장 · 10.3%", ""]] },
+    { "type": "p", "text": "한편 7코스트 이상 카드도 62장, 10.3%나 됩니다. 6코스트(4.2%)보다 많다는 점이 눈에 띕니다. [[ogn-161-298]], [[ogn-075-298]], [[ogn-116-298]]처럼 무거운 카드를 덱마다 몇 장씩 넣어 두는 구성이 흔합니다." },
+    { "type": "p", "text": "카드 유형으로는 유닛 330장(55.0%), 주문 230장(38.3%), 장비 40장(6.7%)입니다. 덱 하나로 치면 유닛 22장, 주문 15장 남짓, 장비 2~3장 정도가 평균입니다." },
+    { "type": "h", "text": "영역을 고르면 따라오는 카드" },
+    { "type": "p", "text": "여러 덱에 공통으로 들어간 카드를 세어 보면, 같은 영역을 쓰는 덱끼리 거의 같은 카드를 나눠 씁니다. 평정 영역을 쓰는 5개 덱(레오나, 리 신, 아리, 마스터 이, 야스오)은 **모두** [[ogn-045-298]]과 [[ogn-058-298]]을 3장씩, [[ogn-046-298]]를 2~3장 넣었습니다." },
+    { "type": "cards", "ids": ["ogn-045-298", "ogn-058-298", "ogn-046-298", "ogn-027-298"], "cap": "평정 5개 덱 전부에 들어간 반응 주문 세 장과, 분노 5개 덱 전부에 들어간 다리우스" },
+    { "type": "p", "text": "세 장 모두 상대 차례에도 쓸 수 있는 [반응] 주문입니다. 평정 덱은 전설이 누구든 상대 행동을 맞받아치는 카드를 기본으로 챙긴다고 볼 수 있습니다. 분노 영역을 쓰는 5개 덱(다리우스, 볼리베어, 애니, 카이사, 징크스)도 마찬가지로 **모두** [[ogn-027-298]]를 1~3장 넣었습니다. 한 턴에 두 번째 카드를 쓰면 위력이 오르고 준비 상태가 되는 유닛이라, 카드를 연달아 내는 분노 덱의 흐름과 잘 맞습니다." },
+    { "type": "quote", "text": "새 덱을 짤 때는 전설보다 영역부터 보세요. 같은 영역 덱들이 공통으로 쓰는 카드가 그 영역의 뼈대입니다." },
+    { "type": "h", "text": "전장은 자운 땅굴" },
+    { "type": "p", "text": "전장 중에서는 [[ogn-298-298]]이 6개 덱으로 가장 많이 쓰였고, [[ogn-291-298]](5개)와 트리파르 주둔지·폭풍의 인장·히라나 수도원·바람이 부는 언덕(각 4개)이 뒤를 잇습니다. 자운 땅굴은 정복하면 카드 1장을 버리고 1장을 뽑는 전장으로, 손패를 고르는 효과는 어느 영역에서나 쓸모가 있습니다." },
+    { "type": "h", "text": "마치며" },
+    { "type": "p", "text": "이 글은 아티클 화면을 시험하기 위한 플레이스홀더입니다. 앞으로 이 탭에는 3~10분 안에 읽을 수 있는 리프트바운드 분석글이 간간이 올라옵니다. 본문의 카드 이름에 마우스를 올리면 카드 미리보기가 뜨고, 카드 이미지를 누르면 상세 정보를 볼 수 있습니다." }
+   ]
+  }
+ ]
+}
+</script>
 <script>
 (() => {
 const RAW = JSON.parse(document.getElementById('card-data').textContent);
@@ -4618,11 +4718,14 @@ const decks = {
 };
 
 /* ---------- views ---------- */
-const VIEWS = ['home', 'collection', 'decks', 'meta', 'kr', 'seoul'];
+const VIEWS = ['home', 'collection', 'decks', 'meta', 'kr', 'articles', 'seoul'];
 let view = 'collection';
 function route() {
-  const h = location.hash.slice(1);
-  view = VIEWS.includes(h) ? h : 'home';
+  const h = decodeURIComponent(location.hash.slice(1)), [base, sub = ''] = h.split('/');
+  const prevAr = view === 'articles' ? arId : null;
+  view = VIEWS.includes(base) ? base : 'home';
+  arId = view === 'articles' ? sub : '';
+  if (view === 'articles' && prevAr !== null && prevAr !== arId) scrollTo(0, 0);   // opening or leaving an article starts at its top
   for (const v of VIEWS) { $('v-' + v).hidden = v !== view; $('tab-' + v).setAttribute('aria-current', v === view ? 'page' : 'false'); }
   if (view !== 'seoul' && window.seoulBoard) seoulBoard.hide();
   renderActive(); syncEditing();
@@ -4634,6 +4737,7 @@ function renderActive() {
   renderSummary();
   if (view === 'decks') { if (edId && decks.data[edId]) renderEditor(); else { if (edId) closeEditor(); renderDeckHome(); } }
   else if (view === 'kr') renderKr();
+  else if (view === 'articles') renderArticles();
   else renderMeta();
 }
 addEventListener('hashchange', route);
@@ -5640,7 +5744,7 @@ function showPreview(art) {
 }
 function onHoverPreview(ev) {
   if (!canHover.matches || (DRAG.st && DRAG.st.active)) return;
-  const art = ev.target.closest('#ws-body .dt-art, .bd-card[data-cid]');
+  const art = ev.target.closest('#ws-body .dt-art, .bd-card[data-cid], #v-articles [data-cid]');
   if (!art) { if (hpFor) hidePreview(); return; }
   if (hpFor === art) return;
   hidePreview(); hpFor = art;
@@ -5649,6 +5753,58 @@ function onHoverPreview(ev) {
 addEventListener('scroll', () => { if (hpFor) hidePreview(); }, { passive: true, capture: true });
 $('sheet').addEventListener('mouseover', onHoverPreview);   // deck boards in the deck sheet
 $('sheet').addEventListener('mouseleave', hidePreview);
+
+/* ---------- articles ---------- */
+const AR = JSON.parse($('article-data').textContent).articles.slice().sort((a, b) => b.date.localeCompare(a.date));
+let arId = '';
+const AR_DOM = { fury: 'var(--d-fury)', calm: 'var(--d-calm)', mind: 'var(--d-mind)', body: 'var(--d-body)', chaos: 'var(--d-chaos)', order: 'var(--d-order)' };
+const arDate = d => { const [y, m, dd] = d.split('-'); return `${y}년 ${+m}월 ${+dd}일`; };
+// reading time from the text a reader actually reads (about 500 Korean characters a minute), at least one minute
+const arMins = a => Math.max(1, Math.round(a.body.reduce((n, b) => n + (b.text || '').length + (b.cap || '').length, 0) / 500));
+const arBy = a => `<span class="ar-by"><b>${esc(a.author)}</b><i></i><span>${arDate(a.date)}</span><i></i><span>${arMins(a)}분 분량</span></span>`;
+const arTags = a => a.tags && a.tags.length ? `<div class="ar-tags">${a.tags.map(t => `<span>${esc(t)}</span>`).join('')}</div>` : '';
+function arCover(a, w) {
+  const c = a.cover && BYID.get(a.cover.card); if (!c) return '';
+  return `<figure class="ar-cover"><img src="${cdn(c, w)}" alt="${esc(koName(c))} 일러스트" loading="lazy" style="object-position:${esc(a.cover.pos || '50% 25%')};transform-origin:${esc(a.cover.pos || '50% 25%')};scale:${+a.cover.zoom || 1.25}"></figure>`;
+}
+function arInline(s) {
+  return esc(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/\[\[([a-z0-9-]+)\]\]/g, (m, id) => {
+    const c = BYID.get(id); return c ? `<button type="button" class="ar-cn" data-cid="${id}" data-ar-card="${id}">${esc(koName(c))}</button>` : '';
+  });
+}
+function arBlock(b) {
+  if (b.type === 'h') return `<h2>${esc(b.text)}</h2>`;
+  if (b.type === 'note') return `<aside class="ar-note">${arInline(b.text)}</aside>`;
+  if (b.type === 'quote') return `<blockquote>${arInline(b.text)}</blockquote>`;
+  const cap = b.cap ? `<figcaption>${arInline(b.cap)}</figcaption>` : '';
+  if (b.type === 'cards') return `<figure class="ar-fig"><div class="ar-cards">${b.ids.map(id => BYID.get(id)).filter(Boolean).map(c =>
+    `<button type="button" class="ar-card" data-cid="${c.id}" data-ar-card="${c.id}" aria-label="${esc(koName(c))} 상세 보기">${tileArt(c)}</button>`).join('')}</div>${cap}</figure>`;
+  if (b.type === 'bars') {
+    const max = Math.max(...b.rows.map(r => r[1])) || 1;
+    return `<figure class="ar-fig"><div class="ar-bars">${b.rows.map(([k, v, label, d]) =>
+      `<div class="ar-bar"><span>${esc(k)}</span><span class="tr"><i style="width:${(v / max * 100).toFixed(1)}%${AR_DOM[d] ? `;--c:${AR_DOM[d]}` : ''}"></i></span><span class="v">${esc(label || v)}</span></div>`).join('')}</div>${cap}</figure>`;
+  }
+  return `<p>${arInline(b.text || '')}</p>`;
+}
+function renderArticles() {
+  const a = arId && AR.find(x => x.id === arId);
+  $('ar-home').hidden = !!a; $('ar-read').hidden = !a;
+  if (!a) {
+    $('ar-list').innerHTML = AR.length ? AR.map(x => `<a class="ar-item" href="#articles/${encodeURIComponent(x.id)}">${arCover(x, 900)}
+      <div class="ar-item-body">${arTags(x)}<h2>${esc(x.title)}</h2>${x.dek ? `<p>${esc(x.dek)}</p>` : ''}${arBy(x)}</div></a>`).join('')
+      : '<p class="empty">아직 올라온 아티클이 없습니다.</p>';
+    return;
+  }
+  const c = a.cover && BYID.get(a.cover.card);
+  $('ar-read').innerHTML = `<a class="ar-back" href="#articles">← 아티클 목록</a>${arTags(a)}<h1>${esc(a.title)}</h1>${a.dek ? `<p class="ar-dek">${esc(a.dek)}</p>` : ''}${arBy(a)}
+    ${arCover(a, 1600)}${c ? `<span class="ar-cap">표지: ${esc(koName(c))} 일러스트 · ${esc(c.code)}</span>` : ''}
+    <div class="ar-body">${a.body.map(arBlock).join('')}</div>
+    <div class="ar-end">${arBy(a)}</div>`;
+  wireLazy($('ar-read'));
+}
+$('v-articles').addEventListener('click', ev => { const b = ev.target.closest('[data-ar-card]'); if (b) { hidePreview(); openDetail(b.dataset.arCard); } });
+$('v-articles').addEventListener('mouseover', onHoverPreview);
+$('v-articles').addEventListener('mouseleave', hidePreview);
 
 /* ---------- meta decks ---------- */
 const KR_META = 'OGN';   // the Korean release is still in the Origins environment
@@ -5767,7 +5923,6 @@ const ku = Object.assign({ sort: 'name', env: 'OGN' }, lsGet(KU_KEY) || {});
 if (!KR_ENVS.some(e => e.id === ku.env)) ku.env = 'OGN';
 if (ku.sort !== 'own') ku.sort = 'name';
 const saveKu = () => lsSet(KU_KEY, ku);
-const KR_SITE = 'https://riftlife.life/';   // deck images live at the repo root; absolute so the claude.ai copy links there too
 const krDeck = o => ({
   name: o.t, legend: o.L, champion: o.C, bf: [...o.b],
   main: Object.fromEntries(o.m), runes: Object.fromEntries(o.u), side: Object.fromEntries(o.s),
@@ -5812,7 +5967,7 @@ function openKrSheet(i) {
   openDeckSheet({ dk: krDeck(o), lg, champ: BYID.get(o.C),
     head: `${esc((KR_ENVS.find(e => e.id === (o.env || 'OGN')) || KR_ENVS[0]).ko)}${o.beta ? ' beta' : ''} · ${esc(krDoms(o))}`, title: o.t, sub: legendLabel(lg),
     note: o.beta ? '한국어판 스피릿포지드 출시 (12월 중반) 이후에 다시 업데이트 예정인 베타 덱입니다' : '',
-    link: o.img ? KR_SITE + encodeURIComponent(o.img) : '', linkText: '원본 덱 이미지 ↗', take: () => takeKr(i), back: () => openKrSheet(i) });
+    take: () => takeKr(i), back: () => openKrSheet(i) });
 }
 // Ban list sheet: Standard bans in effect today (the global list also applies to the Korean Standard format), newest first.
 const BAN_SRC = { '2026-03-31': 'https://playriftbound.com/en-us/news/announcements/announcing-riftbounds-first-bans/',

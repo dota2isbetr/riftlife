@@ -21,9 +21,10 @@ for d in _extra['decks']:
     _meta['decks'].append(d)
 meta = json.dumps(_meta, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
 kr = open(os.path.join(src, 'data', 'samples_kr.json'), encoding='utf-8').read().replace('</', '<\\/')
+articles = open(os.path.join(src, 'data', 'articles.json'), encoding='utf-8').read().replace('</', '<\\/')
 import datetime
 stamp = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).strftime('%Y-%m-%d %H:%M KST')
-page = t.replace('__DATA__', cards).replace('__META__', meta).replace('__KR__', kr).replace('__BUILD__', stamp)
+page = t.replace('__DATA__', cards).replace('__META__', meta).replace('__KR__', kr).replace('__ARTICLES__', articles).replace('__BUILD__', stamp)
 os.makedirs(os.path.join(src, 'build'), exist_ok=True)
 open(os.path.join(src, 'build', 'artifact.html'), 'w', encoding='utf-8').write(page)
 import re

@@ -11,6 +11,7 @@ https://riftlife.life 에 게시된 앱(`/index.html`, `/img/`)을 만드는 원
 | `data/cards.json` | 카드 1,408종 (영문·한글, 이미지 시트 위치 `ix`/`wh`/`rot` 포함) |
 | `data/meta.json` | 메타 덱: 대회, 덱리스트, 금지 목록 |
 | `data/samples_kr.json` | 한국 환경 샘플 덱 ("한국 환경 샘플 덱" 탭). 저장소 루트의 덱 이미지에서 옮겨 적음 |
+| `data/articles.json` | 아티클 ("아티클" 탭). 글 본문은 블록 배열로 적음 (형식은 파일 맨 위 `note`) |
 | `data/meta_extra.json` | 공식 기사 외 대회(SCG CON, CCS 등)의 상위 덱. 카드 id로 적고 `build_page.py`가 meta.json 뒤에 붙임 (build_meta.py를 다시 돌려도 유지됨) |
 | `data/decks_raw.json` | 대회 기사에서 파싱한 원본 덱 (meta.json의 입력) |
 | `scripts/` | 데이터 수집·가공 스크립트 (아래 순서) |
@@ -73,3 +74,7 @@ https://riftlife.life 에 게시된 앱(`/index.html`, `/img/`)을 만드는 원
 - 카드 데이터·이미지: playriftbound.com 공식 카드 갤러리 (영문·한국어). 프로모·지역 한정 카드와 일부 토큰(31종)은 playriftbound.com 공식 뉴스 공지의 카드 이미지 (카드별 출처는 extras.json의 `src`). 카드 이미지 © Riot Games, 비영리 목적으로 허가를 받아 사용.
 - 대회 덱: playriftbound.com Organized Play 지역 예선(RQ) Top Decks 기사
 - 덱 규칙: 공식 Deckbuilding Primer, 대회 규정 (2026년 7월 24일부터 사이드보드 10장 이하)
+
+## 아티클 올리기
+
+`data/articles.json`의 `articles`에 글을 하나 더 넣고 `build_page.py`를 실행합니다. `id`는 주소 `#articles/<id>`가 되므로 영문 소문자·숫자·하이픈만 씁니다. 표지는 `cover.card`에 카드 id를 적으면 그 카드 일러스트를 잘라 쓰고, `pos`·`zoom`으로 자를 위치와 배율을 정합니다. 본문 블록은 `h`(소제목) `p`(문단) `note`(안내 상자) `quote`(인용) `cards`(카드 이미지 줄) `bars`(막대 그래프)이고, 문단 안에서 `**굵게**`와 `[[카드 id]]`(카드 이름, 마우스를 올리면 미리보기)를 쓸 수 있습니다. 읽는 시간은 글자 수(분당 약 500자)로 자동 계산합니다.
